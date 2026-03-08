@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FixoFix | Admin Login Access</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --brand: #1d4ed8;
+      --brand-dark: #1e40af;
+      --slate-600: #475569;
+      --slate-900: #0f172a;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f1f5f9;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column; /* Allows Navbar to sit on top */
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
+    /* Navbar Styling */
+    .navbar-custom {
+      background: linear-gradient(100deg, var(--slate-900), var(--brand));
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 12px 0;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      z-index: 1000;
+    }
+    
+    .navbar-brand {
+      font-weight: 800;
+      color: white !important;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Main Container */
+    .login-container {
+      width: 100%;
+      max-width: 1000px;
+      height: 650px;
+      background: #fff;
+      display: flex;
+      border-radius: 40px;
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.1);
+      margin: 80px 20px 20px 20px; /* Top margin to clear fixed navbar */
+      position: relative;
+    }
+
+    /* Left Side: Branding */
+    .login-branding {
+      flex: 1;
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: white;
+      position: relative;
+    }
+
+    .login-branding::after {
+      content: '';
+      position: absolute;
+      bottom: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 100px;
+      transform: rotate(45deg);
+    }
+
+    .branding-text h2 {
+      font-weight: 800;
+      font-size: 2.5rem;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      letter-spacing: -1.5px;
+    }
+
+    /* Right Side: Form */
+    .login-form-area {
+      flex: 1;
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+
+    .form-header h3 {
+      font-weight: 800;
+      color: var(--slate-900);
+      letter-spacing: -1px;
+      margin-bottom: 10px;
+    }
+
+    .form-header p {
+      color: #64748b;
+      font-weight: 500;
+      margin-bottom: 40px;
+    }
+
+    /* Form Elements */
+    .input-group-custom { margin-bottom: 25px; }
+    
+    .form-label {
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--slate-600);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .form-control {
+      padding: 14px 20px;
+      border-radius: 15px;
+      border: 2px solid #f1f5f9;
+      font-weight: 600;
+    }
+
+    .form-control:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.08);
+    }
+
+    .password-wrapper { position: relative; }
+    
+    .toggle-icon {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--slate-600);
+    }
+
+    .btn-login-pro {
+      background: var(--brand);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 15px;
+      font-weight: 800;
+      width: 100%;
+      transition: 0.3s;
+      box-shadow: 0 10px 25px rgba(29, 78, 216, 0.2);
+    }
+
+    .btn-login-pro:hover {
+      background: var(--brand-dark);
+      transform: translateY(-3px);
+    }
+
+    @media (max-width: 900px) {
+      .login-branding { display: none; }
+      .login-container { max-width: 450px; height: auto; }
+      .login-form-area { padding: 40px 30px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+      <a class="navbar-brand" href="../customer/index.html">
+        <i class="fas fa-screwdriver-wrench"></i> FixoFix
+      </a>
+      <div class="ms-auto">
+        <a href="../customer/index.html" class="btn btn-sm btn-outline-light rounded-pill px-3">
+          <i class="fas fa-arrow-left me-1"></i> Public Site
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="login-container">
+    <div class="login-branding">
+      <div class="brand-logo">
+        <i class="fas fa-shield-check"></i>
+        <span>Secure Terminal</span>
+      </div>
+      
+      <div class="branding-text">
+        <h2>Control. Audit.<br>Verify. Grow.</h2>
+        <p class="opacity-75">The central command for India's premier home service ecosystem.</p>
+      </div>
+
+      <div class="branding-footer">
+        <p class="small fw-bold opacity-50 m-0">&copy; 2026 FixoFix Terminal</p>
+      </div>
+    </div>
+
+    <div class="login-form-area">
+      <div class="form-header">
+        <h3>System Login</h3>
+        <p>Enter your administrative credentials.</p>
+      </div>
+
+      <form id="adminLoginForm">
+        <div class="input-group-custom">
+          <label class="form-label">Admin Email</label>
+          <input type="email" id="adminEmail" class="form-control" placeholder="admin@fixofix.io" required>
+        </div>
+
+        <div class="input-group-custom">
+          <label class="form-label">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="adminPassword" class="form-control" placeholder="••••••••" required>
+            <span id="toggleAdminPassword" class="toggle-icon">
+              <i class="fas fa-eye"></i>
+            </span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-login-pro">
+          Access Dashboard <i class="fas fa-arrow-right ms-2"></i>
+        </button>
+      </form>
+
+      <div class="mt-5 text-center">
+        <small class="text-muted fw-bold">
+          <i class="fas fa-lock me-1 text-primary"></i> 
+          End-to-End Encrypted Session
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Password Visibility Toggle
+    document.getElementById('toggleAdminPassword').addEventListener('click', function() {
+      const pwd = document.getElementById('adminPassword');
+      const icon = this.querySelector('i');
+      if (pwd.type === 'password') {
+        pwd.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        pwd.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    });
+
+    // Handle Login API Call
+    document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('adminEmail').value.trim();
+      const password = document.getElementById('adminPassword').value.trim();
+
+      try {
+        const res = await fetch('http://localhost:3000/login-admin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          window.location.href = 'admin-dashboard.html';
+        } else {
+          alert(data.error || 'Login failed');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Server error. Try again later.');
+      }
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

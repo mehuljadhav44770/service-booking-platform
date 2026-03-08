@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FixoFix Pro | Partner Registration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Allura&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #0f172a 0%, #1e4ed8 100%);
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --accent-blue: #3b82f6;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Background Shapes */
+    .bg-shape { position: fixed; z-index: -1; filter: blur(80px); opacity: 0.3; }
+    .shape-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: #1e4ed8; border-radius: 50%; }
+    .shape-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #0f172a; border-radius: 50%; }
+
+    /* Navbar */
+    .navbar-custom {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      padding: 15px 0;
+      position: sticky;
+      top: 0; z-index: 1000;
+    }
+    .navbar-brand { font-weight: 800; font-size: 1.5rem; color: var(--text-dark); letter-spacing: -1px; }
+    .tagline { font-family: 'Allura', cursive; font-size: 24px; color: var(--accent-blue); margin-left: 15px; }
+
+    /* Layout */
+    .registration-wrapper { margin-top: 40px; margin-bottom: 40px; flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+    .elite-card { background: #ffffff; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); overflow: hidden; max-width: 1100px; width: 100%; display: flex; border: 1px solid rgba(255,255,255,0.5); }
+
+    .info-side { background: var(--primary-gradient); padding: 50px; width: 40%; color: white; display: flex; flex-direction: column; justify-content: center; }
+    .info-side h1 { font-weight: 800; font-size: 2.5rem; margin-bottom: 20px; }
+    
+    .form-side { padding: 50px; width: 60%; background: #fff; }
+    .form-side h2 { font-weight: 700; color: var(--text-dark); margin-bottom: 8px; font-size: 1.8rem; }
+
+    /* Inputs */
+    .form-label { font-weight: 600; font-size: 0.85rem; color: var(--text-dark); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .form-label i { color: var(--accent-blue); }
+    .form-control, .form-select { padding: 12px 16px; border-radius: 12px; border: 1.5px solid #e2e8f0; background: #f8fafc; transition: 0.3s; }
+    .form-control:focus, .form-select:focus { background: #fff; border-color: var(--accent-blue); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); outline: none; }
+
+    .password-group { position: relative; }
+    .toggle-eye { position: absolute; right: 15px; top: 42px; cursor: pointer; color: var(--text-muted); z-index: 10; }
+
+    .btn-submit { background: var(--primary-gradient); color: white; border: none; padding: 14px; font-weight: 700; border-radius: 12px; transition: 0.3s; margin-top: 10px; width: 100%; }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(15, 23, 42, 0.3); color: white; }
+
+    @media (max-width: 991px) { .info-side { display: none; } .form-side { width: 100%; padding: 35px; } .elite-card { max-width: 600px; margin: 0 15px; } }
+  </style>
+</head>
+<body>
+
+<div class="bg-shape shape-1"></div>
+<div class="bg-shape shape-2"></div>
+
+<nav class="navbar navbar-custom">
+  <div class="container">
+    <a class="navbar-brand" href="index.html"><i class="fas fa-screwdriver-wrench text-primary"></i> FixoFix.</a>
+    <span class="tagline d-none d-md-block">where care meets convenience</span>
+    <div class="ms-auto">
+      <a href="index.html" class="btn btn-link text-dark text-decoration-none fw-bold me-3"><i class="fas fa-chevron-left me-1"></i> Back</a>
+      <a href="#" class="btn btn-outline-dark rounded-pill px-4 fw-bold btn-sm" data-bs-toggle="modal" data-bs-target="#workerHelpModal">Help</a>
+    </div>
+  </div>
+</nav>
+
+<div class="registration-wrapper">
+  <div class="elite-card">
+    <div class="info-side">
+      <h1>Join the Fleet.</h1>
+      <p>Partner with FixoFix and get access to premium service requests. Grow your career with the city's top experts.</p>
+      <div class="mt-4">
+        <div class="d-flex align-items-center mb-3"><i class="fas fa-certificate me-3"></i> <span>Verified Expert Badge</span></div>
+        <div class="d-flex align-items-center mb-3"><i class="fas fa-wallet me-3"></i> <span>Direct Bank Payouts</span></div>
+        <div class="d-flex align-items-center"><i class="fas fa-shield-halved me-3"></i> <span>Professional Insurance</span></div>
+      </div>
+    </div>
+
+    <div class="form-side">
+      <h2>Partner Registration</h2>
+      <p class="text-muted small mb-4">Complete your professional onboarding below.</p>
+
+      <form id="workerForm">
+        <div class="row">
+          <div class="col-md-12 mb-3">
+            <label class="form-label"><i class="fas fa-user-tie"></i> Full Professional Name</label>
+            <input type="text" class="form-control" id="name" placeholder="e.g. Rahul Sharma" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label"><i class="fas fa-phone"></i> Contact Number</label>
+            <input type="tel" class="form-control" id="phone" placeholder="10-digit number" maxlength="10" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label"><i class="fas fa-tools"></i> Skill Category</label>
+            <select class="form-select" id="skill" required>
+                <option value="" disabled selected>Select Skill</option>
+                <option>Plumber</option>
+                <option>Electrician</option>
+                <option>Painter</option>
+                <option>AC Mechanic</option>
+                <option>Carpenter</option>
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label"><i class="fas fa-briefcase"></i> Years of Experience</label>
+            <input type="number" class="form-control" id="experience" placeholder="e.g. 5" min="0" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label"><i class="fas fa-map-marker-alt"></i> City / Area</label>
+            <input type="text" class="form-control" id="area" placeholder="Your service location" required />
+          </div>
+
+          <div class="col-md-12 mb-3">
+            <label class="form-label"><i class="fas fa-envelope"></i> Professional Email</label>
+            <input type="email" class="form-control" id="email" placeholder="name@pro.com" required />
+          </div>
+
+          <div class="col-md-12 mb-3 password-group">
+            <label class="form-label"><i class="fas fa-lock"></i> Create Password</label>
+            <input type="password" class="form-control" id="password" placeholder="Min. 6 characters" required />
+            <span id="togglePassword" class="toggle-eye"><i class="fas fa-eye"></i></span>
+          </div>
+
+          <div class="col-md-12 mb-3" id="aadhaarDiv" style="display:none;">
+            <label class="form-label"><i class="fas fa-id-card"></i> Aadhaar Number</label>
+            <input type="text" id="aadhaar" class="form-control" placeholder="12-digit Aadhaar" maxlength="12">
+          </div>
+        </div>
+
+        <div class="form-check mt-2">
+          <input class="form-check-input" type="checkbox" id="agreeTerms" required />
+          <label class="form-check-label small text-muted" for="agreeTerms">
+            I accept the <a href="../customer/terms.html" class="fw-bold text-primary">Professional Partner Agreement</a>
+          </label>
+        </div>
+
+        <div class="mt-4">
+          <button type="submit" class="btn btn-submit">
+            <i class="fas fa-user-check me-2"></i>Initialize Onboarding
+          </button>
+        </div>
+      </form>
+
+      <p class="login-link text-center mt-3">
+        Already have a partner account? <a href="worker-login.html" class="fw-bold text-primary text-decoration-none">Login</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="workerHelpModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow-lg">
+      <div class="modal-header bg-dark text-white rounded-top-4">
+        <h5 class="modal-title fw-bold"><i class="fas fa-circle-question me-2"></i>Partner Assistance</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <h6 class="fw-bold">Registration Guide</h6>
+        <ul class="small text-muted mt-3">
+          <li>Ensure Area matches your ID proof.</li>
+          <li>Skill selection is mandatory for job leads.</li>
+          <li>Accurate experience helps in verification.</li>
+        </ul>
+        <hr>
+        <p class="mb-0 small">Support: <a href="mailto:pro@fixofix.com">pro@fixofix.com</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/** * INTEGRATED LOGIC 
+ */
+
+// Toggle password visibility
+document.getElementById('togglePassword').addEventListener('click', function () {
+  const pwd = document.getElementById('password');
+  const icon = this.querySelector('i');
+  if (pwd.type === 'password') {
+    pwd.type = 'text';
+    icon.classList.replace('fa-eye','fa-eye-slash');
+  } else {
+    pwd.type = 'password';
+    icon.classList.replace('fa-eye-slash','fa-eye');
+  }
+});
+
+// Phone number: Only digits
+document.getElementById('phone').addEventListener('input', function() {
+  this.value = this.value.replace(/[^0-9]/g, '');
+});
+
+// Toast helper
+function showToast(msg, type = 'info'){
+  let c = document.getElementById('globalToast');
+  if(!c){ 
+    c = document.createElement('div'); 
+    c.id = 'globalToast'; 
+    c.style.position='fixed'; 
+    c.style.left='50%'; 
+    c.style.top='20px'; 
+    c.style.transform='translateX(-50%)'; 
+    c.style.zIndex='9999'; 
+    c.style.pointerEvents='none'; 
+    document.body.appendChild(c); 
+  }
+  c.innerHTML='';
+  const m = document.createElement('div'); 
+  m.textContent = msg; 
+  m.style.padding='14px 20px'; 
+  m.style.borderRadius='12px'; 
+  m.style.color='#fff'; 
+  m.style.boxShadow='0 10px 30px rgba(0,0,0,0.15)'; 
+  m.style.pointerEvents='auto'; 
+  m.style.minWidth='300px'; 
+  m.style.textAlign='center';
+  m.style.fontWeight='600';
+
+  if(type==='success') m.style.background='#10b981'; 
+  else if(type==='warning') m.style.background='#f59e0b'; 
+  else if(type==='danger') m.style.background='#ef4444'; 
+  else m.style.background='#3b82f6';
+
+  c.appendChild(m); 
+  clearTimeout(window._gt); 
+  window._gt=setTimeout(()=>c.remove(),4000);
+}
+
+// Form submission
+document.getElementById("workerForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  if (!document.getElementById("agreeTerms").checked) {
+    showToast("Please accept the Professional Partner Agreement.", 'warning');
+    return;
+  }
+
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const skill = document.getElementById("skill").value.trim();
+  const area = document.getElementById("area").value.trim();
+  const experience = document.getElementById("experience").value.trim();
+  const aadhaar = document.getElementById("aadhaar") ? document.getElementById("aadhaar").value.trim() : null;
+
+  // Validations
+  if (!/^[0-9]{10}$/.test(phone)) {
+    showToast("Please enter a valid 10-digit phone number.", 'warning');
+    return;
+  }
+
+  if (password.length < 6) {
+    showToast("Password must be at least 6 characters long.", 'warning');
+    return;
+  }
+
+  const skillToCategoryId = { Plumber: 1, Electrician: 2, Painter: 4, "AC Mechanic": 5, Carpenter: 6 };
+  const category_id = skillToCategoryId[skill];
+
+  try {
+    // Check if worker exists
+    const checkResponse = await fetch(`http://localhost:3000/check-worker?email=${email}`);
+    const checkResult = await checkResponse.json();
+
+    if (checkResult.exists) {
+      if (checkResult.is_verified) {
+        showToast("Account already exists. Redirecting to login...", 'info');
+        setTimeout(() => window.location.href = "worker-login.html", 2000);
+      } else {
+        document.getElementById("aadhaarDiv").style.display = "block";
+        showToast("Please provide Aadhaar number for verification.", 'warning');
+      }
+      return;
+    }
+
+    // First-time registration
+    const response = await fetch("http://localhost:3000/register-worker", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, phone, password, category_id, experience, location: area, aadhaar_number: aadhaar })
+    });
+
+    const result = await response.json();
+
+    if (response.ok && email) {
+
+  sessionStorage.setItem("workerEmail", email.trim());
+
+  console.log("Saved workerEmail:", email);
+
+  showToast("Registration successful! Redirecting to verification...", 'success');
+
+  setTimeout(() => {
+    window.location.href = "./worker-verification.html";
+  }, 1500);
+
+}
+ else {
+      showToast(result.error || "Onboarding failed. Please try again.", 'danger');
+    }
+  } catch (error) {
+    console.error("Exception:", error);
+    showToast("Server connection failed. Is the backend running?", 'danger');
+  }
+});
+</script>
+</body>
+</html>

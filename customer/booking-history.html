@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Booking History - FixoFix</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  
+  <!-- ✅ External CSS & Fonts -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+
+  <!-- ✅ Custom Styles -->
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ===== Navbar ===== */
+    .navbar-custom {
+  background: linear-gradient(135deg, #1a032e 0%, #481c55 100%);    
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-custom .nav-left a,
+    .navbar-custom .btn-outline-light {
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .navbar-custom .quickfix-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ===== Tabs ===== */
+    .tabs .nav-link {
+      font-weight: 500;
+      color: #495057;
+      border-radius: 0.5rem;
+    }
+
+    .tabs .nav-link.active {
+      color: #fff;
+      background: #0d6efd;
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 1.8rem;
+      color: #333;
+    }
+
+    /* ===== Booking Cards ===== */
+    .card-history {
+      border: none;
+      border-radius: 1rem;
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+      transition: transform 0.2s ease;
+    }
+
+    .card-history:hover {
+      transform: translateY(-4px);
+    }
+
+    .card-history .card-body {
+      padding: 1.5rem;
+    }
+
+    .booking-id {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+      color: #0d6efd;
+    }
+
+    .booking-info div {
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .cost {
+      font-weight: 600;
+      color: #198754;
+      margin-top: 0.5rem;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .status.completed {
+      background: #d1e7dd;
+      color: #0f5132;
+    }
+
+    .status.cancelled {
+      background: #f8d7da;
+      color: #842029;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar navbar-custom py-3">
+    <div class="container d-flex justify-content-between align-items-center">
+      <!-- Left -->
+      <div class="nav-left">
+        <a href="customer-home.html" class="text-white">
+          <i class="fas fa-chevron-left me-1"></i> Back
+        </a>
+      </div>
+
+      <!-- Center Brand -->
+      <div class="quickfix-brand text-center">FixoFix</div>
+
+      <!-- Right -->
+      <div>
+        <a href="customer-home.html" class="btn btn-outline-light btn-sm">
+          <i class="fas fa-plus-circle me-1"></i> Book Service
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="container py-5">
+    <h1 class="mb-4">Booking History</h1>
+
+    <!-- Tabs -->
+    <ul class="nav tabs mb-4">
+      
+      <li class="nav-item">
+        <a class="nav-link active" href="#">Booking History</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="customer-dashboard.html">Current Bookings</a>
+      </li>
+    </ul>
+    
+
+    <!-- Booking Card 1 -->
+    <div class="card card-history mb-4">
+      <div class="card-body">
+        <div class="booking-id">Booking ID: BK-101</div>
+        <div class="booking-info">
+          <div><strong>Service:</strong> AC Servicing</div>
+          <div><strong>Address:</strong> 12 Street, Pune</div>
+          <div><strong>Date:</strong> 10 July 2025</div>
+          <div><strong>Worker:</strong> Anil Sharma</div>
+        </div>
+        <div class="cost">Cost: ₹500</div>
+        <div class="status completed">Completed</div>
+      </div>
+    </div>
+
+    <!-- Booking Card 2 -->
+    <div class="card card-history mb-4">
+      <div class="card-body">
+        <div class="booking-id">Booking ID: BK-102</div>
+        <div class="booking-info">
+          <div><strong>Service:</strong> Plumbing</div>
+          <div><strong>Address:</strong> Shivaji Nagar, Mumbai</div>
+          <div><strong>Date:</strong> 1 July 2025</div>
+          <div><strong>Worker:</strong> Ravi Patel</div>
+        </div>
+        <div class="cost">Cost: ₹250</div>
+        <div class="status cancelled">Cancelled</div>
+      </div>
+    </div>
+
+    <!-- Booking Card 3 -->
+    <div class="card card-history mb-4">
+      <div class="card-body">
+        <div class="booking-id">Booking ID: BK-103</div>
+        <div class="booking-info">
+          <div><strong>Service:</strong> Electrical Repair</div>
+          <div><strong>Address:</strong> Model Colony, Pune</div>
+          <div><strong>Date:</strong> 25 June 2025</div>
+          <div><strong>Worker:</strong> Suraj Kulkarni</div>
+        </div>
+        <div class="cost">Cost: ₹400</div>
+        <div class="status completed">Completed</div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+  <script src=></script>
+
+</html>

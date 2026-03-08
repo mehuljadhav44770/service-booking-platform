@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Customer Dashboard - FixoFix</title>
+
+
+
+<!-- Bootstrap & FontAwesome -->
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+
+
+<style>
+
+  body {
+
+    font-family: 'Poppins', sans-serif;
+
+    background: linear-gradient(135deg, #f0f7ff, #e8f0ff);
+
+    color: #222;
+
+    margin: 0;
+
+    padding-bottom: 50px;
+
+  }
+
+
+
+  /* Navbar */
+
+  .navbar {
+
+    background: linear-gradient(135deg, #1a032e 0%, #481c55 100%);    
+
+    padding: 0.8rem 1.2rem;
+
+    height: 80px;
+
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+
+  }
+
+
+
+  .navbar-brand {
+
+    font-weight: 700;
+
+    color: white !important;
+
+    font-size: 1.45rem;
+
+    display: flex;
+
+    align-items: center;
+
+    letter-spacing: 0.5px;
+
+  }
+
+  .navbar-brand i { margin-right: 8px; }
+
+
+
+  /* Page Title */
+
+  h1.fw-bold {
+
+    font-size: 2rem;
+
+    background: linear-gradient(135deg, #1a032e 0%, #481c55 100%);
+
+    background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+
+  }
+
+
+
+  /* Card Styling */
+
+  .card {
+
+    border-radius: 20px;
+
+    background: #fff;
+
+    padding: 22px;
+
+    margin-bottom: 20px;
+
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  }
+
+  .card:hover {
+
+    transform: translateY(-5px);
+
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+
+  }
+
+
+
+  /* Status Badge */
+
+  .status-card {
+
+    text-align: center;
+
+    padding: 15px;
+
+    border-radius: 12px;
+
+    font-weight: 600;
+
+    font-size: 1.1rem;
+
+    transition: all 0.3s ease;
+
+  }
+
+  .status-pending { background: #fff0f6; color: #c81e65; }
+
+  .status-accepted { background: #ecfdf5; color: #047857; }
+
+
+
+  /* Detail Row */
+
+  .detail-row {
+
+    display: flex;
+
+    align-items: center;
+
+    margin-bottom: 12px;
+
+    padding: 10px 14px;
+
+    border-radius: 12px;
+
+    background: #f8fafc;
+
+    transition: background 0.3s;
+
+  }
+
+  .detail-row:hover {
+
+    background: #eef4ff;
+
+  }
+
+  .detail-row i {
+
+    font-size: 1.2rem;
+
+   color: linear-gradient(135deg, #1a032e 0%, #481c55 100%);    
+
+    margin-right: 12px;
+
+  }
+
+  .detail-label { font-weight: 600; margin-right: 5px; }
+
+
+
+  /* Worker Card */
+
+  .worker-card {
+
+    background: linear-gradient(180deg, #ffffff, #f9fbff);
+
+    border: none;
+
+  }
+
+  .worker-card .avatar {
+
+    width: 110px; height: 110px;
+
+    border-radius: 50%;
+
+    background: url('https://cdn-icons-png.flaticon.com/512/149/149071.png') center/cover no-repeat;
+
+    margin: 0 auto 15px;
+
+    border: 5px solid #fff;
+
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1), 0 0 10px rgba(13,110,253,0.3);
+
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+
+  }
+
+  .worker-card .avatar:hover {
+
+    transform: scale(1.08);
+
+    box-shadow: 0 8px 20px rgba(41, 8, 50, 0.5);
+
+  }
+
+  .worker-card h4 { font-size: 1.3rem; color: #210a2c; }
+
+  #worker-role { font-size: 0.9rem; letter-spacing: 0.3px; }
+
+  #worker-rating i { font-size: 1rem; }
+
+
+
+  .action-btn {
+
+    width: 100%;
+
+    margin-bottom: 12px;
+
+    border-radius: 12px;
+
+    transition: all 0.3s ease;
+
+  }
+
+  .action-btn:hover {
+
+    transform: translateY(-2px);
+
+  }
+
+
+
+  /* OTP Modal */
+
+  .modal-content { border-radius: 20px; }
+
+  .modal-header {
+
+    background: linear-gradient(90deg, #0d6efd, #2563eb);
+
+  }
+
+  .modal-body input {
+
+    border: 2px solid #e0e7ff;
+
+  }
+
+  .modal-body input:focus {
+
+    border-color: #e78bf3;
+
+    box-shadow: 0 0 6px rgba(13,110,253,0.3);
+
+  }
+
+
+
+  /* Responsive */
+
+  @media (max-width: 768px) {
+
+    .row { flex-direction: column; }
+
+  }
+
+</style>
+
+</head>
+
+<body>
+
+
+
+<!-- Navbar -->
+
+<nav class="navbar navbar-expand-lg">
+
+  <div class="container">
+
+    <a class="navbar-brand" href="#"><i class="fas fa-wrench"></i> FixoFix</a>
+
+    <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+
+      <span class="navbar-toggler-icon"></span>
+
+    </button>
+
+    <div class="collapse navbar-collapse" id="navMenu">
+
+      <ul class="navbar-nav ms-auto">
+
+        <li class="nav-item"><a class="nav-link active text-white" href="customer-home.html">Home</a></li>
+
+        <li class="nav-item"><a class="nav-link text-white" href="customer-profile.html">Profile</a></li>
+
+        <li class="nav-item"><a class="nav-link text-white" href="customer-payments.html">Payments</a></li>
+
+        <li class="nav-item"><a class="nav-link text-white" href="booking-history.html">Bookings</a></li>
+
+        <li class="nav-item"><a class="nav-link text-danger fw-bold" href="index.html">Logout</a></li>
+
+      </ul>
+
+    </div>
+
+  </div>
+
+</nav>
+
+
+
+<div class="container mt-4">
+
+  <h1 class="fw-bold">Welcome, <span id="customer-name">Loading...</span></h1>
+
+  <p class="text-muted">Here’s the status of your latest service request.</p>
+
+
+
+  <div class="row">
+
+    <!-- Booking Summary -->
+
+    <div class="col-lg-7">
+
+      <div class="card">
+
+        <h4 class="mb-3 text-primary"><i class="fas fa-clipboard-list me-2"></i>Booking Summary</h4>
+
+
+
+        <!-- Status Card -->
+
+        <div id="booking-status" class="status-card status-pending mb-3 shadow-sm">Pending</div>
+
+
+
+        <div class="detail-row"><i class="fas fa-hashtag"></i><span class="detail-label">Booking ID:</span> <span id="booking-id">Loading...</span></div>
+
+        <div class="detail-row"><i class="fas fa-tools"></i><span class="detail-label">Service:</span> <span id="service-request">Loading...</span></div>
+
+        <div class="detail-row"><i class="fas fa-map-marker-alt"></i><span class="detail-label">Address:</span> <span id="service-address">Loading...</span></div>
+
+        <div class="detail-row"><i class="fas fa-calendar-alt"></i><span class="detail-label">Date:</span> <span id="preferred-date">Loading...</span></div>
+
+        <div class="detail-row"><i class="fas fa-clock"></i><span class="detail-label">Time:</span> <span id="preferred-time">Loading...</span></div>
+
+        <button id="viewBillBtn" class="btn btn-warning mt-3" style="display:none;">
+
+  <i class="fas fa-file-invoice-dollar me-2"></i> View Bill
+
+</button>
+
+<button onclick="goForNegotiation()" class="btn btn-primary">
+
+  Go for Negotiation
+
+</button>
+
+
+
+      </div>
+
+    </div>
+
+
+
+    <!-- Worker Info -->
+
+    <div class="col-lg-5">
+
+      <div class="card worker-card text-center p-4">
+
+        <div class="avatar shadow-lg"></div>
+
+        <h4 id="worker-name" class="mb-1 fw-bold">Not Assigned</h4>
+
+        <p id="worker-role" class="text-muted small">Service Expert</p>
+
+        <p id="worker-phone" class="text-muted fw-semibold"></p>
+
+
+
+        <!-- Worker Rating (static example) -->
+
+        <div id="worker-rating" class="mb-3">
+
+          <i class="fas fa-star text-warning"></i>
+
+          <i class="fas fa-star text-warning"></i>
+
+          <i class="fas fa-star text-warning"></i>
+
+          <i class="fas fa-star text-warning"></i>
+
+          <i class="fas fa-star-half-alt text-warning"></i>
+
+          <span class="fw-semibold text-dark ms-1">4.5</span>
+
+        </div>
+
+
+
+        <!-- Contact Buttons -->
+
+        <div class="d-grid gap-2">
+
+          <button class="btn btn-primary action-btn btn-call shadow-sm" disabled>
+
+            <i class="fas fa-phone me-2"></i> Call Worker
+
+          </button>
+
+          <button class="btn btn-outline-primary action-btn btn-msg shadow-sm" disabled>
+
+            <i class="fas fa-comment-dots me-2"></i> Message Worker
+
+          </button>
+
+        </div>
+
+
+
+        <!-- Verify Button -->
+
+        <button id="verify-btn" class="btn btn-success btn-lg px-4 mt-3 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#otpModal" disabled>
+
+          <i class="fas fa-check-circle me-2"></i> Verify OTP
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- OTP Modal -->
+
+<div class="modal fade" id="otpModal" tabindex="-1" aria-hidden="true">
+
+  <div class="modal-dialog modal-dialog-centered">
+
+    <div class="modal-content rounded-4 shadow-lg border-0">
+
+      <div class="modal-header text-white">
+
+        <h5 class="modal-title"><i class="fas fa-key me-2"></i> OTP Verification</h5>
+
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
+      </div>
+
+      <div class="modal-body text-center">
+
+        <p class="text-muted">Enter the OTP shared by the worker to confirm arrival.</p>
+
+        <input type="text" id="customer-otp" class="form-control form-control-lg rounded-3 shadow-sm text-center mb-3"
+
+               placeholder="Enter 6-digit OTP" maxlength="6"
+
+               oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+
+        <div id="otp-status" class="mt-2 fw-semibold"></div>
+
+        <button class="btn btn-success rounded-pill px-4 mt-3" onclick="verifyOTP()">Verify OTP</button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- ✅ Service Charge Modal -->
+
+<div class="modal fade" id="chargeModal" tabindex="-1" aria-hidden="true">
+
+  <div class="modal-dialog modal-dialog-centered">
+
+    <div class="modal-content rounded-4 shadow-lg">
+
+
+
+      <div class="modal-header bg-primary text-white">
+
+        <h5 class="modal-title">
+
+          <i class="fas fa-file-invoice-rupee me-2"></i> Service Charge
+
+        </h5>
+
+      </div>
+
+
+
+      <div class="modal-body text-center">
+
+        <p class="fw-semibold mb-2">Worker has submitted the service charge</p>
+
+
+
+        <h2 class="fw-bold text-success mb-3">
+
+          ₹ <span id="chargeAmount">0</span>
+
+        </h2>
+
+
+
+        <p class="text-muted mb-1">
+
+          Service: <strong id="chargeService"></strong>
+
+        </p>
+
+        <p class="text-muted">
+
+          Worker: <strong id="chargeWorker"></strong>
+
+        </p>
+
+
+
+        <div class="d-grid gap-2 mt-4">
+
+          <button class="btn btn-success btn-lg" onclick="payOnline()">
+
+            <i class="fas fa-qrcode me-2"></i> Pay Online
+
+          </button>
+
+
+
+          <button class="btn btn-outline-primary btn-lg" onclick="confirmCashPayment()">
+
+            <i class="fas fa-money-bill-wave me-2"></i> Pay Cash
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ✅ Payment Success Modal -->
+
+<div class="modal fade" id="paymentSuccessModal" tabindex="-1" aria-hidden="true">
+
+  <div class="modal-dialog modal-dialog-centered">
+
+    <div class="modal-content text-center p-4 rounded-4 shadow-lg">
+
+
+
+      <i class="fas fa-circle-check text-success fa-4x mb-3"></i>
+
+      <h4 class="fw-bold text-success">Payment Successful</h4>
+
+      <p class="text-muted mb-3">
+
+        Your payment has been received successfully.
+
+      </p>
+
+
+
+      <button class="btn btn-primary rounded-pill px-4"
+
+              onclick="window.location.href='customer-home.html'">
+
+        Back to Home
+
+      </button>
+
+
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ================= NEGOTIATION MODAL ================= -->
+
+<div class="modal fade" id="negotiationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+    <div class="modal-content" style="border: none; border-radius: 28px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);">
+      
+      <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); padding: 40px 20px; text-align: center; color: white;">
+        <div style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; backdrop-filter: blur(10px);">
+          <i class="fas fa-handshake-simple" style="font-size: 1.5rem;"></i>
+        </div>
+        <h3 style="font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px;">Smart Negotiation</h3>
+        <p style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 20px;">Review offer and propose your terms</p>
+        
+        <div id="modalWorkerRange" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.3); padding: 8px 24px; border-radius: 100px; display: inline-block; font-weight: 700; font-size: 1.1rem; backdrop-filter: blur(12px);">
+          ₹500 - ₹700
+        </div>
+      </div>
+
+      <div class="modal-body" style="padding: 30px;">
+        
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #64748b; letter-spacing: 1px; margin-bottom: 10px;">
+            <i class="fas fa-tag me-1"></i> Your Counter Offer
+          </label>
+          <div style="display: flex; align-items: center; background: #f1f5f9; border: 2px solid #e2e8f0; border-radius: 16px; padding: 12px 18px; transition: 0.3s;" 
+               onfocusin="this.style.borderColor='#4f46e5'; this.style.backgroundColor='#fff';" 
+               onfocusout="this.style.borderColor='#e2e8f0'; this.style.backgroundColor='#f1f5f9';">
+            <span style="font-weight: 700; color: #4f46e5; margin-right: 10px;">₹</span>
+            <input type="number" id="modalCustomerCounter" placeholder="0.00" 
+                   style="border: none; background: transparent; outline: none; width: 100%; font-size: 1.2rem; font-weight: 600; color: #1e293b;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+          <label style="display: block; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #64748b; letter-spacing: 1px; margin-bottom: 10px;">
+            <i class="fas fa-comment-dots me-1"></i> Note to Worker
+          </label>
+          <div style="background: #f1f5f9; border: 2px solid #e2e8f0; border-radius: 16px; padding: 12px 18px;">
+            <textarea id="modalNegNotes" rows="2" placeholder="Explain your pricing (optional)..." 
+                      style="border: none; background: transparent; outline: none; width: 100%; font-size: 0.95rem; color: #1e293b; resize: none;"></textarea>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-6">
+            <button type="button" data-bs-dismiss="modal" 
+                    style="width: 100%; padding: 14px; border-radius: 14px; border: 1px solid #e2e8f0; background: white; color: #64748b; font-weight: 600; transition: 0.2s;"
+                    onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">
+              Cancel
+            </button>
+          </div>
+          <div class="col-6">
+            <button onclick="submitNegotiationCounter()" 
+                    style="width: 100%; padding: 14px; border-radius: 14px; border: none; background: #4f46e5; color: white; font-weight: 600; transition: 0.3s; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);"
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.background='#4338ca'" onmouseout="this.style.transform='translateY(0)'; this.style.background='#4f46e5'">
+              Send Offer
+            </button>
+          </div>
+          <div class="col-12">
+            <button onclick="acceptWorkerOffer()" 
+                    style="width: 100%; padding: 14px; border-radius: 14px; border: none; background: #10b981; color: white; font-weight: 600; margin-top: 10px; transition: 0.3s;"
+                    onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='none'">
+              <i class="fas fa-check-circle me-2"></i>Accept Range (₹500 - ₹700)
+            </button>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 25px; color: #94a3b8; font-size: 0.75rem;">
+          <i class="fas fa-lock me-1"></i> Payments are held securely by FixoFix
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+<!-- JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Your existing HTML head and styles remain unchanged -->
+
+<!-- Only the JS part is updated for booking-ID-based final bill -->
+
+<script>
+
+let currentConnectionId = null;
+
+let currentOtp = null;
+
+let chargeModalInstance = null;
+
+let latestBookingId = null;
+
+
+
+// ================= FETCH LATEST BOOKING =================
+
+async function fetchLatestBooking() {
+
+    try {
+
+        const res = await fetch('http://localhost:3000/latest-booking-with-worker', {
+
+            credentials: 'include'
+
+        });
+
+        const booking = await res.json();
+
+
+
+        if (!booking || !booking.booking_id) {
+
+            document.querySelector("#booking-id").textContent = "No booking found";
+
+            return;
+
+        }
+
+
+
+        latestBookingId = booking.booking_id;
+
+
+
+        // Display booking details
+
+        document.querySelector("#customer-name").textContent = booking.customer_name || "Customer";
+
+        document.querySelector("#booking-id").textContent = `BK-${booking.booking_id}`;
+
+        document.querySelector("#service-request").textContent = booking.service;
+
+        document.querySelector("#service-address").textContent = booking.address;
+
+        document.querySelector("#preferred-date").textContent = booking.preferred_date;
+
+        document.querySelector("#preferred-time").textContent = booking.preferred_time;
+
+
+
+        const statusEl = document.querySelector("#booking-status");
+
+
+
+        if (booking.booking_status === 'accepted') {
+
+            statusEl.textContent = "Accepted";
+
+            statusEl.className = "status-card status-accepted shadow-sm";
+
+
+
+            // Worker info
+
+            document.querySelector("#worker-name").textContent = booking.worker_name;
+
+            document.querySelector("#worker-phone").textContent = booking.worker_phone ? `📞 ${booking.worker_phone}` : "";
+
+
+
+            const callBtn = document.querySelector(".btn-call");
+
+            const msgBtn = document.querySelector(".btn-msg");
+
+            callBtn.disabled = false;
+
+            msgBtn.disabled = false;
+
+            document.querySelector("#verify-btn").disabled = false;
+
+
+
+            callBtn.onclick = () => { if (booking.worker_phone) window.location.href = `tel:${booking.worker_phone}`; };
+
+            msgBtn.onclick = () => {
+
+                if (booking.worker_phone) {
+
+                    const phone = booking.worker_phone.replace(/\D/g, '');
+
+                    window.open(`https://wa.me/${phone}`, "_blank");
+
+                }
+
+            };
+
+
+
+            currentOtp = booking.worker_otp;
+
+
+
+            // Show "View Bill" button if charge exists
+
+            const billBtn = document.getElementById("viewBillBtn");
+
+
+            billBtn.style.display = "block"; // show button
+
+            billBtn.onclick = () => fetchFinalBill(true); // true = show modal manually
+
+
+
+        } else {
+
+            statusEl.textContent = "Pending";
+
+            statusEl.className = "status-card status-pending shadow-sm";
+
+
+
+            document.querySelector("#worker-name").textContent = "Not Assigned";
+
+            document.querySelector("#worker-phone").textContent = "";
+
+            document.querySelector(".btn-call").disabled = true;
+
+            document.querySelector(".btn-msg").disabled = true;
+
+            document.querySelector("#verify-btn").disabled = true;
+
+
+
+            currentOtp = null;
+
+
+
+            // Hide "View Bill" button
+
+            const billBtn = document.getElementById("viewBillBtn");
+
+            billBtn.style.display = "none";
+
+        }
+
+
+
+    } catch (err) {
+
+        console.error("Error fetching latest booking:", err);
+
+    }
+
+}
+
+
+
+// ================= FETCH FINAL BILL =================
+
+async function fetchFinalBill(showModal = false) {
+
+    if (!latestBookingId) return;
+
+
+
+    try {
+
+        const billRes = await fetch(`http://localhost:3000/api/customer/final-bill/${latestBookingId}`, {
+
+            method: 'GET',
+
+            credentials: 'include'
+
+        });
+
+        const billData = await billRes.json();
+
+
+
+        if (billData.hasCharge && billData.bill) {
+
+            const bill = billData.bill;
+
+            currentConnectionId = bill.connection_id;
+
+
+
+            document.getElementById("chargeAmount").textContent = bill.service_charge || 0;
+
+            document.getElementById("chargeService").textContent = bill.service_name || "Unknown";
+
+            document.getElementById("chargeWorker").textContent = bill.worker_name || "Not Assigned";
+
+
+
+            // Only show modal if called manually and charge not paid
+
+            if (
+
+                showModal &&
+
+                bill.charge_status !== 'paid_online' &&
+
+                bill.charge_status !== 'paid_cash'
+
+            ) {
+
+                if (!chargeModalInstance) {
+
+                    chargeModalInstance = new bootstrap.Modal(document.getElementById("chargeModal"), {
+
+                        backdrop: 'static',
+
+                        keyboard: false
+
+                    });
+
+                }
+
+                chargeModalInstance.show();
+
+            }
+
+
+
+        } else {
+
+            // Hide button if no charge exists
+
+            const billBtn = document.getElementById("viewBillBtn");
+              console.log("View Bill clicked");
+
+
+            if (billBtn) billBtn.style.display = "none";
+
+        }
+
+
+
+    } catch (err) {
+
+        console.error("Error fetching final bill:", err);
+
+    }
+
+}
+
+
+
+// ================= PAYMENT =================
+
+async function submitPayment(method) {
+
+  if (!currentConnectionId) return alert("Invalid connection");
+
+  try {
+
+    const amount = document.getElementById("chargeAmount").textContent;
+
+    // Update connection (your existing API)
+    const res = await fetch('http://localhost:3000/api/submit-charge', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        connection_id: currentConnectionId,
+        amount,
+        payment_method: method
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+
+      // ✅ SAVE TO PAYMENTS TABLE
+      await savePaymentToDB(method);
+
+      if (chargeModalInstance) chargeModalInstance.hide();
+
+      // Show success modal
+      const successModal = new bootstrap.Modal(
+        document.getElementById('paymentSuccessModal')
+      );
+
+      successModal.show();
+
+    } else {
+
+      alert("Payment failed. Try again.");
+
+    }
+
+  } catch (err) {
+
+    console.error("Payment error:", err);
+    alert("Server error");
+
+  }
+
+}
+
+
+
+function payOnline() { submitPayment('online'); }
+
+function confirmCashPayment() { submitPayment('cash'); }
+
+
+
+// ================= OTP =================
+
+function verifyOTP() {
+
+    const enteredOtp = document.getElementById("customer-otp").value.trim();
+
+    const statusEl = document.getElementById("otp-status");
+
+
+
+    if (!enteredOtp) {
+
+        statusEl.innerHTML = '<span class="badge bg-warning text-dark p-2">⚠ Please enter OTP</span>';
+
+        return;
+
+    }
+
+
+
+    if (currentOtp && enteredOtp === currentOtp) {
+
+        statusEl.innerHTML = '<span class="badge bg-success p-2">✅ OTP Verified! Worker has arrived.</span>';
+
+        setTimeout(() => bootstrap.Modal.getInstance(document.getElementById("otpModal")).hide(), 2000);
+
+    } else {
+
+        statusEl.innerHTML = '<span class="badge bg-danger p-2">❌ Invalid OTP. Try again.</span>';
+
+    }
+
+}
+
+
+
+// ================= POLLING =================
+
+fetchLatestBooking();
+
+setInterval(fetchLatestBooking, 5000); // Booking info every 5s
+
+setInterval(fetchFinalBill, 7000);      // Update bill data every 7s (no modal)
+
+
+
+
+
+
+
+
+
+
+
+
+  // ================= NEGOTIATION LOGIC =================
+// ================= NEGOTIATION LOGIC =================
+
+let workerMin = 0;
+let workerMax = 0;
+
+// Open modal with range
+function openNegotiationRange(min, max) {
+  workerMin = min;
+  workerMax = max;
+
+  document.getElementById("modalWorkerRange").textContent =
+    `₹${min} - ₹${max}`;
+}
+
+async function submitNegotiationCounter() {
+  const counterInput = document.getElementById("modalCustomerCounter").value;
+  const counter = parseFloat(counterInput);
+  const notes = document.getElementById("modalNegNotes").value;
+
+  if (!latestBookingId) {
+    alert("No active booking found. Cannot send offer.");
+    return;
+  }
+
+  if (isNaN(counter) || counter <= 0) {
+    alert("Please enter a valid counter amount");
+    return;
+  }
+
+  try {
+    const res = await fetch('http://localhost:3000/api/customer/submit-counter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        booking_id: latestBookingId,
+        counter,
+        notes
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert(`Counter offer ₹${counter} sent!`);
+      bootstrap.Modal.getInstance(document.getElementById("negotiationModal")).hide();
+    } else {
+      alert(data.message || "Failed to send counter offer");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Server error while submitting counter offer");
+  }
+}
+
+
+// Accept worker range
+// Accept worker range and auto-generate bill (lowest price)
+async function acceptWorkerOffer() {
+
+  if (!latestBookingId) {
+    alert("No booking found");
+    return;
+  }
+
+  // Lowest value = final amount
+  const finalAmount = workerMin;
+
+  try {
+
+    const res = await fetch(
+      'http://localhost:3000/api/customer/accept-negotiation',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          booking_id: latestBookingId,
+          final_amount: finalAmount
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+
+      alert("Offer accepted. Final price ₹" + finalAmount);
+
+      // Reload bill immediately
+      fetchFinalBill(true);
+
+      // Close modal
+      setTimeout(() => {
+        const modal =
+          bootstrap.Modal.getInstance(
+            document.getElementById("negotiationModal")
+          );
+
+        if (modal) modal.hide();
+
+      }, 700);
+
+    } else {
+
+      alert(data.message || "Failed to accept offer");
+
+    }
+
+  } catch (err) {
+
+    console.error("Accept error:", err);
+    alert("Server error");
+
+  }
+}
+
+// Fetch latest negotiation and open modal
+async function goForNegotiation() {
+  if (!latestBookingId) return alert("No booking found");
+
+  try {
+    const res = await fetch(`http://localhost:3000/api/customer/latest-negotiation?booking_id=${latestBookingId}`, {
+      credentials: 'include'
+    });
+    const data = await res.json();
+
+    if (!data.exists) {
+      alert("No negotiation found yet for this booking.");
+      return;
+    }
+
+    const n = data.negotiation;
+
+    // Set worker range dynamically
+    workerMin = parseFloat(n.min_charge);
+    workerMax = parseFloat(n.max_charge);
+    document.getElementById("modalWorkerRange").textContent = `₹${workerMin} - ₹${workerMax}`;
+
+    // Set previous customer counter & notes if exists
+    document.getElementById("modalCustomerCounter").value = n.customer_counter || '';
+    document.getElementById("modalNegNotes").value = n.customer_notes || '';
+
+    // Update Accept Range button dynamically
+    const acceptBtn = document.querySelector("#negotiationModal .col-12 button");
+    acceptBtn.textContent = `Accept Range (₹${workerMin} - ₹${workerMax})`;
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('negotiationModal'));
+    modal.show();
+
+  } catch (err) {
+    console.error("Error fetching negotiation:", err);
+    alert("Failed to fetch negotiation data");
+  }
+}
+
+// ================= SAVE PAYMENT TO DB =================
+async function savePaymentToDB(method, transactionId = null) {
+
+  try {
+
+    const res = await fetch('http://localhost:3000/api/payment/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        booking_id: latestBookingId,
+        connection_id: currentConnectionId,
+        payment_mode: method,
+        transaction_id: transactionId
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      console.error("Payment saved failed:", data.message);
+    }
+
+  } catch (err) {
+    console.error("Save payment error:", err);
+  }
+
+}
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>

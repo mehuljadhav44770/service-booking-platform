@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Worker Wallet | FixoFix Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --brand-dark: #021428;
+      --brand-blue: #2563eb;
+      --success: #10b981;
+      --danger: #ef4444;
+      --bg: #f8fafc;
+      --text: #0f172a;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      padding-top: 100px;
+    }
+
+    /* 🔵 NAV BAR */
+    .navbar-custom {
+      background: linear-gradient(135deg, #021428, #08214f);
+      padding: 1.1rem 0;
+      position: fixed;
+      width: 100%; top: 0; z-index: 1000;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .brand-logo { font-weight: 800; font-size: 1.6rem; color: #fff !important; text-decoration: none; }
+    
+    .back-link { color: rgba(255,255,255,0.8); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+
+    /* 💎 BALANCE HERO */
+    .balance-hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border-radius: 40px; padding: 50px; color: white;
+      box-shadow: 0 30px 60px rgba(15, 23, 42, 0.2);
+      margin-bottom: 30px; position: relative;
+    }
+    .balance-hero .amount { font-size: 4rem; font-weight: 800; letter-spacing: -2px; }
+
+    /* 📊 BENTO STATS */
+    .stat-box {
+      background: white; border-radius: 30px; padding: 25px;
+      border: 1px solid #f1f5f9; box-shadow: 0 15px 35px rgba(0,0,0,0.03);
+      height: 100%; transition: 0.3s;
+    }
+    .stat-box:hover { transform: translateY(-5px); }
+    .stat-box span { color: #64748b; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; }
+    .stat-box h3 { font-weight: 800; margin-top: 10px; font-size: 1.6rem; }
+
+    /* ⚠️ PENALTY ALERT */
+    .penalty-alert {
+      background: #fff1f2; border: 2px solid #fecaca; border-radius: 25px;
+      padding: 20px 30px; color: #991b1b; margin-bottom: 30px;
+      display: none;
+    }
+
+    /* 📋 LEDGER TABLE */
+    .history-card { background: white; border-radius: 35px; padding: 35px; border: 1px solid #f1f5f9; margin-bottom: 30px; }
+    .table-luxe thead th { background: #f8fafc; padding: 15px; border: none; font-size: 0.7rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
+    .table-luxe tbody td { padding: 18px 15px; font-weight: 600; font-size: 0.9rem; }
+    
+    .status-pill { padding: 6px 14px; border-radius: 100px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
+    .pill-danger { background: #fee2e2; color: #b91c1c; }
+    .pill-success { background: #dcfce7; color: #15803d; }
+    .pill-info { background: #e0f2fe; color: #0369a1; }
+
+    /* 💸 BUTTONS */
+    .withdraw-btn-elite {
+      background: #fff; color: var(--brand-dark); border: none;
+      padding: 12px 28px; border-radius: 18px; font-weight: 800; transition: 0.3s;
+    }
+    .withdraw-btn-elite:hover:not(:disabled) { background: var(--brand-blue); color: #fff; }
+    .withdraw-btn-elite:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-pay-now { background: var(--brand-dark); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar-custom">
+  <div class="container d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-4">
+      <a href="worker-dashboard.html" class="back-link"><i class="fas fa-arrow-left"></i> Back</a>
+      <a class="brand-logo" href="#">FixoFix</a>
+    </div>
+    <button id="mainWithdrawBtn" class="withdraw-btn-elite" onclick="openWithdrawModal()">Withdraw Money</button>
+  </div>
+</nav>
+
+<div class="container">
+  <div id="penaltyBox" class="penalty-alert">
+    <div class="d-flex align-items-center gap-3">
+      <i class="fas fa-hand-holding-dollar fs-3"></i>
+      <div>
+        <h6 class="fw-800 mb-1">Overdue Commission Detected</h6>
+        <p class="small m-0 fw-600">Withdrawals locked. Please settle pending cash commissions to resume visibility.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="balance-hero">
+        <small>Total Wallet Balance</small>
+        <div class="amount" id="displayBalance">₹5,750</div>
+        <p class="mb-0 opacity-75 fw-600" id="statusText"><i class="fas fa-check-circle me-2"></i>Verified for Payout</p>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="row g-3 h-100">
+        <div class="col-6">
+            <div class="stat-box">
+                <span>Cash In Hand</span>
+                <h3 class="text-danger" id="displayCash">₹1,500</h3>
+                <small class="fw-bold text-muted" style="font-size: 10px;">COMMISSION DUE: ₹150</small>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="stat-box">
+                <span>Online Earnings</span>
+                <h3 class="text-primary">₹4,250</h3>
+                <small class="fw-bold text-muted" style="font-size: 10px;">NET AFTER 10% CUT</small>
+            </div>
+        </div>
+        <div class="col-6"><div class="stat-box"><span>Completed Jobs</span><h3>18</h3></div></div>
+        <div class="col-6"><div class="stat-box"><span>Withdrawals</span><h3>₹12.0K</h3></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="history-card mt-5">
+    <h5 class="fw-800 mb-4 text-danger"><i class="fas fa-wallet me-2"></i>Cash Recovery Ledger</h5>
+    <div class="table-responsive">
+      <table class="table table-luxe align-middle">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Service</th>
+            <th>Collected</th>
+            <th>Admin Cut (10%)</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="cashLedgerBody">
+          <tr>
+            <td>14 Feb 2026</td>
+            <td>Electrician Service</td>
+            <td>₹1,500</td>
+            <td>₹150</td>
+            <td><span class="status-pill pill-danger" id="jobStatus">Pending (>24h)</span></td>
+            <td><button class="btn-pay-now" id="payBtn" onclick="payCommission()">Pay ₹150</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="history-card mt-4 mb-5">
+    <h5 class="fw-800 mb-4 text-primary"><i class="fas fa-globe me-2"></i>Online Payment History</h5>
+    <div class="table-responsive">
+      <table class="table table-luxe align-middle">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Service</th>
+            <th>Total Paid</th>
+            <th>Your Share (90%)</th>
+            <th>Txn ID</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>13 Feb 2026</td>
+            <td>AC Repair</td>
+            <td>₹2,500</td>
+            <td class="text-success">₹2,250</td>
+            <td class="text-muted small">#FF_992144</td>
+            <td><span class="status-pill pill-success">Auto-Settled</span></td>
+          </tr>
+          <tr>
+            <td>12 Feb 2026</td>
+            <td>Cleaning Service</td>
+            <td>₹2,200</td>
+            <td class="text-success">₹1,980</td>
+            <td class="text-muted small">#FF_992130</td>
+            <td><span class="status-pill pill-success">Auto-Settled</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="withdrawModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-5 p-4">
+      <div class="text-center">
+        <h3 class="fw-800">Withdraw Funds</h3>
+        <p class="text-muted small mb-4">Transfer online earnings to bank</p>
+        <input type="number" class="form-control border-0 bg-light p-3 rounded-4 mb-3" placeholder="Enter Amount">
+        <button class="btn btn-primary w-100 p-3 rounded-4 fw-800" onclick="alert('Payout Initiated!')">Confirm Withdrawal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  let session = {
+    isPenalty: true,
+    commissionDue: 150,
+    balance: 5750
+  };
+
+  function initSystem() {
+    const penaltyBox = document.getElementById('penaltyBox');
+    const withdrawBtn = document.getElementById('mainWithdrawBtn');
+    const statusText = document.getElementById('statusText');
+
+    if (session.isPenalty) {
+      penaltyBox.style.display = 'block';
+      withdrawBtn.disabled = true;
+      statusText.innerHTML = '<i class="fas fa-lock text-danger me-2"></i>Withdrawals Locked';
+      statusText.classList.add('text-danger');
+    } else {
+      penaltyBox.style.display = 'none';
+      withdrawBtn.disabled = false;
+      statusText.innerHTML = '<i class="fas fa-check-circle text-success me-2"></i>Verified for Payout';
+      statusText.classList.remove('text-danger');
+    }
+  }
+
+  function payCommission() {
+    const btn = document.getElementById('payBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Settle...';
+    
+    setTimeout(() => {
+      session.isPenalty = false;
+      document.getElementById('displayCash').innerText = "₹0";
+      document.getElementById('jobStatus').className = "status-pill pill-success";
+      document.getElementById('jobStatus').innerText = "Settled";
+      btn.parentElement.innerHTML = '<i class="fas fa-check-circle text-success fs-5"></i>';
+      initSystem();
+      alert("Platform commission settled successfully!");
+    }, 1500);
+  }
+
+  function openWithdrawModal() {
+    if(!session.isPenalty) new bootstrap.Modal(document.getElementById('withdrawModal')).show();
+  }
+
+  window.onload = initSystem;
+</script>
+
+</body>
+</html>

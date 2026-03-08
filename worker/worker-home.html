@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FixoFix Worker Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ✅ External Styles & Fonts -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f8f9fa;
+      color: #333;
+    }
+
+    .navbar {
+    
+      background: linear-gradient(to bottom, #021428, #08214f);
+      padding: 1rem 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand,
+    .navbar-nav .nav-link {
+      color: #fff !important;
+      font-weight: 500;
+    }
+
+    
+
+    .nav-link:hover {
+      text-decoration: underline;
+    }
+
+    .online-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+      font-weight: 500;
+    }
+    
+
+    
+    .form-switch .form-check-input {
+      cursor: pointer;
+      width: 50px;
+      height: 25px;
+      background-color: rgb(179, 178, 180) ;
+    }
+
+    .status-online {
+      color: #2ecc71;
+      font-size: 23px;
+    }
+
+    .status-offline {
+      color: #e74c3c;
+      font-size: 23px;
+
+    }
+
+    .notification-btn {
+      color: #fff;
+      font-size: 1.4rem;
+      position: relative;
+      margin-right: 70px;
+      margin-left: 70px;
+
+      transition: transform 0.2s ease;
+    }
+
+    .notification-btn:hover {
+      transform: scale(1.15);
+    }
+
+    .notification-panel {
+      position: absolute;
+      top: 65px;
+      right: 20px;
+      width: 340px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      max-height: 400px;
+      display: none;
+      z-index: 999;
+      border: 1px solid #ddd;
+    }
+
+    .notification-item {
+      padding: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .notification-item h6 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .notification-item small {
+      color: #444;
+      display: block;
+      margin-top: 5px;
+    }
+
+    .notification-actions {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .notification-actions button {
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: 0.2s ease;
+    }
+
+    .accept-btn {
+      background-color: #27ae60;
+      color: #fff;
+    }
+
+    .accept-btn:hover {
+      background-color: #219150;
+    }
+
+    .reject-btn {
+      background-color: #e74c3c;
+      color: #fff;
+    }
+
+    .reject-btn:hover {
+      background-color: #c0392b;
+    }
+
+    .dashboard-header {
+      padding: 3rem 1rem 2rem;
+      background: white;
+      text-align: center;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .dashboard-header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(to bottom, #021428, #08214f);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: fadeInDown 1s ease-out;
+    }
+
+    .dashboard-header p {
+      color: #555;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .table {
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .table thead {
+      background-color: #0d1b2a;
+      color: white;
+    }
+
+    .table-hover tbody tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    h4 {
+      font-weight: 600;
+    }
+    
+
+    footer {
+      background: linear-gradient(to bottom, #021428, #08214f);
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      margin-top: 2rem;
+    }
+    .welcome sapn{
+      color: #00b5f7;
+    }
+    .profile{
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="helpModalLabel">
+          <i class="fas fa-question-circle me-2"></i>Need Help?
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Common Issues:</strong></p>
+        <ul>
+          <li>Make sure your email is valid and not already registered.</li>
+          <li>If you see "Email already exists", try <a href="customer-login.html">logging in</a>.</li>
+          <li>Forgot your password? <a href="#">Click here</a> to reset it.</li>
+        </ul>
+        <hr>
+        <p class="mb-1"><strong>Still need help?</strong></p>
+        <p><a href="mailto:support@fixofix.com">📧 Contact FixoFix Support</a></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- ✅ Navbar -->
+  <nav class="navbar navbar-expand-lg position-relative">
+    <div class="container-fluid">
+      <a class="navbar-brand text-info fs-3 fw-bold" href="#"><i class="fas fa-wrench me-1"></i>FixoFix</a>
+
+      <div class="d-flex align-items-center ms-auto gap-4 ">
+  <!-- ✅ Bell icon links directly to notifications page -->
+  <a href="worker-notification.html" class="notification-btn" aria-label="Notifications">
+    <i class="fas fa-bell"></i>
+  </a>
+
+  <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+    <span><i class="fas fa-bars"></i></span>
+  </button>
+</div>
+
+
+      <div class="collapse navbar-collapse justify-content-end mt-2 mt-lg-0" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="worker-dashboard.html">Dashboard</a></li>
+         
+<div class="dropdown ms-auto">
+    <button class="profile btn dropdown-toggle d-flex align-items-center" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fas fs-3 fa-user-circle me-2"></i> Profile
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+<li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"><i class="fas fa-user me-2"></i> My Profile</a></li>
+      
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="../customer/index.html" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+    </ul>
+  </div>
+        </ul>
+      </div>
+      <button class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#helpModal">
+  <i class="fas fa-question-circle"></i> Help
+</button>
+
+
+      
+    </div>
+  </nav>
+
+  <!-- ✅ Welcome Section -->
+
+<div class="container mt-4">
+  <div class=" ps-5 d-flex justify-content-between align-items-center">
+
+    <!-- Centered Heading -->
+    <div class="flex-grow-1 text-center">
+      <h1 class="pt-3 ps-5 fw-bold mb-3 welcome">Welcome to <sapn>FixoFix</sapn></h1>
+      <p class="ps-5 lead text-muted mb-0">Your trusted partner for on-demand services</p>
+    </div>
+
+    <!-- Online Toggle (Right) -->
+<div class="form-check form-switch ms-3">
+  <input class="form-check-input" type="checkbox" id="onlineSwitch" onclick="toggleAvailability()" />
+  <label class="pb-5 ps-2 form-check-label fw-bold" id="statusLabel" for="onlineSwitch">Offline</label>
+</div>
+
+
+  </div>
+</div>
+
+</div>
+
+
+ <!-- ✅ Incomplete Bookings -->
+<div class="container my-5">
+  <div class="p-4 bg-white shadow rounded-4">
+    <h5 class="mb-3 fw-semibold text-dark border-bottom pb-2">
+      <i class="fas fa-hourglass-half text-warning me-2"></i> Incomplete Booking Details
+    </h5>
+    <div class="table-responsive">
+      <table class="table table-hover table-bordered align-middle text-center mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Booking ID</th>
+            <th>Customer</th>
+            <th>Address</th>
+            <th>Service</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="pendingBookingsBody">
+          <!-- Dynamic Rows will be injected here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ✅ OTP Modal -->
+<div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title" id="otpModalLabel"><i class="fas fa-key me-2"></i>Generated OTP</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="fw-semibold text-muted mb-2">Share this OTP with the customer</p>
+        <h1 id="otpValue" class="fw-bold text-primary display-4"></h1>
+        <p class="text-muted">Booking ID: <span id="bookingIdValue" class="fw-semibold"></span></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ Negotiation Modal -->
+<div class="modal fade" id="negotiationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title"><i class="fas fa-handshake me-2"></i> Set Negotiation Range</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="negBookingId">
+        <input type="hidden" id="negConnectionId">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Minimum Amount (₹)</label>
+          <input type="number" id="negMinAmount" class="form-control" placeholder="Enter minimum">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Maximum Amount (₹)</label>
+          <input type="number" id="negMaxAmount" class="form-control" placeholder="Enter maximum">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-warning" onclick="submitNegotiationRange()">Set Range</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+ <!-- ✅ FOOTER -->
+<footer class="text-white pt-5 pb-4" style="background-color: #0d1b2a;">
+
+  <div class="container text-md-left">
+    <div class="row text-md-left">
+      
+      <!-- Company Info -->
+      <div class="col-md-4 col-lg-4 col-xl-4 mx-auto mt-3">
+        <h5 class="text-uppercase mb-4 font-weight-bold text-info">FixoFix</h5>
+        <p>
+          FixoFix connects verified workers with customers across India. We help you grow your service business with job tracking, profile management, and smart scheduling.
+        </p>
+      </div>
+
+     <!-- Contact Info -->
+<div class="col-md-4 col-lg-4 col-xl-4 mx-auto mt-3">
+  <h5 class="text-uppercase mb-4 font-weight-bold text-info">Contact</h5>
+  <p><i class="fas fa-envelope me-2"></i> support@fixofix.com</p>
+  <p>
+    <i class="fab fa-instagram me-2"></i> 
+    <a href="https://instagram.com/yourpage" target="_blank" class="text-white text-decoration-none">Follow us on Instagram</a>
+  </p>
+  <p><i class="fas fa-phone me-2"></i> +91 88888 88888</p>
+  
+
+</div>
+
+
+      <!-- Quick Links -->
+      <div class="col-md-4 col-lg-4 col-xl-4 mx-auto mt-3">
+        <h5 class="text-uppercase mb-4 font-weight-bold text-info">Quick Links</h5>
+        <p><a href="#" class="text-white text-decoration-none">Help Center</a></p>
+        <p><a href="#" class="text-white text-decoration-none">Privacy Policy</a></p>
+        <p><a href="#" class="text-white text-decoration-none">Terms of Service</a></p>
+        <p><a href="#" class="text-white text-decoration-none">Worker Login</a></p>
+      </div>
+
+    </div>
+
+    <!-- Divider -->
+    <hr class="my-4" style="border-top: 1px solid rgba(255,255,255,0.15);" />
+
+    <!-- Social + Copyright -->
+    <div class="row align-items-center text-center">
+      <div class="col-md-12">
+
+        <!-- Copyright -->
+        <p class="mb-0" style="color: #ccc;">&copy; 2025 <span class="text-info">FixoFix</span>. All rights reserved.</p>
+        
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+  <!-- ✅ Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const switchToggle = document.getElementById('onlineSwitch');
+    const statusLabelOld = document.getElementById('statusLabel');
+
+    function updateStatus() {
+      if (switchToggle.checked) {
+        statusLabelOld.textContent = 'Online';
+        statusLabelOld.classList.remove('status-offline');
+        statusLabelOld.classList.add('status-online');
+      } else {
+        statusLabelOld.textContent = 'Offline';
+        statusLabelOld.classList.remove('status-online');
+        statusLabelOld.classList.add('status-offline');
+      }
+    }
+
+    switchToggle.addEventListener('change', updateStatus);
+    updateStatus();
+
+   
+  </script>
+
+
+<!-- ✅ Profile Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded-4">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title" id="profileModalLabel"><i class="fas fa-user-edit me-2"></i>Edit Profile</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-4 pt-4 pb-2">
+        <div class="text-center mb-4 position-relative">
+  <img id="profilePreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" 
+       class="rounded-circle border" style="width: 100px; height: 100px; object-fit: cover;" 
+       alt="Profile Picture">
+  
+  <label for="profileImage" class="position-absolute rounded-circle bg-white shadow d-flex align-items-center justify-content-center"
+         style="width: 32px; height: 32px; bottom: 0; right: 38%; cursor: pointer;">
+    <i class="fas fa-pencil-alt text-dark"></i>
+  </label>
+
+  <input type="file" id="profileImage" accept="image/*" class="d-none">
+</div>
+
+        </div>
+
+       <form class="p-5" id="workerProfileForm">
+
+  <div class="mb-3">
+    <label class="form-label fw-semibold">Name</label>
+    <input type="text" name="name" class="form-control">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label fw-semibold">Phone Number</label>
+    <input type="text" name="phone" class="form-control">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label fw-semibold">Email</label>
+    <input type="email" name="email" class="form-control" readonly>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label fw-semibold">Address</label>
+    <input type="text" name="address" class="form-control">
+  </div>
+
+  <div class="mb-4">
+    <label class="form-label fw-semibold">Service</label>
+    <input type="text" name="service" class="form-control bg-light" readonly>
+  </div>
+
+</form>
+
+      </div>
+      <div class="modal-footer px-4 pb-4">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveWorkerProfile()">
+  Save Changes
+</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ Toast Notification -->
+<div id="toast" class="position-fixed bottom-0 start-50 translate-middle-x mb-4" style="z-index: 9999; display: none;">
+  <div class="toast align-items-center text-white bg-dark border-0 show" role="alert">
+    <div class="d-flex align-items-center px-3 py-2">
+      <div id="toastIcon" class="me-2 fs-5"><i class="fas fa-spinner fa-spin text-primary"></i></div>
+      <div id="toastMessage">Updating...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const modal = document.getElementById("profileModal");
+  const form = document.getElementById("workerProfileForm");
+
+  const profileImg = document.getElementById("profilePreview");
+  const fileInput = document.getElementById("profileImage");
+
+  let selectedImage = null;
+
+
+
+  /* ============================
+      Load Worker Profile
+  ============================ */
+
+  async function loadWorkerProfile() {
+
+    try {
+
+      const res = await fetch("http://localhost:3000/api/worker/profile", {
+        credentials: "include"
+      });
+
+      if (res.status === 401) {
+        alert("Session expired. Please login again.");
+        window.location.href = "worker-login.html";
+        return;
+      }
+
+      const data = await res.json();
+
+      // Fill form
+      form.name.value = data.name || "";
+      form.phone.value = data.phone || "";
+      form.email.value = data.email || "";
+      form.address.value = data.address || "";
+      form.service.value = data.service || "";
+
+      if (data.profile_image) {
+        profileImg.src = data.profile_image;
+      }
+
+    } catch (err) {
+      console.error("Load Profile Error:", err);
+    }
+  }
+
+
+
+  /* ============================
+      Image Preview
+  ============================ */
+
+  fileInput.addEventListener("change", function () {
+
+    const file = this.files[0];
+
+    if (!file) return;
+
+    selectedImage = file;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      profileImg.src = reader.result;
+    };
+
+    reader.readAsDataURL(file);
+  });
+
+
+
+  /* ============================
+      Save Worker Profile
+  ============================ */
+
+  window.saveWorkerProfile = async function () {
+
+    const formData = new FormData(form);
+
+    if (selectedImage) {
+      formData.append("profile_image", selectedImage);
+    }
+
+    try {
+
+      const res = await fetch("http://localhost:3000/api/worker/profile", {
+        method: "PUT",
+        body: formData,
+        credentials: "include"
+      });
+
+      if (res.status === 401) {
+        alert("Session expired. Please login again.");
+        window.location.href = "worker-login.html";
+        return;
+      }
+
+      const result = await res.json();
+
+      if (result.success) {
+
+        alert("Profile Updated Successfully ✅");
+
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        bsModal.hide();
+
+      } else {
+        alert("Update Failed ❌");
+      }
+
+    } catch (err) {
+      console.error("Save Error:", err);
+      alert("Server Error");
+    }
+  };
+
+
+
+  /* ============================
+      Load When Modal Opens
+  ============================ */
+
+  modal.addEventListener("show.bs.modal", loadWorkerProfile);
+
+});
+</script>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  const workerEmail = sessionStorage.getItem('workerEmail');
+  const workerId = sessionStorage.getItem('workerId');
+  const onlineSwitch = document.getElementById('onlineSwitch');
+  const statusLabel = document.getElementById('statusLabel');
+
+  if (!workerEmail || !workerId || !onlineSwitch || !statusLabel) return;
+
+  // 🔄 Load availability from DB
+  async function loadWorkerStatus() {
+    try {
+      const res = await fetch(`http://localhost:3000/worker/status?email=${encodeURIComponent(workerEmail)}`);
+      const data = await res.json();
+      if (data && data.worker && typeof data.worker.available === 'boolean') {
+        onlineSwitch.checked = data.worker.available;
+        statusLabel.innerText = data.worker.available ? 'Online' : 'Offline';
+        statusLabel.classList.remove('status-online', 'status-offline');
+        statusLabel.classList.add(data.worker.available ? 'status-online' : 'status-offline');
+      }
+    } catch (err) { console.error('Error fetching worker status:', err); }
+  }
+
+  // ✅ Toggle status manually
+  onlineSwitch.addEventListener('change', async () => {
+    const newStatus = onlineSwitch.checked;
+    try {
+      const res = await fetch('http://localhost:3000/worker/availability', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: workerEmail, available: newStatus })
+      });
+      const data = await res.json();
+      statusLabel.innerText = newStatus ? 'Online' : 'Offline';
+    } catch (err) { console.error('Error updating worker availability:', err); }
+  });
+
+  // 🔒 Logout
+  window.logoutWorker = function () {
+    fetch('http://localhost:3000/logout-worker', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: workerEmail })
+    })
+    .then(res => res.json())
+    .then(() => {
+      sessionStorage.clear();
+      window.location.href = '/worker-login.html';
+    })
+    .catch(err => console.error('Logout error:', err));
+  };
+
+  // ✅ Fetch pending bookings dynamically
+  async function fetchPendingBookings() {
+    try {
+      const res = await fetch(`http://localhost:3000/api/worker-pending-bookings/${workerId}`);
+      const data = await res.json();
+      const tbody = document.getElementById('pendingBookingsBody');
+      tbody.innerHTML = '';
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No pending bookings.</td></tr>`;
+        return;
+      }
+
+      data.forEach(item => {
+        const tr = document.createElement('tr');
+        let badgeClass = 'bg-warning text-dark';
+        if (item.status === 'accepted') badgeClass = 'bg-success text-white';
+        if (item.status === 'rejected') badgeClass = 'bg-danger text-white';
+
+        tr.innerHTML = `
+          <td>#${item.booking_id}</td>
+          <td>${item.customer_name}</td>
+          <td>${item.address || 'N/A'}</td>
+          <td>${item.service || 'N/A'}</td>
+          <td>${item.date || 'N/A'} ${item.time || ''}</td>
+          <td><span class="badge ${badgeClass}">${item.status.charAt(0).toUpperCase() + item.status.slice(1)}</span></td>
+<td>
+<div class="d-flex justify-content-center gap-2">
+  <button class="btn btn-success btn-sm" onclick="generateOTP('${item.booking_id}')">
+    <i class="fas fa-map-marker-alt me-1"></i> Reached
+  </button>
+
+  <button class="btn btn-warning btn-sm" onclick="openNegotiationModal('${item.booking_id}','${item.connection_id}')">
+    <i class="fas fa-handshake me-1"></i> Negotiate
+  </button>
+
+  <button class="btn btn-primary btn-sm" onclick="openChargeModal('${item.connection_id}')">
+    <i class="fas fa-rupee-sign me-1"></i> Charge
+  </button>
+
+  <button class="btn btn-info btn-sm" onclick="viewCounterOffer('${item.connection_id}')">
+    <i class="fas fa-comments me-1"></i> Counter Offer
+  </button>
+</div>
+
+
+</div>
+
+</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } catch (err) { console.error('Error fetching pending bookings:', err); }
+  }
+
+  loadWorkerStatus();
+  fetchPendingBookings();
+  
+});
+
+async function generateOTP(bookingId) {
+  const workerId = sessionStorage.getItem('workerId'); // ensure this exists
+  const otp = Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
+
+  try {
+    const res = await fetch('http://localhost:3000/api/save-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        booking_id: bookingId,
+        provider_id: workerId,
+        otp: otp
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      // Show OTP in modal
+      document.getElementById("otpValue").textContent = otp;
+      document.getElementById("bookingIdValue").textContent = bookingId;
+      const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
+      otpModal.show();
+    } else {
+      const toastEl = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMessage');
+      if (toastEl && toastMsg) { toastMsg.textContent = 'Failed to generate OTP'; toastEl.style.display = 'block'; setTimeout(()=>{ toastEl.style.display='none'; },2000);} 
+    }
+  } catch (err) {
+    console.error('Error saving OTP:', err);
+    const toastEl = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMessage');
+    if (toastEl && toastMsg) { toastMsg.textContent = 'Error generating OTP. Check console.'; toastEl.style.display = 'block'; setTimeout(()=>{ toastEl.style.display='none'; },2000);} 
+  }
+}
+
+
+</script>
+
+
+<!-- ✅ Charge Service Modal -->
+<div class="modal fade" id="chargeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-file-invoice-rupee me-2"></i> Enter Service Fee
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- 🔑 Hidden input for connection_id -->
+        <input type="hidden" id="chargeConnectionId">
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Service Amount (₹)</label>
+          <input type="number" id="serviceAmount" class="form-control" placeholder="Enter amount">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Notes (optional)</label>
+          <textarea id="serviceNote" class="form-control" rows="3" placeholder="Extra work / material cost"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" onclick="submitCharge()">
+          <i class="fas fa-check me-1"></i> Confirm Charge
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ✅ Counter Offer Modal (Static MVP) -->
+<!-- ✅ Counter Offer Modal -->
+<div class="modal fade" id="counterOfferModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title">
+          <i class="fas fa-handshake me-2"></i> Customer Counter Offer
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <p><strong>Your Range:</strong> ₹<span id="coMin">500</span> – ₹<span id="coMax">700</span></p>
+        <p><strong>Customer Offer:</strong> ₹<span id="coAmount">550</span></p>
+        <p class="text-muted"><strong>Note:</strong> <span id="coNote">Customer wants a fair price</span></p>
+      </div>
+
+      <div class="modal-footer d-flex justify-content-between">
+        <button class="btn btn-danger" data-bs-dismiss="modal">
+          Reject
+        </button>
+
+        <button class="btn btn-success" onclick="chargeFromCounterOffer()">
+  Charge
+</button>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* =======================
+   CHARGE MODAL
+======================= */
+function openChargeModal(connectionId) {
+  document.getElementById('chargeConnectionId').value = connectionId;
+  document.getElementById('serviceAmount').value = '';
+  document.getElementById('serviceNote').value = '';
+
+  const modal = new bootstrap.Modal(document.getElementById('chargeModal'));
+  modal.show();
+}
+
+async function submitCharge() {
+  const connectionId = document.getElementById('chargeConnectionId').value;
+  const amount = parseFloat(document.getElementById('serviceAmount').value);
+  const note = document.getElementById('serviceNote').value;
+
+  if (isNaN(amount) || amount <= 0) {
+    alert('Please enter a valid amount');
+    return;
+  }
+
+  try {
+    const res = await fetch('http://localhost:3000/api/submit-charge', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ connection_id: connectionId, amount, note })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert('Charge submitted successfully');
+      bootstrap.Modal
+        .getInstance(document.getElementById('chargeModal'))
+        .hide();
+
+      /* ✅ SAFE REFRESH */
+      if (typeof fetchPendingBookings === 'function') {
+        fetchPendingBookings();
+      }
+    } else {
+      alert('Failed to submit charge');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Server error while submitting charge');
+  }
+}
+
+/* =======================
+   NEGOTIATION MODAL
+======================= */
+function openNegotiationModal(bookingId, connectionId) {
+
+  document.getElementById('negBookingId').value = bookingId;
+  document.getElementById('negConnectionId').value = connectionId;
+
+  document.getElementById('negMinAmount').value = '';
+  document.getElementById('negMaxAmount').value = '';
+
+  const modal = new bootstrap.Modal(
+    document.getElementById('negotiationModal')
+  );
+
+  modal.show();
+}
+
+async function submitNegotiationRange() {
+
+  const bookingId = document.getElementById('negBookingId').value;
+  const connectionId = document.getElementById('negConnectionId').value;
+  const workerId = sessionStorage.getItem('workerId');
+
+  const minAmount = parseFloat(
+    document.getElementById('negMinAmount').value
+  );
+
+  const maxAmount = parseFloat(
+    document.getElementById('negMaxAmount').value
+  );
+
+  if (
+    !bookingId ||
+    !workerId ||
+    isNaN(minAmount) ||
+    isNaN(maxAmount) ||
+    minAmount <= 0 ||
+    maxAmount <= 0 ||
+    minAmount > maxAmount
+  ) {
+    alert('Enter valid negotiation details');
+    return;
+  }
+
+  try {
+    const res = await fetch('http://localhost:3000/api/submit-negotiation', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        booking_id: bookingId,
+        worker_id: workerId,
+        connection_id: connectionId,
+        min_charge: minAmount,
+        max_charge: maxAmount
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+
+      alert('Negotiation sent successfully');
+
+      bootstrap.Modal
+        .getInstance(document.getElementById('negotiationModal'))
+        .hide();
+
+    } else {
+      alert(data.message || 'Failed to submit');
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert('Server error');
+  }
+}
+
+/* =======================
+   COUNTER OFFER
+======================= */
+let activeCounterConnectionId = null;
+let activeCounterAmount = null;
+
+let counterOfferConnectionId = null;
+
+async function viewCounterOffer(connectionId) {
+
+  activeCounterConnectionId = connectionId; // save
+  try {
+
+    const res = await fetch(
+      `http://localhost:3000/api/worker/latest-counter?connection_id=${connectionId}`,
+      { credentials: 'include' }
+    );
+
+    const data = await res.json();
+
+    if (!data.exists) {
+      alert("No counter offer yet");
+      return;
+    }
+
+    // Save amount
+    activeCounterAmount = data.offer.customer_counter;
+
+    document.getElementById('coMin').textContent = data.offer.min_charge;
+    document.getElementById('coMax').textContent = data.offer.max_charge;
+    document.getElementById('coAmount').textContent = data.offer.customer_counter;
+    document.getElementById('coNote').textContent = data.offer.customer_notes || 'No notes';
+
+    new bootstrap.Modal(
+      document.getElementById('counterOfferModal')
+    ).show();
+
+  } catch (err) {
+    console.error(err);
+    alert("Failed to load counter");
+  }
+}
+
+function chargeFromCounterOffer() {
+
+  if (!activeCounterConnectionId || !activeCounterAmount) {
+    alert("Invalid counter data");
+    return;
+  }
+
+  // Fill charge modal automatically
+  document.getElementById('chargeConnectionId').value =
+    activeCounterConnectionId;
+
+  document.getElementById('serviceAmount').value =
+    activeCounterAmount;
+
+  document.getElementById('serviceNote').value =
+    'From customer counter offer';
+
+  // Close counter modal
+  bootstrap.Modal
+    .getInstance(document.getElementById('counterOfferModal'))
+    .hide();
+
+  // Open charge modal
+  const modal = new bootstrap.Modal(
+    document.getElementById('chargeModal')
+  );
+
+  modal.show();
+}
+
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

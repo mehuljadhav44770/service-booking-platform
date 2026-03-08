@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickFix Workflow</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 40px;
+    }
+
+    .flowchart {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .role {
+      flex: 1;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .role h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 10px;
+      border-radius: 8px;
+      color: white;
+    }
+
+    .customer h2 { background: #4a90e2; }
+    .admin h2 { background: #f39c12; }
+    .worker h2 { background: #2ecc71; }
+
+    .step {
+      background: #fafafa;
+      border-left: 5px solid #ccc;
+      margin: 12px 0;
+      padding: 12px 16px;
+      border-radius: 6px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .step:hover {
+      background: #eef3f9;
+      transform: translateX(3px);
+    }
+
+    .step::before {
+      content: "→";
+      position: absolute;
+      left: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+      font-size: 16px;
+    }
+
+    .database {
+      text-align: center;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .database h2 {
+      background: #9b59b6;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .database ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .database li {
+      background: #fafafa;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .database li:hover {
+      background: #eef3f9;
+      border-color: #bbb;
+    }
+  </style>
+</head>
+<body>
+  <h1>QuickFix Role-Based Workflow</h1>
+
+  <div class="flowchart">
+    <!-- Customer -->
+    <div class="role customer">
+      <h2>Customer</h2>
+      <div class="step">Register / Login</div>
+      <div class="step">Select Service</div>
+      <div class="step">Book Service (bookings table)</div>
+      <div class="step">Make Payment (payments table)</div>
+      <div class="step">Receive Confirmation</div>
+      <div class="step">Give Feedback (feedback table)</div>
+    </div>
+
+    <!-- Admin -->
+    <div class="role admin">
+      <h2>Admin</h2>
+      <div class="step">View Booking Requests</div>
+      <div class="step">Verify Payments</div>
+      <div class="step">Assign Worker (connections table)</div>
+      <div class="step">Re-Assign Worker if needed</div>
+      <div class="step">Monitor System</div>
+    </div>
+
+    <!-- Worker -->
+    <div class="role worker">
+      <h2>Worker</h2>
+      <div class="step">Register / Login</div>
+      <div class="step">Toggle Availability (workers table)</div>
+      <div class="step">Receive Assignment (connections table)</div>
+      <div class="step">Accept / Reject Task</div>
+      <div class="step">Complete Service</div>
+    </div>
+  </div>
+
+  <!-- Database -->
+  <div class="database">
+    <h2>Database Tables</h2>
+    <ul>
+      <li>customers</li>
+      <li>workers</li>
+      <li>services</li>
+      <li>bookings</li>
+      <li>payments</li>
+      <li>connections</li>
+      <li>feedback</li>
+    </ul>
+  </div>
+</body>
+</html>

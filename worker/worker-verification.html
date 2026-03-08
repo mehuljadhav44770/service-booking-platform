@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixoFix | Elite Partner Verification</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Match worker theme colors */
+            --primary: #084298;
+            --primary-dark: #084298;
+            /* keep existing brand tokens but map them to worker primary */
+            --brand: var(--primary);
+            --brand-dark: var(--primary-dark);
+            --brand-glow: rgba(8, 66, 152, 0.15);
+            --bg: #f8fafc;
+            --text: #0f172a;
+        }
+
+        body {
+            background-color: var(--bg);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Normal Standard Navbar */
+        .navbar {
+            background: var(--brand);
+            padding: 15px 5%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: grid;
+            grid-template-columns: 120px 1fr 120px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .navbar-brand { 
+            font-weight: 800; 
+            font-size: 26px; 
+            color: #ffffff !important; 
+            letter-spacing: -1.5px; 
+            text-align: center;
+            margin: 0;
+            text-decoration: none;
+        }
+
+        .btn-back {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+        .btn-back:hover { opacity: 0.8; }
+
+        /* Help Dropdown Styling */
+        .help-dropdown-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .dropdown-menu {
+            border: none;
+            border-radius: 20px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            margin-top: 10px;
+        }
+
+        .help-step-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .h-icon {
+            width: 26px; height: 26px; background: #eff6ff;
+            color: var(--brand); border-radius: 6px; font-weight: 800;
+            font-size: 12px; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .h-content h6 { font-size: 14px; font-weight: 700; margin-bottom: 2px; color: var(--text); }
+        .h-content p { font-size: 12px; color: var(--text-muted); margin: 0; }
+
+        /* Master Card Wrapper */
+        .master-wrapper {
+            max-width: 1100px;
+            margin: 50px auto;
+            background: #ffffff;
+            border-radius: 32px;
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            overflow: hidden;
+            box-shadow: 0 40px 80px rgba(15, 23, 42, 0.05);
+            border: 1px solid #f1f5f9;
+        }
+
+        /* Sidebar Branding */
+        .side-branding {
+            background: linear-gradient(160deg, var(--brand), var(--brand-dark));
+            padding: 60px 40px;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .side-branding h1 { font-weight: 800; font-size: 2.4rem; line-height: 1.1; }
+        
+        /* Privacy Box (4 points only) */
+        .privacy-box {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .privacy-title { font-weight: 800; font-size: 0.75rem; letter-spacing: 1px; color: #fbbf24; margin-bottom: 15px; display: block; }
+        .privacy-list { list-style: none; padding: 0; margin: 0; }
+        .privacy-list li { font-size: 0.85rem; margin-bottom: 12px; display: flex; gap: 12px; line-height: 1.4; opacity: 0.9; }
+        .privacy-list i { color: #34d399; margin-top: 3px; }
+
+        /* Right Action Panel */
+        .action-panel { padding: 60px 80px; display: flex; flex-direction: column; justify-content: center; }
+
+        .stepper-dots { display: flex; gap: 10px; margin-bottom: 40px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #e2e8f0; transition: 0.5s; }
+        .dot.active { background: var(--brand); width: 30px; border-radius: 10px; }
+
+        .input-premium {
+            width: 100%; padding: 18px 22px; border-radius: 16px; border: 2.5px solid #f1f5f9;
+            background: #f8fafc; font-size: 1.2rem; font-weight: 700; transition: 0.3s;
+        }
+        .input-premium:focus { border-color: var(--brand); background: #fff; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.05); outline: none; }
+
+        .btn-pro {
+            background: var(--brand); color: #fff; border: none; padding: 18px; border-radius: 16px;
+            width: 100%; font-weight: 800; font-size: 1.1rem; margin-top: 30px; transition: 0.3s ease;
+        }
+        .btn-pro:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(37, 99, 235, 0.2); }
+
+        .section { display: none; }
+        .section.active { display: block; animation: smoothSlide 0.5s ease-out; }
+
+        @keyframes smoothSlide { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 992px) {
+            .nav-container { grid-template-columns: 50px 1fr 50px; }
+            .master-wrapper { grid-template-columns: 1fr; margin: 15px; border-radius: 20px; }
+            .side-branding { display: none; }
+            .action-panel { padding: 40px 30px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="worker.html" class="btn-back">
+            <i class="fa-solid fa-arrow-left"></i> <span class="d-none d-md-inline">Back</span>
+        </a>
+        <a href="#" class="navbar-brand">FixoFix</a>
+        
+        <div class="dropdown text-end">
+            <button class="help-dropdown-btn dropdown-toggle border-0" data-bs-toggle="dropdown">
+                Help
+            </button>
+            <div class="dropdown-menu dropdown-menu-end">
+                <h6 class="fw-800 mb-3" style="color: var(--brand); font-size: 15px;">How to Verify?</h6>
+                <div class="help-step-item">
+                    <div class="h-icon">01</div>
+                    <div class="h-content"><h6>Aadhaar</h6><p>Enter 12-digit number.</p></div>
+                </div>
+                <div class="help-step-item">
+                    <div class="h-icon">02</div>
+                    <div class="h-content"><h6>OTP</h6><p>Verify mobile code.</p></div>
+                </div>
+                <div class="help-step-item">
+                    <div class="h-icon">03</div>
+                    <div class="h-content"><h6>Upload</h6><p>Photo of original ID.</p></div>
+                </div>
+                <div class="help-step-item mb-0">
+                    <div class="h-icon">04</div>
+                    <div class="h-content"><h6>Approval</h6><p>Wait for 24h review.</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="master-wrapper">
+    <div class="side-branding">
+        <div>
+            <div class="mb-4"><i class="fa-solid fa-user-check fa-3x"></i></div>
+            <h1>Identity<br>Verification</h1>
+            <p class="mt-3 opacity-75">Join our verified network to start receiving service requests.</p>
+        </div>
+        
+        <div class="privacy-box">
+            <span class="privacy-title">DATA PRIVACY & SECURITY</span>
+            <ul class="privacy-list">
+                <li><i class="fa-solid fa-lock"></i> <span>Data protected with 256-bit military-grade encryption.</span></li>
+                <li><i class="fa-solid fa-shield-halved"></i> <span>Aadhaar used strictly for validation only.</span></li>
+                <li><i class="fa-solid fa-eye-slash"></i> <span>Documents are never shared with third-party apps.</span></li>
+                <li><i class="fa-solid fa-user-shield"></i> <span>Fully compliant with UIDAI data standards.</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="action-panel">
+        <div class="stepper-dots">
+            <div class="dot active" id="d1"></div>
+            <div class="dot" id="d2"></div>
+            <div class="dot" id="d3"></div>
+            <div class="dot" id="d4"></div>
+        </div>
+
+      <div class="section active" id="section1">
+
+    <h2 class="fw-800 mb-2">Aadhaar Number</h2>
+    <p class="text-muted mb-4 fw-600">Enter your 12-digit Aadhaar.</p>
+
+    <input type="text" id="aadhaar-input" class="input-premium mb-3" placeholder="0000 0000 0000" maxlength="14">
+
+    <button class="btn-pro w-100 mb-4" onclick="nextStep(2)">
+        Proceed to OTP
+    </button>
+
+    <hr class="my-4">
+
+    <h2 class="fw-800 mb-2">Email Verification</h2>
+    <p class="text-muted mb-4 fw-600">Verify your email before continuing.</p>
+
+    <!-- Email -->
+    <input type="email" id="email-input" class="input-premium mb-3" placeholder="Enter your email">
+
+    <!-- Send OTP -->
+    <button class="btn btn-outline-primary w-100" onclick="sendEmailOtp()">
+        Send OTP
+    </button>
+
+</div>
+
+
+
+        <div class="section" id="section2">
+            <h2 class="fw-800 mb-2">Verify OTP</h2>
+            <p class="text-muted mb-5 fw-600">Enter the code sent to your mobile.</p>
+           <div class="d-flex gap-2 mb-4">
+<input type="tel" inputmode="numeric" pattern="[0-9]*" class="input-premium text-center p-0" style="width:50px;height:55px;" maxlength="1">
+<input type="tel" inputmode="numeric" pattern="[0-9]*" class="input-premium text-center p-0" style="width:50px;height:55px;" maxlength="1">
+<input type="tel" inputmode="numeric" pattern="[0-9]*" class="input-premium text-center p-0" style="width:50px;height:55px;" maxlength="1">
+<input type="tel" inputmode="numeric" pattern="[0-9]*" class="input-premium text-center p-0" style="width:50px;height:55px;" maxlength="1">
+<input type="tel" inputmode="numeric" pattern="[0-9]*" class="input-premium text-center p-0" style="width:50px;height:55px;" maxlength="1">
+<input type="tel" inputmode="numeric" pattern="[0-9]*" class="input-premium text-center p-0" style="width:50px;height:55px;" maxlength="1">
+</div>
+
+<button class="btn-pro" onclick="verifyEmailOtp()">Confirm OTP</button>
+        </div>
+
+       <div class="section" id="section3">
+
+    <h2 class="fw-800 mb-2">Upload Documents</h2>
+    <p class="text-muted mb-4 fw-600">Upload Aadhaar & Driving Licence.</p>
+
+    <!-- Aadhaar Upload -->
+    <div class="p-4 text-center border rounded-4 mb-4"
+         style="background:#f8fafc;border:2px dashed #cbd5e1;cursor:pointer"
+         onclick="document.getElementById('aadhaarFile').click()">
+
+        <i class="fa-solid fa-id-card fa-2x mb-2 text-primary"></i>
+        <h6 class="fw-bold">Upload Aadhaar</h6>
+
+        <input type="file" id="aadhaarFile" hidden accept="image/*,.pdf">
+    </div>
+
+    <!-- License Upload -->
+    <div class="p-4 text-center border rounded-4"
+         style="background:#f8fafc;border:2px dashed #cbd5e1;cursor:pointer"
+         onclick="document.getElementById('licenseFile').click()">
+
+        <i class="fa-solid fa-car fa-2x mb-2 text-primary"></i>
+        <h6 class="fw-bold">Upload Driving Licence</h6>
+
+        <input type="file" id="licenseFile" hidden accept="image/*,.pdf">
+    </div>
+
+    <button class="btn-pro" onclick="nextStep(4)">Submit Documents</button>
+
+</div>
+
+
+        <div class="section text-center" id="section4">
+            <i class="fa-solid fa-circle-check fa-5x text-success mb-4" style="filter: drop-shadow(0 10px 20px rgba(16,185,129,0.3))"></i>
+            <h2 class="fw-800">Verification Sent</h2>
+            <p class="text-muted fw-600">We are reviewing your documents. You will be notified shortly.</p>
+            <a href="worker-home.html" class="btn-pro d-block text-decoration-none">Return Home</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+        // Toast helper (centered)
+        function showToast(msg, type='info'){
+            let c = document.getElementById('globalToast');
+            if(!c){
+                c = document.createElement('div');
+                c.id = 'globalToast';
+                c.style.position = 'fixed';
+                c.style.left = '50%';
+                c.style.top = '50%';
+                c.style.transform = 'translate(-50%, -50%)';
+                c.style.zIndex = '99999';
+                c.style.pointerEvents = 'none';
+                document.body.appendChild(c);
+            }
+            c.innerHTML = '';
+            const m = document.createElement('div');
+            m.textContent = msg;
+            m.style.padding = '14px 20px';
+            m.style.borderRadius = '8px';
+            m.style.color = '#fff';
+            m.style.boxShadow = '0 6px 18px rgba(0,0,0,0.12)';
+            m.style.pointerEvents = 'auto';
+            m.style.minWidth = '260px';
+            m.style.textAlign = 'center';
+            if(type==='success') m.style.background='#198754'; else if(type==='warning') m.style.background='#ffc107'; else if(type==='danger') m.style.background='#dc3545'; else m.style.background='#0d6efd';
+            c.appendChild(m);
+            clearTimeout(window._gtoast);
+            window._gtoast = setTimeout(()=>c.remove(),3000);
+        }
+    // Aadhaar number formatting
+    const aInp = document.getElementById('aadhaar-input');
+    aInp.addEventListener('input', function (e) {
+        let v = e.target.value.replace(/\D/g, ''); 
+        if (v.length > 12) v = v.slice(0, 12);
+        let m = v.match(/.{1,4}/g);
+        e.target.value = m ? m.join(' ') : v;
+    });
+
+    // Step navigation
+    function nextStep(step){
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById('section' + step).classList.add('active');
+
+        document.querySelectorAll('.dot').forEach((dot, idx) => {
+            if (idx + 1 === step) dot.classList.add('active');
+            else dot.classList.remove('active');
+        });
+
+        if(step === 4) submitAadhaar();
+    }
+
+    // OTP auto-focus
+   const otps = document.querySelectorAll('#section2 input');
+
+otps.forEach((o, i) => {
+
+    o.addEventListener('input', (e) => {
+
+        // Allow numbers only
+        e.target.value = e.target.value.replace(/[^0-9]/g,'');
+
+        if (e.target.value.length === 1 && i < otps.length - 1) {
+            otps[i+1].focus();
+        }
+
+    });
+
+    o.addEventListener('keydown', (e) => {
+
+        if (e.key === "Backspace" && i > 0 && o.value === "") {
+            otps[i-1].focus();
+        }
+
+    });
+
+});
+
+
+    // Submit Aadhaar verification
+    async function submitAadhaar(){
+        const aadhaar = document.getElementById('aadhaar-input').value.replace(/\s/g, '').trim();
+        const otpInputs = document.querySelectorAll('#section2 input');
+        let otp = '';
+        otpInputs.forEach(input => otp += input.value);
+
+        if(!/^\d{12}$/.test(aadhaar)){
+            showToast("Invalid Aadhaar number", 'warning');
+            nextStep(1); 
+            return;
+        }
+        if(!/^\d{6}$/.test(otp)){
+            showToast("Invalid OTP", 'warning');
+            nextStep(2); 
+            return;
+        }
+
+        try{
+            const email = sessionStorage.getItem('workerEmail');
+            const res = await fetch('http://localhost:3000/verify-aadhaar',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({
+                    email,
+                    aadhaar_number: aadhaar,
+                    is_verified: true
+                })
+            });
+
+            const data = await res.json();
+            if(!res.ok) throw new Error(data.error);
+            showToast("Aadhaar submitted successfully", 'success');
+        }catch(err){
+            showToast("Server error: " + err.message, 'danger');
+        }
+    }
+
+    // ================= EMAIL OTP ===================
+// ================= EMAIL OTP ===================
+
+// Check email when page loads
+document.addEventListener("DOMContentLoaded", () => {
+
+    const email = sessionStorage.getItem("workerEmail");
+
+    console.log("Verification page email:", email);
+
+    if (!email || email === "null" || email === "undefined") {
+
+        showToast("Session expired. Please register again.", "danger");
+
+        setTimeout(() => {
+            window.location.href = "worker.html";
+        }, 1500);
+
+    }
+});
+
+
+// Send OTP
+async function sendEmailOtp() {
+
+    const email = sessionStorage.getItem("workerEmail");
+
+    console.log("Sending OTP for:", email);
+
+    // Strong validation
+    if (!email || typeof email !== "string" || !email.trim()) {
+
+        showToast("Email missing. Please re-register.", "danger");
+
+        setTimeout(() => {
+            window.location.href = "worker-register.html";
+        }, 1500);
+
+        return;
+    }
+
+    try {
+
+        const res = await fetch("http://localhost:3000/send-email-otp", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: email.trim()
+            })
+        });
+
+        const data = await res.json();
+
+        console.log("OTP Send Response:", data);
+
+        if (!res.ok) {
+            showToast(data.error || "Failed to send OTP", "danger");
+            return;
+        }
+
+        showToast("OTP sent to your email!", "success");
+
+        // Move to OTP input step
+        nextStep(2);
+
+    } catch (err) {
+
+        console.error("OTP Error:", err);
+
+        showToast("Server connection failed", "danger");
+    }
+}
+
+
+// Verify OTP
+async function verifyEmailOtp(){
+
+    const otpInputs = document.querySelectorAll('#section2 input');
+    let otp = '';
+
+    otpInputs.forEach(i => otp += i.value);
+
+    // Validate OTP
+    if(!/^\d{6}$/.test(otp)){
+        showToast("Enter valid 6-digit OTP", "warning");
+        return;
+    }
+
+    const email = sessionStorage.getItem("workerEmail");
+
+    if(!email || !email.trim()){
+
+        showToast("Session expired. Please resend OTP.", "danger");
+
+        nextStep(1);
+        return;
+    }
+
+    try{
+
+        const res = await fetch("http://localhost:3000/verify-email-otp",{
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body: JSON.stringify({
+                email: email.trim(),
+                otp: otp.trim()
+            })
+        });
+
+        const data = await res.json();
+
+        console.log("OTP Verify Response:", data);
+
+        if(!res.ok) throw new Error(data.error);
+
+        showToast("Email Verified Successfully", "success");
+
+        // Continue flow
+        nextStep(3);
+
+    }catch(err){
+
+        console.error("Verify OTP Error:", err);
+
+        showToast(err.message || "Invalid OTP", "danger");
+    }
+}
+
+</script>
+
+</body>
+</html>

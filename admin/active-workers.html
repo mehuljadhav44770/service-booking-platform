@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Active Workers — FixoFix Admin</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+
+  <!-- Bootstrap CSS & FontAwesome -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f7fa;
+      color: #333;
+    }
+    .navbar {
+      background-color: #007bff;
+      padding: 0.75rem 2rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .navbar-brand {
+      font-weight: 600;
+      font-size: 1.3rem;
+      color: white;
+    }
+    .back-btn {
+      margin-right: 1rem;
+      color: white;
+      border: 1px solid white;
+    }
+    .back-btn:hover {
+      background-color: white;
+      color: #007bff;
+    }
+    .page-title {
+      font-size: 2rem;
+      font-weight: 600;
+      text-align: center;
+      margin: 2rem 0 0.5rem;
+      color: #007bff;
+    }
+    .subtext {
+      text-align: center;
+      color: #6c757d;
+      margin-bottom: 2rem;
+    }
+    .filter-box {
+      background: white;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
+    }
+    .card-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      padding-bottom: 3rem;
+    }
+    .worker-card {
+      background-color: #ffffff;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      transition: 0.3s;
+      position: relative;
+    }
+    .worker-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+    }
+    .worker-title {
+      font-weight: 600;
+      color: #007bff;
+    }
+    .badge-status {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+    }
+    .worker-info {
+      margin-top: 0.75rem;
+    }
+    .worker-info i {
+      color: #007bff;
+      margin-right: 0.5rem;
+    }
+    .assign-btn {
+      padding: 0.4rem 0.75rem;
+      font-weight: 500;
+      border-radius: 10px;
+    }
+    .filter-checkbox {
+      margin-top: 2rem;
+    }
+    .section-title {
+      margin: 2rem 0 1rem;
+      font-weight: 600;
+    }
+    @media (max-width: 576px) {
+      .navbar-brand {
+        font-size: 1.1rem;
+      }
+    }
+
+    /* modal table styles */
+    .modal .table td, .modal .table th { vertical-align: middle; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg position-relative">
+    <a class="btn btn-outline-light back-btn position-relative z-2" href="admin-dashboard.html">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+    <span class="navbar-brand position-absolute top-50 start-50 translate-middle">
+      <i class="fas fa-wrench me-2"></i>FixoFix Admin
+    </span>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="container">
+    <h1 class="page-title">Active Workers</h1>
+    <p class="subtext">View and filter all service workers by service, city, or availability</p>
+
+    <!-- Filter Section -->
+    <div class="filter-box">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <label for="serviceSelect" class="form-label fw-semibold">Filter by Service</label>
+          <select id="serviceSelect" class="form-select">
+            <option value="">— Select Service —</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="citySelect" class="form-label fw-semibold">Filter by City</label>
+          <select id="citySelect" class="form-select">
+            <option value="">— Select City —</option>
+          </select>
+        </div>
+        <div class="col-md-4 filter-checkbox">
+          <div class="form-check mt-4">
+            <input class="form-check-input" type="checkbox" id="onlineOnly">
+            <label class="form-check-label fw-semibold" for="onlineOnly">Show only Online workers</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Online Workers -->
+    <h3 class="text-success section-title">Online Workers (<span id="onlineCount">0</span>)</h3>
+    <div class="card-list" id="onlineWorkers"></div>
+
+    <!-- Offline Workers -->
+    <h3 class="text-secondary section-title">Offline Workers (<span id="offlineCount">0</span>)</h3>
+    <div class="card-list" id="offlineWorkers"></div>
+  </div>
+
+  <!-- Assign Modal -->
+  <div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="assignModalLabel">Assign Customer to Worker</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div id="customerListLoader" class="text-center py-4 d-none">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-2">Loading matching customer requests...</p>
+          </div>
+
+          <div id="customerListContainer" class="d-none">
+            <div class="mb-3">
+              <strong>Worker:</strong> <span id="modalWorkerName"></span> — <small id="modalWorkerServiceCity"></small>
+            </div>
+
+            <table class="table table-sm table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Customer</th>
+                  <th>Service</th>
+                  <th>City</th>
+                  <th>Date</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="customerList">
+                <!-- filled dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <div id="noCustomerMatch" class="text-center text-muted d-none py-4">
+            <i class="fas fa-user-slash fa-2x mb-2"></i>
+            <div>No matching customer requests found for this worker.</div>
+          </div>
+
+          <div id="customerError" class="text-center text-danger d-none py-3">Failed to load customer requests.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  // ----------------------
+  // Helpers
+  // ----------------------
+  const tryGet = (obj, ...keys) => {
+    for (const k of keys) {
+      if (!obj) continue;
+      const v = obj[k];
+      if (v !== undefined && v !== null) return v;
+    }
+    return undefined;
+  };
+
+  const normalizeStr = (s) => (s || '').toString().trim().toLowerCase();
+
+  const formatDate = (d) => {
+    if (!d) return '—';
+    const date = new Date(d);
+    if (isNaN(date)) return d;
+    return date.toLocaleString();
+  };
+
+  // ----------------------
+  // DOM refs
+  // ----------------------
+  const serviceSelect = document.getElementById('serviceSelect');
+  const citySelect = document.getElementById('citySelect');
+  const onlineOnlyCheckbox = document.getElementById('onlineOnly');
+  const onlineWorkersContainer = document.getElementById('onlineWorkers');
+  const offlineWorkersContainer = document.getElementById('offlineWorkers');
+  const onlineCount = document.getElementById('onlineCount');
+  const offlineCount = document.getElementById('offlineCount');
+
+  // Modal refs
+  const assignModalEl = document.getElementById('assignModal');
+  const customerListLoader = document.getElementById('customerListLoader');
+  const customerListContainer = document.getElementById('customerListContainer');
+  const customerListTbody = document.getElementById('customerList');
+  const noCustomerMatch = document.getElementById('noCustomerMatch');
+  const customerError = document.getElementById('customerError');
+  const modalWorkerName = document.getElementById('modalWorkerName');
+  const modalWorkerServiceCity = document.getElementById('modalWorkerServiceCity');
+
+  let workers = [];
+  let selectedWorker = null;
+  let bsAssignModal = null;
+
+  function showWorkersLoader() {
+    onlineWorkersContainer.innerHTML = offlineWorkersContainer.innerHTML = `<div class="text-center w-100 py-4">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-2">Loading workers...</p>
+    </div>`;
+  }
+
+  // ----------------------
+  // Fetch workers & render
+  // ----------------------
+  async function fetchWorkers() {
+    showWorkersLoader();
+    try {
+      const response = await fetch('http://127.0.0.1:3000/api/workers');
+      workers = await response.json();
+
+      // Normalize id's to number if strings
+      workers = workers.map(w => ({ ...w, id: typeof w.id === 'string' ? parseInt(w.id, 10) : w.id }));
+
+      // show newest first if id present
+      workers.sort((a, b) => (b.id || 0) - (a.id || 0));
+
+      populateFilters();
+      renderWorkers();
+    } catch (err) {
+      console.error('Error fetching workers:', err);
+      onlineWorkersContainer.innerHTML = offlineWorkersContainer.innerHTML =
+        `<p class="text-danger text-center">Failed to load workers.</p>`;
+    }
+  }
+
+  function populateFilters() {
+    serviceSelect.innerHTML = '<option value="">— Select Service —</option>';
+    citySelect.innerHTML = '<option value="">— Select City —</option>';
+
+    const uniqueServices = [...new Set(workers.map(w => tryGet(w, 'service', 'service_type')).filter(Boolean))];
+    uniqueServices.forEach(service => {
+      const opt = document.createElement('option');
+      opt.value = service;
+      opt.textContent = service;
+      serviceSelect.appendChild(opt);
+    });
+
+    const uniqueCities = [...new Set(workers.map(w => tryGet(w, 'location', 'city')).filter(Boolean))];
+    uniqueCities.forEach(city => {
+      const opt = document.createElement('option');
+      opt.value = city;
+      opt.textContent = city;
+      citySelect.appendChild(opt);
+    });
+  }
+
+  function renderWorkers() {
+    const selectedService = normalizeStr(serviceSelect.value);
+    const selectedCity = normalizeStr(citySelect.value);
+    const onlineOnly = onlineOnlyCheckbox.checked;
+
+    const filteredWorkers = workers
+      .filter(w => !selectedService || normalizeStr(tryGet(w, 'service', 'service_type')) === selectedService)
+      .filter(w => !selectedCity || normalizeStr(tryGet(w, 'location', 'city')) === selectedCity);
+
+    const onlineWorkers = filteredWorkers.filter(w => Boolean(w.available));
+    const offlineWorkers = onlineOnly ? [] : filteredWorkers.filter(w => !Boolean(w.available));
+
+    onlineWorkersContainer.innerHTML = '';
+    offlineWorkersContainer.innerHTML = '';
+
+    onlineCount.textContent = onlineWorkers.length;
+    offlineCount.textContent = offlineWorkers.length;
+
+    if (onlineWorkers.length === 0 && offlineWorkers.length === 0) {
+      onlineWorkersContainer.innerHTML = `<div class="text-center w-100 py-4 text-muted">
+        <i class="fas fa-users-slash fa-2x mb-2"></i>
+        <p>No workers found for selected filters.</p>
+      </div>`;
+      return;
+    }
+
+    onlineWorkers.forEach(w => createWorkerCard(w, onlineWorkersContainer));
+    if (!onlineOnly) {
+      offlineWorkers.forEach(w => createWorkerCard(w, offlineWorkersContainer));
+    }
+  }
+
+  function createWorkerCard(worker, container) {
+    const badgeClass = worker.available ? 'bg-success' : 'bg-secondary';
+    const badgeText = worker.available ? 'Online' : 'Offline';
+
+    const card = document.createElement('div');
+    card.className = 'worker-card';
+    card.innerHTML = `
+      <span class="badge ${badgeClass} badge-status">${badgeText}</span>
+      <h5 class="worker-title"><i class="fas fa-user me-2"></i>${worker.name}</h5>
+      <div class="worker-info mt-2">
+        <p><i class="fas fa-id-badge"></i> <strong>ID:</strong> ${worker.id}</p>
+        <p><i class="fas fa-toolbox"></i> <strong>Service:</strong> ${worker.service || worker.service_type || '—'}</p>
+        <p><i class="fas fa-city"></i> <strong>City:</strong> ${worker.location || worker.city || '—'}</p>
+        <p><i class="fas fa-phone"></i> <strong>Phone:</strong> ${worker.phone || '—'}</p>
+      </div>
+      <div class="mt-3 text-end">
+        ${worker.available ? `<button class="btn btn-primary btn-sm assign-btn" data-worker-id="${worker.id}">
+          <i class="fas fa-user-check me-1"></i> Assign
+         </button>` : `<button class="btn btn-outline-secondary btn-sm" disabled>Assign</button>`}
+      </div>
+    `;
+    container.appendChild(card);
+  }
+
+  // ----------------------
+  // Modal: load bookings filtered by worker
+  // ----------------------
+  async function loadBookingsForWorker(worker) {
+    // show loader
+    customerListContainer.classList.add('d-none');
+    noCustomerMatch.classList.add('d-none');
+    customerError.classList.add('d-none');
+    customerListLoader.classList.remove('d-none');
+    customerListTbody.innerHTML = '';
+
+    // display worker info in modal
+    modalWorkerName.textContent = worker.name || '—';
+    modalWorkerServiceCity.textContent = `${worker.service || worker.service_type || '—'} • ${worker.location || worker.city || '—'}`;
+
+    try {
+      const res = await fetch('http://127.0.0.1:3000/api/bookings');
+      if (!res.ok) throw new Error('Failed fetching bookings');
+      let bookings = await res.json();
+
+      // Normalize & filter bookings
+      bookings = bookings.map(b => ({ ...b, id: typeof b.id === 'string' ? parseInt(b.id, 10) : b.id }));
+
+      const workerService = normalizeStr(tryGet(worker, 'service', 'service_type'));
+      const workerCity = normalizeStr(tryGet(worker, 'location', 'city'));
+
+      const excludedStatuses = ['assigned','completed','cancelled','done'];
+      const filtered = bookings.filter(b => {
+        const bService = normalizeStr( tryGet(b, 'service', 'service_type', 'service_type_name') );
+        const bCity = normalizeStr( tryGet(b, 'city', 'location', 'address') );
+        const status = normalizeStr( tryGet(b, 'status', 'booking_status') || '' );
+
+        if (workerService && bService && bService !== workerService) return false;
+        if (workerCity && bCity && bCity !== workerCity) return false;
+        if (excludedStatuses.includes(status)) return false;
+        return true;
+      }).sort((a,b) => (b.id||0)-(a.id||0));
+
+      customerListLoader.classList.add('d-none');
+
+      if (!filtered.length) {
+        noCustomerMatch.classList.remove('d-none');
+        return;
+      }
+
+      // show table
+      customerListContainer.classList.remove('d-none');
+      customerListTbody.innerHTML = '';
+      filtered.forEach(b => {
+        const custName = tryGet(b, 'customer_name', 'name') || '—';
+        const service = tryGet(b, 'service', 'service_type') || '—';
+        const city = tryGet(b, 'city', 'location', 'address') || '—';
+        const date = formatDate( tryGet(b, 'date', 'created_at', 'booking_date') );
+        const bookingId = b.id;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${bookingId}</td>
+          <td>${escapeHtml(custName)}</td>
+          <td>${escapeHtml(service)}</td>
+          <td>${escapeHtml(city)}</td>
+          <td>${date}</td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-success request-btn" data-booking-id="${bookingId}">Request</button>
+          </td>
+        `;
+        customerListTbody.appendChild(row);
+      });
+
+    } catch (err) {
+      console.error('Error loading bookings:', err);
+      customerListLoader.classList.add('d-none');
+      customerError.classList.remove('d-none');
+    }
+  }
+
+  // small helper to prevent XSS when using innerHTML for data from server
+  function escapeHtml(str) {
+    return String(str)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  // ----------------------
+  // Event handling (delegated)
+  // ----------------------
+  document.addEventListener('click', async (e) => {
+    // Assign button on worker card
+    const assignBtn = e.target.closest('.assign-btn');
+    if (assignBtn) {
+      const workerId = assignBtn.getAttribute('data-worker-id');
+      selectedWorker = workers.find(w => String(w.id) === String(workerId));
+      if (!selectedWorker) {
+        alert('Worker not found');
+        return;
+      }
+
+      // open modal and load bookings
+      if (!bsAssignModal) bsAssignModal = new bootstrap.Modal(assignModalEl);
+      bsAssignModal.show();
+      loadBookingsForWorker(selectedWorker);
+      return;
+    }
+
+    // Request button inside modal (assign booking to worker: send request)
+    const reqBtn = e.target.closest('.request-btn');
+    if (reqBtn) {
+      const bookingId = reqBtn.getAttribute('data-booking-id');
+      if (!selectedWorker) {
+        alert('No worker selected');
+        return;
+      }
+
+      // disable button while processing
+      reqBtn.disabled = true;
+      const originalText = reqBtn.innerHTML;
+      reqBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> Sending`;
+
+      try {
+      const resp = await fetch('http://127.0.0.1:3000/api/assign-worker-to-customer', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ workerId: selectedWorker.id, bookingId }),
+  credentials: 'include'   // 🔑 this makes sure session cookie goes with the request
+});
+
+        if (!resp.ok) {
+          const text = await resp.text().catch(()=>null);
+          throw new Error(text || 'Server error');
+        }
+
+        // success: hide modal and optionally refresh workers/bookings
+        bsAssignModal.hide();
+        alert(`Request sent to worker ${selectedWorker.name} for booking #${bookingId}`);
+      } catch (err) {
+        console.error('Error sending request:', err);
+        alert('Failed to send request. See console for details.');
+      } finally {
+        // restore button
+        reqBtn.disabled = false;
+        reqBtn.innerHTML = originalText;
+      }
+      return;
+    }
+  });
+
+  // close modal cleanup
+  assignModalEl.addEventListener('hidden.bs.modal', () => {
+    selectedWorker = null;
+    customerListTbody.innerHTML = '';
+    customerListContainer.classList.add('d-none');
+    noCustomerMatch.classList.add('d-none');
+    customerError.classList.add('d-none');
+    customerListLoader.classList.add('d-none');
+  });
+
+  // Filter events
+  serviceSelect.addEventListener('change', renderWorkers);
+  citySelect.addEventListener('change', renderWorkers);
+  onlineOnlyCheckbox.addEventListener('change', renderWorkers);
+
+  // initial load
+  fetchWorkers();
+  </script>
+</body>
+</html>

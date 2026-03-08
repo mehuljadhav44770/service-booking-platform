@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Active Bookings — FixoFix Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #eef2f6;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .navbar {
+      background-color: #007bff;
+      padding: 0.75rem 2rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .navbar-brand {
+      font-weight: 600;
+      font-size: 1.3rem;
+      color: white;
+    }
+
+    .back-btn {
+      margin-right: 1rem;
+      color: white;
+      border: 1px solid white;
+    }
+
+    .back-btn:hover {
+      background-color: white;
+      color: #007bff;
+    }
+
+    .page-title {
+      text-align: center;
+      font-weight: 800;
+      font-size: 2.5rem;
+      color: #0d6efd;
+      margin: 40px 0 10px;
+      letter-spacing: -0.5px;
+    }
+
+    .filter-bar {
+      margin: 30px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      max-width: 1200px;
+    }
+
+    .table-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 1200px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    }
+
+    .status-badge {
+      font-size: 0.85rem;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .status-inprogress {
+      background-color: #e0f0ff;
+      color: #0d6efd;
+    }
+
+    .status-complete {
+      background-color: #d4edda;
+      color: #198754;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg position-relative">
+    <a class="btn btn-outline-light back-btn position-relative z-2" href="admin-dashboard.html">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+    <span class="navbar-brand position-absolute top-50 start-50 translate-middle text-white">
+      <i class="fas fa-wrench me-2"></i>FixoFix Admin
+    </span>
+  </nav>
+
+  <!-- Page Title -->
+  <div class="page-title">Active Bookings</div>
+
+  <!-- Filters -->
+  <div class="filter-bar row g-3">
+    <div class="col-md-3">
+      <label class="form-label">Service Type</label>
+      <select class="form-select" id="filterService">
+        <option>All</option>
+        <option>Plumbing</option>
+        <option>Electrician</option>
+        <option>Cleaning</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">From Date</label>
+      <input type="date" class="form-control" id="fromDate">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">To Date</label>
+      <input type="date" class="form-control" id="toDate">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Worker Name</label>
+      <input type="text" class="form-control" id="filterWorker" placeholder="Search">
+    </div>
+    <!-- ✅ Status Filter Added -->
+    <div class="col-md-3">
+      <label class="form-label">Status</label>
+      <select class="form-select" id="filterStatus">
+        <option>All</option>
+        <option>In Progress</option>
+        <option>Complete</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Booking Table -->
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead class="table-primary">
+          <tr>
+            <th>#</th>
+            <th>Booking ID</th>
+            <th>Customer</th>
+            <th>Address</th>
+            <th>Service</th>
+            <th>Date</th>
+            <th>Worker</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="bookingTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+  let bookings = [];
+  const tableBody = document.getElementById("bookingTableBody");
+  const filterService = document.getElementById("filterService");
+  const filterWorker = document.getElementById("filterWorker");
+  const filterStatus = document.getElementById("filterStatus");
+
+  // Fetch bookings from backend
+  async function fetchBookings() {
+    try {
+      const res = await fetch("http://localhost:3000/api/admin-active-bookings");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      bookings = data.map(b => ({
+        connection_id: b.connection_id,
+        customer_id: b.customer_id,
+        customer_name: b.customer_name,
+        worker_id: b.worker_id,
+        worker_name: b.worker_name,
+        booking_id: b.booking_id,
+        service: b.service,
+        date: new Date(b.preferred_date).toLocaleDateString(),
+        time: b.preferred_time.slice(0, 5), // hh:mm
+        address: b.address,
+        status: b.status === "accepted" ? "In Progress" : 
+                b.status === "completed" ? "Complete" : b.status
+      }));
+
+      localStorage.setItem("activeBookingCount", bookings.length);
+      renderTable();
+    } catch (err) {
+      console.error("❌ Failed to fetch active bookings", err);
+      tableBody.innerHTML =
+        `<tr><td colspan="9" class="text-center text-muted">Failed to load bookings.</td></tr>`;
+    }
+  }
+
+  function renderTable() {
+    tableBody.innerHTML = "";
+    const workerFilter = filterWorker.value.toLowerCase();
+    const serviceFilter = filterService.value;
+    const statusFilter = filterStatus.value;
+
+    const filtered = bookings.filter(b => {
+      const matchWorker = b.worker_name.toLowerCase().includes(workerFilter);
+      const matchService = serviceFilter === "All" || b.service === serviceFilter;
+      const matchStatus = statusFilter === "All" || b.status === statusFilter;
+      return matchWorker && matchService && matchStatus;
+    });
+
+    if (filtered.length === 0) {
+      tableBody.innerHTML =
+        `<tr><td colspan="9" class="text-center text-muted">No active bookings found.</td></tr>`;
+      return;
+    }
+
+    filtered.forEach((b, index) => {
+      const row = `
+        <tr>
+          <td>${index + 1}</td>
+          <td>#${b.booking_id}</td>
+          <td>
+            <strong>${b.customer_name}</strong><br/>
+            <small>ID: ${b.customer_id}</small>
+          </td>
+          <td>${b.address}</td>
+          <td>${b.service}</td>
+          <td>${b.date} ${b.time}</td>
+          <td>
+            <strong>${b.worker_name}</strong><br/>
+            <small>ID: ${b.worker_id}</small>
+          </td>
+          <td>
+            <span class="status-badge ${b.status === "In Progress" ? "status-inprogress" : "status-complete"}">
+              ${b.status}
+            </span>
+          </td>
+        </tr>
+      `;
+      tableBody.innerHTML += row;
+    });
+  }
+
+  // Filters events
+  filterWorker.addEventListener("input", renderTable);
+  filterService.addEventListener("change", renderTable);
+  filterStatus.addEventListener("change", renderTable);
+
+  // Initial load
+  fetchBookings();
+  
+</script>
+
+
+
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

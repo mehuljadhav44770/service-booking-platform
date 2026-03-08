@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FixoFix | Elite Settlement Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --sidebar-blue: #1d4ed8;
+      --body-bg: #f8fafc;
+      --slate-dark: #0f172a;
+      --border-light: #e2e8f0;
+      --danger: #ef4444;
+      --success: #10b981;
+      --warning: #f59e0b;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--body-bg);
+      color: var(--slate-dark);
+      padding: 40px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Navigation */
+    .btn-back-hub {
+      background: #fff; border: 1px solid var(--border-light); padding: 12px 24px; border-radius: 16px;
+      font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 10px;
+      transition: 0.3s; margin-bottom: 30px; color: var(--slate-dark); font-size: 14px;
+    }
+    .btn-back-hub:hover { background: var(--slate-dark); color: #fff; transform: translateX(-5px); }
+
+    /* Premium Banner */
+    .settlement-banner {
+      background: linear-gradient(135deg, var(--sidebar-blue) 0%, #1e40af 100%);
+      color: white; border-radius: 35px; padding: 45px; margin-bottom: 45px;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 25px 50px -12px rgba(29, 78, 216, 0.25);
+      position: relative; overflow: hidden;
+    }
+
+    .nav-tabs-premium {
+      display: flex; gap: 15px; margin-top: 25px;
+    }
+
+    .tab-wrapper { text-align: center; }
+
+    .btn-tab {
+      background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px); font-weight: 700; padding: 12px 24px; border-radius: 18px;
+      transition: 0.3s; font-size: 13px; cursor: pointer; margin-bottom: 8px;
+    }
+    .btn-tab:hover, .btn-tab.active { background: #fff; color: var(--sidebar-blue); border-color: #fff; }
+
+    .tab-total-label { font-size: 11px; font-weight: 700; opacity: 0.8; color: #fff; }
+
+    .btn-withdraw-elite {
+      background: #fff; color: var(--sidebar-blue); border: none;
+      font-weight: 800; padding: 14px 28px; border-radius: 18px;
+      transition: 0.3s; font-size: 14px;
+    }
+
+    /* Table UI */
+    .table-container-elite {
+      background: #fff; border-radius: 32px; padding: 35px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.02); border: 1px solid var(--border-light);
+      margin-bottom: 50px; animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 0 10px; }
+    .section-title { font-weight: 800; font-size: 1.4rem; letter-spacing: -0.8px; }
+
+    .worker-card { display: flex; align-items: center; gap: 12px; }
+    .worker-img-sq { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; }
+    
+    .id-badge { font-size: 10px; background: #f1f5f9; padding: 3px 8px; border-radius: 6px; color: #64748b; font-weight: 700; display: inline-block; }
+    .status-pill { padding: 6px 14px; border-radius: 100px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1px solid transparent; }
+    .pill-paid { background: #f0fdf4; color: #15803d; border-color: #dcfce7; }
+    .pill-warning { background: #fff1f2; color: #e11d48; border-color: #ffe4e6; }
+    .pill-pending { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
+
+    .text-detail { font-weight: 700; color: var(--slate-dark); font-size: 0.95rem; }
+    .badge-count { background: var(--slate-dark); color: #fff; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 11px; }
+
+    .btn-table-action { border: none; font-weight: 800; padding: 10px 20px; border-radius: 12px; font-size: 12px; transition: 0.3s; }
+    .btn-confirm { background: var(--slate-dark); color: #fff; }
+    .btn-execute { background: var(--sidebar-blue); color: #fff; }
+
+    .inspection-total-section {
+      background: #fff; border-radius: 32px; padding: 25px 35px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.02); border: 1px solid var(--border-light);
+      margin-top: -30px; margin-bottom: 50px;
+    }
+
+    .total-row {
+      display: flex; justify-content: flex-end; align-items: center; gap: 15px;
+      border-top: 2px solid var(--border-light); padding-top: 20px;
+    }
+
+    .total-label { font-weight: 700; font-size: 1.1rem; color: var(--slate-dark); }
+    .total-amount { font-weight: 800; font-size: 1.5rem; color: var(--success); }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid">
+    <a href="admin-dashboard.html" class="btn-back-hub">
+      <i class="fa-solid fa-chevron-left"></i> Admin Dashboard Control
+    </a>
+
+    <div class="settlement-banner shadow">
+      <div>
+        <h2 class="fw-800 m-0">Settlement Hub</h2>
+        <p class="m-0 opacity-75 mt-1">Institutional ledger for verified service transactions.</p>
+        
+        <div class="nav-tabs-premium">
+          <div class="tab-wrapper">
+            <div class="btn-tab active" onclick="switchTab(this, 'cashSection')"><i class="fa-solid fa-money-bill-wave me-2"></i>Cash Payments</div>
+            <div class="tab-total-label">Total: ₹4,500.00</div>
+          </div>
+          <div class="tab-wrapper">
+            <div class="btn-tab" onclick="switchTab(this, 'onlineSection')"><i class="fa-solid fa-bolt-lightning me-2"></i>Online Payments</div>
+            <div class="tab-total-label">Total: ₹18,000.00</div>
+          </div>
+          <div class="tab-wrapper">
+            <div class="btn-tab" onclick="switchTab(this, 'inspectionSection')"><i class="fa-solid fa-magnifying-glass me-2"></i>Inspection Fees</div>
+            <div  class="tab-total-label" id="totalFees">Total: ₹0.00</div>
+          </div>
+        </div>
+      </div>
+      <div class="text-end text-white">
+        <small class="text-uppercase fw-bold opacity-60">Gross Platform Revenue</small>
+        <h1 class="fw-800 m-0">₹24,840.00</h1>
+        <button class="btn-withdraw-elite mt-3"><i class="fa-solid fa-vault me-2"></i>Withdrawal Terminal</button>
+      </div>
+    </div>
+
+    <div id="cashSection" class="content-section">
+      <div class="section-header">
+        <h4 class="section-title text-dark"><i class="fa-solid fa-hand-holding-dollar me-3 text-warning"></i>Cash Recovery Ledger</h4>
+        <span class="status-pill pill-warning px-3 py-2"><i class="fa-solid fa-circle-exclamation me-1"></i> Deposit Pending</span>
+      </div>
+      <div class="table-container-elite">
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead class="text-muted small text-uppercase">
+              <tr>
+                <th>Customer</th>
+                <th>Partner Details</th>
+                <th>Service</th>
+                <th class="text-center">Bill Amount</th>
+                <th class="text-center">Cash Jobs</th>
+                <th class="text-center">In-Hand Cash</th>
+                <th class="text-center">Access Status</th>
+                <th class="text-center">Finance Status</th>
+                <th class="text-end">Action</th>
+              </tr>
+            </thead>
+            <tbody id="cashBody"></tbody>
+
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="onlineSection" class="content-section" style="display:none;">
+      <div class="section-header">
+        <h4 class="section-title text-dark"><i class="fa-solid fa-bolt-lightning me-3 text-primary"></i>Online Gateway Payments</h4>
+        <span class="status-pill pill-paid px-3 py-2"><i class="fa-solid fa-circle-check me-1"></i> Auto-Settle Enabled</span>
+      </div>
+      <div class="table-container-elite">
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead class="text-muted small text-uppercase">
+              <tr>
+                <th>Customer</th>
+                <th>Partner Details</th>
+                <th>Service Category</th>
+                <th class="text-center">Transaction Value</th>
+                <th class="text-center">Commission (10%)</th>
+                <th class="text-center">Gateway Status</th>
+                <th class="text-end">Settlement</th>
+              </tr>
+            </thead>
+            <tbody id="onlineBody"></tbody>
+
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="inspectionSection" class="content-section" style="display:none;">
+      <div class="section-header">
+        <h4 class="section-title text-dark"><i class="fa-solid fa-magnifying-glass me-3 text-success"></i>Inspection Fee Ledger</h4>
+        <!-- <div id="totalFees">Total: ₹0.00</div> -->
+
+
+      </div>
+      <div class="table-container-elite">
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead class="text-muted small text-uppercase">
+              <tr>
+                <th>Booking ID</th>
+                <th>Customer Name</th>
+                
+                <th class="text-center">Service</th>
+                <th class="text-center">Inspection Fee</th>
+                <th class="text-center">Transaction ID</th>
+                <th class="text-center">Time</th>
+                <th class="text-end">Status</th>
+              </tr>
+            </thead>
+            <tbody id="inspectionBody">
+</tbody>
+          </table>
+        </div>
+      </div>
+      <div class="inspection-total-section">
+        <div class="total-row">
+          <span class="total-label">Total Inspection Fees:</span>
+          <span id="inspectionTotal" class="total-amount">₹0</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function switchTab(element, sectionId) {
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.style.display = 'none';
+      });
+      document.getElementById(sectionId).style.display = 'block';
+      document.querySelectorAll('.btn-tab').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      element.classList.add('active');
+    }
+  </script>
+  <script>
+
+async function loadInspectionFees() {
+
+  try {
+
+    const res = await fetch('http://localhost:3000/admin/inspection-fees');
+    const data = await res.json();
+
+    const tbody = document.getElementById('inspectionBody');
+    tbody.innerHTML = '';
+
+    let total = 0;
+
+    data.forEach(row => {
+
+      const fee = Number(row.amount || 0);
+      total += fee;
+
+      const time = new Date(row.paid_at)
+        .toLocaleString('en-IN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          day: '2-digit',
+          month: 'short'
+        });
+
+      tbody.innerHTML += `
+        <tr>
+          <td><span class="id-badge">#FIX-${row.booking_id}</span></td>
+
+          <td>
+            <div class="text-detail">${row.customer_name}</div>
+          </td>
+
+          <td class="text-center text-muted-small">
+            ${row.service}
+          </td>
+
+          <td class="text-center text-detail">
+            ₹${fee.toFixed(2)}
+          </td>
+
+          <td class="text-center text-muted-small">
+            ${row.transaction_id || '-'}
+          </td>
+
+          <td class="text-center text-muted-small">
+            ${time}
+          </td>
+
+          <td class="text-end">
+            <span class="status-pill pill-paid">Received</span>
+          </td>
+        </tr>
+      `;
+    });
+
+    // ✅ Show total at bottom
+    document.getElementById('inspectionTotal').innerText =
+      `₹${total.toFixed(2)}`;
+
+  } catch (err) {
+    console.error(err);
+    alert("Failed to load inspection fees");
+  }
+}
+
+
+// Load when page opens
+window.addEventListener('DOMContentLoaded', loadInspectionFees);
+
+</script>
+<script>
+async function loadTotalFees() {
+  try {
+
+    const res = await fetch('http://localhost:3000/admin/total-inspection-fees');
+
+    if (!res.ok) {
+      throw new Error("Server error");
+    }
+
+    const data = await res.json();
+
+    document.getElementById('totalFees').innerText =
+      `Total: ₹${Number(data.total).toFixed(2)}`;
+
+  } catch (err) {
+    console.error("Load total error:", err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadTotalFees);
+</script>
+<script>
+async function loadCashPayments() {
+
+  try {
+
+    const res = await fetch('http://localhost:3000/admin/cash-payments');
+    const data = await res.json();
+
+    const tbody = document.getElementById('cashBody');
+    tbody.innerHTML = '';
+
+    data.forEach(row => {
+
+      tbody.innerHTML += `
+        <tr>
+
+          <td>
+            <div class="text-detail">${row.customer_name}</div>
+            <div class="id-badge">ID: C-${row.customer_id}</div>
+          </td>
+
+          <td>
+            <div class="worker-card">
+              <img src="https://i.pravatar.cc/150?u=${row.provider_id}" class="worker-img-sq">
+              <div>
+                <div class="text-detail">${row.provider_name}</div>
+                <div class="id-badge">ID: W-${row.provider_id}</div>
+              </div>
+            </div>
+          </td>
+
+          <td>${row.service}</td>
+
+          <td class="text-center">₹${row.final_charge}</td>
+
+          <td class="text-center">
+            ₹${row.provider_amount}
+          </td>
+
+          <td class="text-center text-danger fw-800">
+            ₹${row.final_charge}
+          </td>
+
+          <td class="text-center">
+            <span class="status-pill pill-warning">Blocked</span>
+          </td>
+
+          <td class="text-center">
+            <span class="status-pill pill-pending">
+              ${row.payment_status}
+            </span>
+          </td>
+
+          <td class="text-end">
+            <button class="btn-table-action btn-confirm">
+              Confirm
+            </button>
+          </td>
+
+        </tr>
+      `;
+    });
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadCashPayments);
+</script>
+<script>
+async function loadOnlinePayments() {
+
+  try {
+
+    const res = await fetch('http://localhost:3000/admin/online-payments');
+    const data = await res.json();
+
+    const tbody = document.getElementById('onlineBody');
+    tbody.innerHTML = '';
+
+    data.forEach(row => {
+
+      const commission = (row.final_charge * 0.10).toFixed(2);
+
+      tbody.innerHTML += `
+        <tr>
+
+          <td>
+            <div class="text-detail">${row.customer_name}</div>
+            <div class="id-badge">ID: C-${row.customer_id}</div>
+          </td>
+
+          <td>
+            <div class="worker-card">
+              <img src="https://i.pravatar.cc/150?u=${row.provider_id}" class="worker-img-sq">
+              <div>
+                <div class="text-detail">${row.provider_name}</div>
+                <div class="id-badge">ID: W-${row.provider_id}</div>
+              </div>
+            </div>
+          </td>
+
+          <td>${row.service}</td>
+
+          <td class="text-center">₹${row.final_charge}</td>
+
+          <td class="text-center text-danger">
+            ₹${commission}
+          </td>
+
+          <td class="text-center">
+            <span class="status-pill pill-paid">
+              ${row.payment_status}
+            </span>
+          </td>
+
+          <td class="text-end">
+            <button class="btn-table-action btn-execute">
+              Settle
+            </button>
+          </td>
+
+        </tr>
+      `;
+
+    });
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadOnlinePayments);
+</script>
+<script>
+async function loadTotals() {
+
+  const res = await fetch('http://localhost:3000/admin/grand-total');
+  const data = await res.json();
+
+  // Cash
+  document.querySelectorAll('.tab-total-label')[0].innerText =
+    `Total: ₹${Number(data.cash_total).toFixed(2)}`;
+
+  // Online
+  document.querySelectorAll('.tab-total-label')[1].innerText =
+    `Total: ₹${Number(data.online_total).toFixed(2)}`;
+
+  // Inspection
+  document.getElementById('totalFees').innerText =
+    `Total: ₹${Number(data.inspection_total).toFixed(2)}`;
+
+  // Big Revenue
+  document.querySelector('h1').innerText =
+    `₹${Number(data.grand_total).toFixed(2)}`;
+}
+
+document.addEventListener('DOMContentLoaded', loadTotals);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Elite Registration - FixoFix</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Allura&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%);
+      --glass-bg: rgba(255, 255, 255, 0.9);
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Background Abstract Shapes */
+    .bg-shape {
+      position: fixed;
+      z-index: -1;
+      filter: blur(80px);
+      opacity: 0.4;
+    }
+    .shape-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: #3b82f6; border-radius: 50%; }
+    .shape-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #8b5cf6; border-radius: 50%; }
+
+    /* Navbar */
+    .navbar-custom {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      padding: 15px 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-brand {
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--text-dark);
+      letter-spacing: -1px;
+    }
+
+    .tagline {
+      font-family: 'Allura', cursive;
+      font-size: 24px;
+      color: #7c3aed;
+      margin-left: 15px;
+    }
+
+    /* Main Container */
+    .registration-wrapper {
+      margin-top: 40px;
+      margin-bottom: 40px;
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .elite-card {
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      max-width: 1000px;
+      width: 100%;
+      display: flex;
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    /* Left Welcome Side */
+    .info-side {
+      background: var(--primary-gradient);
+      padding: 50px;
+      width: 40%;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .info-side h1 { font-weight: 800; font-size: 2.5rem; margin-bottom: 20px; }
+    .info-side p { opacity: 0.9; font-size: 1rem; line-height: 1.6; }
+
+    /* Right Form Side */
+    .form-side {
+      padding: 50px;
+      width: 60%;
+      background: #fff;
+    }
+
+    .form-side h2 {
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+      font-size: 1.8rem;
+    }
+
+    .sub-text {
+      color: var(--text-muted);
+      margin-bottom: 30px;
+      font-size: 0.95rem;
+    }
+
+    /* Input Styling */
+    .form-label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-label i { color: #6366f1; }
+
+    .form-control {
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1.5px solid #e2e8f0;
+      transition: all 0.3s ease;
+      background: #f8fafc;
+    }
+
+    .form-control:focus {
+      background: #fff;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+      outline: none;
+    }
+
+    .input-group-text {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-left: none;
+      border-radius: 0 12px 12px 0;
+      cursor: pointer;
+    }
+
+    .btn-submit {
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      padding: 14px;
+      font-weight: 700;
+      border-radius: 12px;
+      transition: 0.3s;
+      margin-top: 10px;
+      box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.3);
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 25px -5px rgba(124, 58, 237, 0.4);
+      color: white;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .login-link a {
+      color: #6366f1;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    /* Responsive */
+    @media (max-width: 991px) {
+      .info-side { display: none; }
+      .form-side { width: 100%; padding: 35px; }
+      .elite-card { max-width: 500px; margin: 0 15px; }
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-check {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 30px 0;
+      font-size: 0.95rem;
+    }
+
+    .form-check-input {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: #6366f1;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .form-check-label {
+      cursor: pointer;
+      margin: 0;
+      color: #555;
+    }
+
+    .form-check-label a {
+      color: #6366f1;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .form-check-label a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+
+
+<body>
+
+<div class="bg-shape shape-1"></div>
+<div class="bg-shape shape-2"></div>
+
+<nav class="navbar navbar-custom">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <i class="fas fa-screwdriver-wrench text-primary"></i> FixoFix.
+    </a>
+    <span class="tagline d-none d-md-block">where care meets convenience</span>
+    <div class="ms-auto">
+      <a href="index.html" class="btn btn-link text-dark text-decoration-none fw-bold me-3">
+        <i class="fas fa-chevron-left me-1"></i> Back
+      </a>
+      <a href="#" class="btn btn-outline-dark rounded-pill px-4 fw-bold btn-sm" data-bs-toggle="modal" data-bs-target="#helpModal">Help</a>
+    </div>
+  </div>
+</nav>
+
+<div class="registration-wrapper">
+  <div class="elite-card">
+    <div class="info-side">
+      <h1>Join the Community.</h1>
+      <p>Register today to access professional home services at your fingertips. Safe, reliable, and verified experts just for you.</p>
+      <div class="mt-4">
+        <div class="d-flex align-items-center mb-3">
+          <i class="fas fa-check-circle me-3"></i> <span>100% Verified Professionals</span>
+        </div>
+        <div class="d-flex align-items-center mb-3">
+          <i class="fas fa-check-circle me-3"></i> <span>Transparent Fixed Pricing</span>
+        </div>
+        <div class="d-flex align-items-center">
+          <i class="fas fa-check-circle me-3"></i> <span>24/7 Premium Support</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-side">
+      <h2>Create Your Account</h2>
+      <p class="sub-text">Register now and book trusted professionals at your convenience</p>
+
+      <form id="bookingForm">
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-user"></i> Full Name</label>
+          <input type="text" class="form-control" id="fullName" placeholder="Enter your full name" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-phone"></i> Phone Number</label>
+<input 
+  type="tel" 
+  class="form-control" 
+  id="phone" 
+  placeholder="10-digit mobile number"
+  maxlength="10"
+  pattern="[0-9]{10}"
+  oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+  required
+/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
+          <input type="email" class="form-control" id="email" placeholder="your.email@example.com" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-lock"></i> Password</label>
+          <div class="input-group">
+            <input type="password" class="form-control" id="password" placeholder="Minimum 6 characters" required />
+            <span class="input-group-text" id="togglePassword">
+              <i class="fas fa-eye text-muted"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-map-marker-alt"></i> Service Address</label>
+          <textarea class="form-control" id="address" rows="2" placeholder="Enter your complete service address" required></textarea>
+        </div>
+
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="agreeTerms" />
+          <label class="form-check-label">
+            I agree to the <a href="terms.html" target="_blank">Terms & Conditions</a>
+          </label>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-submit">
+            <i class="fas fa-user-check me-2"></i>Create Account
+          </button>
+        </div>
+
+        <p class="login-link">
+          Already have an account? <a href="customer-login.html">Login</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="helpModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow-lg">
+      <div class="modal-header bg-dark text-white rounded-top-4">
+        <h5 class="modal-title fw-bold"><i class="fas fa-circle-question me-2"></i>Registration Help</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <h6 class="fw-bold">Need assistance?</h6>
+        <ul class="small text-muted mt-3">
+          <li>Ensure your 10-digit mobile number is correct.</li>
+          <li>Password must be strong (at least 6 characters).</li>
+          <li>If your email is already registered, try logging in.</li>
+        </ul>
+        <hr>
+        <p class="mb-0 small">Email us: <a href="mailto:support@fixofix.com">support@fixofix.com</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Password Toggle logic
+  document.getElementById('togglePassword').addEventListener('click', function () {
+    const passwordField = document.getElementById('password');
+    const icon = this.querySelector('i');
+    if (passwordField.type === 'password') {
+      passwordField.type = 'text';
+      icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+      passwordField.type = 'password';
+      icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+  });
+
+  // Form submission logic
+  document.getElementById('bookingForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+    const phoneNumber = phone.value.trim();
+
+if(!/^[0-9]{10}$/.test(phoneNumber)){
+  alert("Please enter a valid 10-digit phone number.");
+  return;
+}
+
+
+    if(!document.getElementById("agreeTerms").checked){
+      alert("Please accept the Terms & Conditions to proceed.");
+      return;
+    }
+
+    const data = {
+      name: fullName.value.trim(),
+      phone: phone.value.trim(),
+      email: email.value.trim(),
+      password: password.value,
+      address: address.value.trim(),
+      role: 'customer'
+    };
+
+    try {
+      const response = await fetch('http://127.0.0.1:3000/register', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if(response.ok){
+        if(result.id){
+          sessionStorage.setItem("customer_id", result.id);
+        }
+        alert("✅ Registration Successful!");
+        window.location.href="customer-login.html";
+      } else {
+        alert("❌ Registration failed: "+(result.error||"Unknown error"));
+      }
+    } catch(err){
+      alert("❌ Error connecting to server.");
+      console.error(err);
+    }
+  });
+</script>
+
+</body>
+</html>
+

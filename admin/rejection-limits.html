@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FixoFix | Rejection Control Terminal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --brand: #1d4ed8;
+      --brand-hover: #1e40af;
+      --body-bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --card-shadow: 0 12px 32px rgba(0, 0, 0, 0.04);
+      --border-color: #e2e8f0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--body-bg);
+      color: var(--text-main);
+      padding: 40px;
+    }
+
+    /* Navigation */
+    .btn-back {
+      background: var(--card-bg); 
+      border: 1px solid var(--border-color); 
+      padding: 10px 20px; 
+      border-radius: 12px;
+      font-weight: 600; 
+      font-size: 14px;
+      text-decoration: none; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 10px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+      margin-bottom: 25px; 
+      color: var(--text-muted);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    .btn-back:hover { 
+      background: #f1f5f9; 
+      transform: translateX(-4px); 
+      color: var(--text-main); 
+      border-color: #cbd5e1;
+    }
+
+    /* Premium Revenue Header Style */
+    .revenue-header {
+      background: linear-gradient(135deg, #1d4ed8 0%, #0f172a 100%);
+      color: white; 
+      border-radius: 20px; 
+      padding: 35px 40px; 
+      margin-bottom: 30px;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      box-shadow: 0 20px 40px rgba(29, 78, 216, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background glow effect for header */
+    .revenue-header::before {
+      content: '';
+      position: absolute;
+      top: -50px; left: -50px;
+      width: 200px; height: 200px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      filter: blur(40px);
+    }
+
+    .revenue-header h2 { letter-spacing: -0.5px; }
+
+    /* Table & Container Polish */
+    .table-container {
+      background: var(--card-bg); 
+      border-radius: 20px; 
+      padding: 30px;
+      box-shadow: var(--card-shadow); 
+      border: 1px solid var(--border-color);
+    }
+    
+    .worker-avatar { 
+      width: 46px; 
+      height: 46px; 
+      border-radius: 12px; 
+      object-fit: cover; 
+      border: 2px solid #f8fafc;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    /* Premium Search Input */
+    .search-wrapper {
+      position: relative;
+      width: 280px;
+    }
+    .search-wrapper i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+    }
+    .search-input {
+      width: 100%;
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 16px 10px 40px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    .search-input:focus {
+      outline: none;
+      background: #fff;
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Clean Status Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 100px; 
+      font-weight: 700; 
+      font-size: 11px; 
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .status-danger { background: #fee2e2; color: #b91c1c; }
+    .status-warning { background: #fef3c7; color: #b45309; }
+    .status-safe { background: #f1f5f9; color: #64748b; }
+
+    /* Table adjustments */
+    .table > :not(caption) > * > * {
+      padding: 16px 12px;
+      border-bottom-color: #f1f5f9;
+    }
+    .table-hover tbody tr { transition: all 0.2s; }
+    .table-hover tbody tr:hover { background-color: #f8fafc; }
+    .table thead th { 
+      font-weight: 600; 
+      letter-spacing: 0.5px;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    /* Modern Action Buttons */
+    .action-btn {
+      border: none;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      gap: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .btn-execute {
+      background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
+    }
+    .btn-execute:hover { 
+      background: #1d4ed8; color: #fff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(29,78,216,0.2); border-color: #1d4ed8;
+    }
+
+    .btn-notify {
+      background: #fffbeb; color: #d97706; border: 1px solid #fde68a;
+    }
+    .btn-notify:hover { 
+      background: #d97706; color: #fff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(217,119,6,0.2); border-color: #d97706;
+    }
+
+    .btn-restrict {
+      background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;
+    }
+    .btn-restrict:hover {
+      background: #dc2626; color: #fff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(220,38,38,0.2); border-color: #dc2626;
+    }
+
+    .rejection-val { font-weight: 800; font-size: 16px; color: #0f172a; }
+
+    .btn-unrestrict {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+.btn-unrestrict:hover {
+  background: #059669;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(5,150,105,0.2);
+  border-color: #059669;
+}
+
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid">
+    <a href="admin-dashboard.html" class="btn-back">
+      <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+    </a>
+
+    <div class="revenue-header">
+      <div style="position: relative; z-index: 1;">
+        <h2 class="fw-800 m-0">Quality Control Terminal</h2>
+        <p class="m-0 opacity-75 mt-1">Automated penalty enforcement for high rejection rates.</p>
+      </div>
+      <div class="text-end" style="position: relative; z-index: 1;">
+        <small class="text-uppercase fw-bold text-white-50">Penalty Policy</small>
+        <h4 class="fw-800 m-0">5% Wallet Deduction at 5+ Rejects</h4>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-800 m-0">Partner Compliance Monitor</h5>
+        <div class="search-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="search-input" placeholder="Filter by Name...">
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="text-uppercase">
+            <tr style="border-bottom: 2px solid #e2e8f0;">
+              <th class="py-3">Partner Information</th>
+              <th class="py-3">Rejections</th>
+              <th class="py-3">System Status</th>
+              <th class="py-3 text-end">Administrative Action</th>
+            </tr>
+          </thead>
+          <tbody class="fw-600">
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  <img src="https://i.pravatar.cc/150?u=w11" class="worker-avatar">
+                  <div>
+                    <h6 class="m-0 fw-800" style="color: #0f172a;">Mohit Sharma</h6>
+                    <small class="text-muted fw-bold">Electrician</small>
+                  </div>
+                </div>
+              </td>
+              <td><span class="rejection-val text-danger">5</span> <small class="text-muted">/ Month</small></td>
+              <td><span class="status-badge status-danger"><i class="fa-solid fa-circle-exclamation"></i> Penalty Eligible</span></td>
+              <td class="text-end">
+                <div class="d-flex justify-content-end gap-2">
+  <button class="action-btn btn-execute" title="Apply Fine" onclick="confirm('Apply 5% platform penalty for Mohit Sharma?')">
+    <i class="fa-solid fa-file-invoice-dollar"></i> Fine
+  </button>
+
+  <button class="action-btn btn-restrict" title="Restrict Partner" onclick="confirm('Are you sure you want to restrict Mohit Sharma from the platform?')">
+    <i class="fa-solid fa-ban"></i> Restrict
+  </button>
+
+  <button class="action-btn btn-unrestrict" title="Unrestrict Partner" onclick="confirm('Unrestrict Mohit Sharma and restore platform access?')">
+    <i class="fa-solid fa-unlock"></i> Unrestrict
+  </button>
+</div>
+
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  <img src="https://i.pravatar.cc/150?u=w12" class="worker-avatar">
+                  <div>
+                    <h6 class="m-0 fw-800" style="color: #0f172a;">Vikram Rathore</h6>
+                    <small class="text-muted fw-bold">Plumber</small>
+                  </div>
+                </div>
+              </td>
+              <td><span class="rejection-val text-warning">4</span> <small class="text-muted">/ Month</small></td>
+              <td><span class="status-badge status-warning"><i class="fa-solid fa-triangle-exclamation"></i> Final Warning</span></td>
+              <td class="text-end">
+                <div class="d-flex justify-content-end gap-2">
+                  <button class="action-btn btn-notify" title="Send Warning">
+                    <i class="fa-solid fa-paper-plane"></i> Warn
+                  </button>
+                  <button class="action-btn btn-restrict" title="Restrict Partner" onclick="confirm('Are you sure you want to restrict Vikram Rathore from the platform?')">
+                    <i class="fa-solid fa-ban"></i> Restrict
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  <img src="https://i.pravatar.cc/150?u=w13" class="worker-avatar">
+                  <div>
+                    <h6 class="m-0 fw-800" style="color: #0f172a;">Sanjeev Kumar</h6>
+                    <small class="text-muted fw-bold">AC Repair</small>
+                  </div>
+                </div>
+              </td>
+              <td><span class="rejection-val text-success">2</span> <small class="text-muted">/ Month</small></td>
+              <td><span class="status-badge status-safe"><i class="fa-solid fa-circle-check"></i> Compliant</span></td>
+              <td class="text-end">
+                <small class="text-muted fw-bold"><i class="fa-solid fa-check text-success"></i> No Action Needed</small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FixoFix | Secure Inspection Deposit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root { 
+      --brand: #1d4ed8; 
+      --text-dark: #0f172a; 
+      --bg-soft: #f8fafc; 
+    }
+
+    body { 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
+      background: var(--bg-soft); 
+      color: var(--text-dark); 
+      padding: 60px 0; 
+    }
+    
+    .checkout-container {
+      max-width: 1100px;
+      margin: auto;
+      background: #fff;
+      border-radius: 35px;
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
+    }
+
+    /* LEFT SIDE: WHY INSPECTION? */
+    .info-side { 
+      background: #0f172a; 
+      color: #fff; 
+      padding: 60px 50px; 
+    }
+    .brand-header { font-weight: 800; font-size: 1.8rem; margin-bottom: 50px; display: flex; align-items: center; gap: 12px; }
+    
+    .reason-item { display: flex; gap: 20px; margin-bottom: 35px; }
+    .reason-icon { width: 45px; height: 45px; background: rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; color: #60a5fa; }
+    .reason-text h6 { font-weight: 800; margin-bottom: 5px; }
+    .reason-text p { font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.5; margin: 0; }
+
+    /* RIGHT SIDE: SUMMARY & PAY */
+    .payment-side { padding: 60px 50px; background: #fff; }
+    .back-link { color: #64748b; text-decoration: none; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; margin-bottom: 40px; cursor: pointer; }
+    
+    .summary-box { background: #f8fafc; border-radius: 20px; padding: 25px; margin-bottom: 30px; border: 1px solid #f1f5f9; }
+    .data-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
+    .data-label { font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
+    .data-val { font-weight: 700; font-size: 0.95rem; }
+
+    .price-card { background: #eff6ff; border-radius: 25px; padding: 30px; text-align: center; margin-bottom: 30px; border: 2px solid #dbeafe; }
+    .price-card h1 { font-size: 3.5rem; font-weight: 900; letter-spacing: -3px; color: var(--brand); margin: 0; }
+    
+    .pay-btn { background: var(--brand); color: #fff; border: none; width: 100%; padding: 20px; border-radius: 20px; font-weight: 800; font-size: 1.1rem; transition: 0.3s; }
+    .pay-btn:hover:not(:disabled) { background: #1e40af; transform: translateY(-3px); box-shadow: 0 15px 30px rgba(29, 78, 216, 0.2); }
+    .pay-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+    /* PAYMENT OPTION STYLING */
+    .payment-option {
+      cursor: pointer;
+      border: 2px solid #f1f5f9;
+      transition: 0.3s;
+      flex: 1;
+    }
+    .payment-option:hover { border-color: var(--brand); background: #f8fafc; }
+    .payment-option.active { background: #f8fafc; border-color: var(--brand) !important; box-shadow: 0 10px 20px rgba(29, 78, 216, 0.05); }
+
+    /* UPI/Card Input fields */
+    .input-group-luxury { margin-top: 20px; display: none; }
+    .input-group-luxury.active { display: block; animation: fadeIn 0.4s ease; }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .form-control-luxury {
+      border-radius: 15px;
+      padding: 12px 18px;
+      border: 2px solid #f1f5f9;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="checkout-container">
+    <div class="row g-0">
+      
+      <div class="col-lg-5 info-side">
+        <div class="brand-header">
+          <i class="fas fa-screwdriver-wrench text-primary"></i> FixoFix
+        </div>
+        
+        <h3 class="fw-800 mb-4">Why an Inspection Fee?</h3>
+        
+        <div class="reason-item">
+          <div class="reason-icon"><i class="fas fa-truck-fast"></i></div>
+          <div class="reason-text">
+            <h6>Expert Travel & Logistics</h6>
+            <p>This fee covers the logistics and fuel for our verified professional to reach your doorstep for a live diagnostic.</p>
+          </div>
+        </div>
+
+        <div class="reason-item">
+          <div class="reason-icon"><i class="fas fa-microscope"></i></div>
+          <div class="reason-text">
+            <h6>Physical On-Site Audit</h6>
+            <p>A physical check allows the worker to accurately assess the spare parts and labor required for a long-term fix.</p>
+          </div>
+        </div>
+
+        <div class="reason-item">
+          <div class="reason-icon"><i class="fas fa-shield-heart"></i></div>
+          <div class="reason-text">
+            <h6>Committed Appointments</h6>
+            <p>It ensures that the slot is reserved exclusively for you, preventing last-minute service cancellations.</p>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-top border-white border-opacity-10 text-white-50 small">
+          <i class="fas fa-lock me-2"></i> Secured by FixoFix Encryption v3.0
+        </div>
+      </div>
+
+      <div class="col-lg-7 payment-side">
+        <div id="backButton" class="back-link">
+          <i class="fas fa-chevron-left"></i> Edit booking details
+        </div>
+
+        <h4 class="fw-800 mb-4">Confirm Deployment</h4>
+        
+        <div class="summary-box">
+          <div class="data-row">
+            <span class="data-label">Member</span>
+            <span class="data-val" id="d-name">Loading...</span>
+          </div>
+          <div class="data-row">
+            <span class="data-label">Service Category</span>
+            <span class="data-val text-primary" id="d-service">--</span>
+          </div>
+          <div class="data-row">
+            <span class="data-label">Schedule</span>
+            <span class="data-val text-end" id="d-schedule">--</span>
+          </div>
+          <div class="data-row m-0">
+            <span class="data-label">Address</span>
+            <span class="data-val text-end" id="d-address" style="max-width: 250px;">--</span>
+          </div>
+        </div>
+
+        <div class="price-card">
+          <p class="small fw-800 text-muted mb-1 text-uppercase">Initial Inspection Deposit</p>
+          <h1 id="d-total">₹29</h1>
+          <p class="small fw-600 text-success mt-2 m-0"><i class="fas fa-check-circle"></i> Fully adjustable in your final labor bill</p>
+        </div>
+
+        <div class="mb-4">
+          <h6 class="fw-800 mb-3 small">SELECT PAYMENT METHOD</h6>
+          <div class="d-flex gap-3">
+             <div class="p-3 border rounded-4 payment-option active" id="btn-upi" onclick="selectMethod('UPI')">
+                <i class="fas fa-mobile-alt text-primary mb-2"></i><br>
+                <span class="fw-800 small">UPI App</span>
+             </div>
+             <div class="p-3 border rounded-4 payment-option" id="btn-card" onclick="selectMethod('Card')">
+                <i class="fas fa-credit-card text-primary mb-2"></i><br>
+                <span class="fw-800 small">Card / Net</span>
+             </div>
+          </div>
+
+          <div id="upi-input" class="input-group-luxury active">
+            <input type="text" id="upiId" class="form-control form-control-luxury" placeholder="Enter UPI ID (e.g. user@okaxis)">
+          </div>
+          <div id="card-input" class="input-group-luxury">
+            <div class="row g-2">
+              <div class="col-12"><input type="text" class="form-control form-control-luxury" placeholder="Card Number"></div>
+              <div class="col-6"><input type="text" class="form-control form-control-luxury" placeholder="MM/YY"></div>
+              <div class="col-6"><input type="password" class="form-control form-control-luxury" placeholder="CVV"></div>
+            </div>
+          </div>
+        </div>
+
+        <button class="pay-btn" id="mainPayBtn" onclick="confirmPayment()">Authorize Secure Payment</button>
+        
+        <div class="text-center mt-4">
+          <p class="extra-small text-muted fw-600" style="font-size: 0.75rem;">
+            70% Refundable if the job is technically unserviceable.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  let selectedMethod = "UPI";
+  let bookingId = null;
+  let platformFee = 29.00;
+
+  // ✨ Helper Function: Formats "2024-05-20" into "Monday, May 20"
+  function formatHumanDate(dateStr) {
+    if (!dateStr) return "Today";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  }
+
+  // ✨ Helper Function: Formats "14:30" into "02:30 PM"
+  function formatHumanTime(timeStr) {
+    if (!timeStr) return "ASAP";
+    const [hours, minutes] = timeStr.split(':');
+    const h = parseInt(hours);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const formattedHours = h % 12 || 12;
+    return `${formattedHours}:${minutes} ${ampm}`;
+  }
+
+  // 1. Load latest booking from Backend
+  window.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const res = await fetch('http://localhost:3000/latest-booking', { credentials: 'include' });
+      const data = await res.json();
+      
+      if(!res.ok) {
+        alert("No booking details found. Redirecting...");
+        window.location.href = "customer-home.html";
+        return;
+      }
+
+      bookingId = data.id;
+      document.getElementById('d-name').innerText = data.name;
+      document.getElementById('d-service').innerText = data.service;
+      document.getElementById('d-address').innerText = data.address;
+
+      // ✅ Properly Formatted Date and Time
+      const readableDate = formatHumanDate(data.preferred_date);
+      const readableTime = formatHumanTime(data.preferred_time);
+      
+      document.getElementById('d-schedule').innerHTML = `
+        <span class="text-dark">${readableDate}</span><br>
+        <small class="text-muted">${readableTime}</small>
+      `;
+
+      document.getElementById('d-total').innerText = `₹${platformFee}`;
+      
+    } catch(err) {
+      console.error(err);
+      alert("Error connecting to server.");
+    }
+  });
+
+  // 2. Handle UI Method selection
+  function selectMethod(method) {
+    selectedMethod = method;
+    document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('active'));
+    document.querySelectorAll('.input-group-luxury').forEach(div => div.classList.remove('active'));
+    
+    if(method === 'UPI') {
+      document.getElementById('btn-upi').classList.add('active');
+      document.getElementById('upi-input').classList.add('active');
+    } else {
+      document.getElementById('btn-card').classList.add('active');
+      document.getElementById('card-input').classList.add('active');
+    }
+  }
+
+  // 3. Confirm Payment
+  async function confirmPayment() {
+    const btn = document.getElementById('mainPayBtn');
+    if (!bookingId) return;
+
+    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Authorizing...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch('http://127.0.0.1:3000/platform-fee', {
+         method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    booking_id: bookingId,
+    amount: platformFee,
+    method: selectedMethod
+        })
+      });
+
+      if (res.ok) {
+        btn.innerHTML = 'Success ✅';
+        btn.style.background = '#22c55e';
+        setTimeout(() => {
+          window.location.href = "customer-dashboard.html";
+        }, 1500);
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = 'Try Again';
+      }
+    } catch(err) {
+      btn.disabled = false;
+      btn.innerHTML = 'Authorize Secure Payment';
+    }
+  }
+
+  // 4. Back button logic
+  document.getElementById('backButton').addEventListener('click', () => {
+    localStorage.setItem('editBooking', 'true');
+    window.location.href = 'customer-home.html';
+  });
+</script>
+</body>
+</html>

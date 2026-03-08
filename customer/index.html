@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FixoFix | Elite Home Services Ecosystem</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+  <style>
+    :root {
+      --brand: #1d4ed8;
+      --brand-soft: #eff6ff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --glass: rgba(255, 255, 255, 0.8);
+      --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #ffffff;
+      color: var(--text-main);
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* ===== NAVIGATION ===== */
+    nav { position: fixed; top: 0; width: 100%; padding: 30px 0; z-index: 2000; transition: 0.5s; }
+    .nav-scrolled { background: var(--glass); backdrop-filter: blur(25px); padding: 15px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .nav-container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; }
+
+    .nav-menu { display: flex; gap: 30px; list-style: none; margin: 0; padding: 0; }
+    .nav-menu a { text-decoration: none; color: var(--text-main); font-weight: 700; font-size: 0.95rem; opacity: 0.6; transition: 0.3s; }
+    .nav-menu a:hover { opacity: 1; color: var(--brand); }
+
+    .brand-logo { font-weight: 800; font-size: 1.7rem; color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 12px; letter-spacing: -1.5px; }
+
+    /* ===== NEW HERO DESIGN (MODERN LOCATION & IMAGE) ===== */
+    .hero { min-height: 90vh; display: flex; align-items: center; padding: 160px 0 100px; background: radial-gradient(circle at 10% 10%, #eff6ff 0%, transparent 30%); position: relative; }
+
+    .hero-h1 { font-size: clamp(3.5rem, 7vw, 5.5rem); font-weight: 800; letter-spacing: -4px; line-height: 0.9; margin-bottom: 30px; }
+
+    /* Premium Image Bento Box */
+    .hero-image-container { position: relative; z-index: 10; padding-left: 50px; }
+    .main-hero-card { 
+      width: 100%; height: 500px; border-radius: 40px; overflow: hidden; 
+      box-shadow: 0 40px 100px rgba(0,0,0,0.15); border: 12px solid #fff;
+      transform: perspective(1000px) rotateY(-5deg); transition: 0.5s;
+    }
+    .main-hero-card:hover { transform: perspective(1000px) rotateY(0deg); }
+    .main-hero-card img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Floating Badges */
+    .floating-tag {
+      position: absolute; background: #fff; padding: 15px 25px; border-radius: 24px; 
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 15px; z-index: 20;
+    }
+    .tag-top { top: -30px; left: 0; }
+    .tag-bottom { bottom: -20px; right: -20px; }
+
+    .btn-main { background: var(--text-main); color: white !important; padding: 18px 35px; border-radius: 16px; font-weight: 800; text-decoration: none; transition: 0.3s; display: inline-block; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+    .btn-outline-pro { background: transparent; color: var(--text-main); padding: 18px 35px; border-radius: 16px; font-weight: 800; text-decoration: none; border: 2px solid #e2e8f0; transition: 0.3s; display: inline-block; }
+/* ===== BENTO SERVICE CARDS ===== */
+    .service-card-scroll { background: #ffffff; border-radius: 45px; padding: 50px 30px; border: 1px solid #f1f5f9; text-align: center; transition: 0.5s; height: 100%; box-shadow: var(--card-shadow); }
+    .service-card-scroll:hover { transform: translateY(-15px); border-color: var(--brand); box-shadow: 0 40px 80px rgba(37, 99, 235, 0.08); }
+    .icon-box-pro { width: 80px; height: 80px; background: var(--brand); color: white; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 30px; box-shadow: 0 15px 30px rgba(37, 99, 235, 0.2); }
+
+    /* ===== STATS & OTHERS ===== */
+    .service-card-scroll { background: #ffffff; border-radius: 40px; padding: 45px; border: 1px solid #f1f5f9; text-align: center; transition: 0.4s; height: 100%; box-shadow: var(--card-shadow); }
+    .service-card-scroll:hover { transform: translateY(-10px); border-color: var(--brand); }
+    .icon-box-pro { width: 70px; height: 70px; background: var(--brand); color: white; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 25px; }
+
+    .review-section { background: var(--text-main); color: white; padding: 120px 0; border-radius: 80px 80px 0 0; }
+    .review-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 50px; border-radius: 45px; transition: 0.4s; height: 100%; }
+
+    .stat-val { font-size: 3rem; font-weight: 800; color: var(--brand); letter-spacing: -2px; }
+    .stat-label { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); }
+    .step-num { font-size: 11rem; font-weight: 900; color: #f8fafc; position: absolute; top: -50px; left: 50%; transform: translateX(-50%); z-index: -1; }
+  /* ===== WORKER CTA CARD ===== */
+    .worker-cta { background: var(--brand); border-radius: 40px; padding: 60px; color: white; margin-bottom: -50px; position: relative; z-index: 5; box-shadow: 0 30px 60px rgba(29, 78, 216, 0.2); }
+
+    /* ===== PREMIUM FOOTER ===== */
+     .premium-footer { background: #0f172a; color: #ffffff; padding: 120px 0 30px; border-radius: 60px 60px 0 0; }
+    .footer-link { color: #e2e8f0; text-decoration: none; transition: 0.3s; display: block; margin-bottom: 12px; font-weight: 500; opacity: 0.8; }
+    .footer-link:hover { color: #ffffff; opacity: 1; padding-left: 5px; }
+    .footer-text-white { color: #ffffff !important; opacity: 0.9; }
+    .social-icon { width: 45px; height: 45px; background: rgba(255, 255, 255, 0.1); display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; margin-right: 10px; color: #fff; transition: 0.3s; text-decoration: none; }
+    .social-icon:hover { background: #ffffff; color: var(--brand); transform: translateY(-5px); }
+    .newsletter-input { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 14px; padding: 12px 20px; color: #fff; }
+    .newsletter-input::placeholder { color: rgba(255,255,255,0.5); }
+
+  </style>
+</head>
+<body>
+
+  <nav id="topNav">
+    <div class="nav-container">
+      <a href="#home" class="brand-logo text-decoration-none">
+        <i class="fa-solid fa-screwdriver-wrench text-primary"></i> <span>FixoFix.</span>
+      </a>
+
+      <ul class="nav-menu d-none d-lg-flex">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#testimonials">Reviews</a></li>
+        <li><a href="#footer">About</a></li>
+      </ul>
+
+      <div class="dropdown">
+        <button class="btn btn-dark rounded-pill px-4 py-2 fw-bold border-0 dropdown-toggle" data-bs-toggle="dropdown">Sign in</button>
+        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-3 mt-4" style="border-radius: 24px;">
+          <li><a class="dropdown-item fw-bold py-2 px-4 rounded-3" href="customer-login.html"> As a Customer </a></li>
+          <li><a class="dropdown-item fw-bold py-2 px-4 rounded-3" href="../worker/worker-login.html"> As a Worker</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item fw-bold text-primary py-2 px-4 rounded-3" href="../admin/admin-login.html">Admin Terminal</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <section id="home" class="position-relative overflow-hidden d-flex align-items-center" style="min-height: 100vh; background: #ffffff;">
+
+  <h1 class="position-absolute start-0 w-100 text-center opacity-05 fw-900" style="font-size: 20vw; top: 50%; transform: translateY(-50%); color: #000; pointer-events: none; letter-spacing: -10px; z-index: 0;">FIXO-FIX</h1>
+
+  <div class="container position-relative" style="z-index: 2;">
+    <div class="row align-items-center g-0">
+
+      <div class="col-lg-6 py-5" data-aos="fade-right">
+        <div class="badge-elite mb-4 mt-4 d-inline-flex align-items-center gap-2 px-3 py-2" style="background: #f0f7ff; border: 1px solid #d0e7ff;">
+          <span class="pulse-dot"></span>
+          <span class="text-primary fw-900 text-uppercase small" style="letter-spacing: 2px ;">Standards Over Shortcuts</span>
+        </div>
+
+        <h1 class="display-1 fw-900 text-dark mb-4" style="letter-spacing: -6px; line-height: 0.9;">
+          The <span class="text-primary">Gold</span> Standard <br>of Home Care.
+        </h1>
+
+        <p class="fs-5 text-secondary mb-5 fw-500" style="max-width: 480px; line-height: 1.6;">
+A structured service platform where every professional is verified, audited, and onboarded through defined checks—ensuring reliable, consistent service before deployment.        </p>
+
+        <div class="d-flex align-items-center gap-4">
+          <a href="customer.html" class="btn-pro-black">
+            Book Service <i class="fas fa-arrow-right ms-2"></i>
+          </a>
+          <a href="../worker/worker.html" class="text-dark fw-900 text-decoration-none border-bottom border-2 border-dark pb-1">
+            Join as Worker
+          </a>
+        </div>
+      </div>
+
+      <div class="col-lg-6 position-relative" data-aos="zoom-in-left">
+        <div class="hero-visual-wrapper ps-lg-5">
+          <div class="position-relative overflow-hidden shadow-2xl" style="height: 600px; border-radius: 40px 0 40px 0;">
+            <img src="images/hero2.jpg" style="width: 100%; height: 100%; object-fit: cover;">
+
+            <div class="position-absolute bottom-0 start-0 m-4 p-4 d-flex align-items-center gap-4 backdrop-blur-lg" style="background: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; width: 80%;">
+               <div class="stats-circle d-flex align-items-center justify-content-center bg-primary text-white fw-900" style="width: 60px; height: 60px; border-radius: 50%; min-width: 60px;">
+                 <i class="fas fa-bolt"></i>
+               </div>
+               <div>
+                 <p class="m-0 fw-900 text-dark">60-Min Deployment</p>
+                 <p class="m-0 text-muted small fw-600">Guaranteed real-time response</p>
+               </div>
+            </div>
+          </div>
+
+          <div class="position-absolute top-0 end-0 m-5 p-3 bg-white shadow-xl d-flex align-items-center gap-2" style="border-radius: 100px; z-index: 10;">
+             <i class="fas fa-check-circle text-success"></i>
+             <span class="fw-900 small text-dark">PLATFORM-VERIFIED</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  /* PREMIUM UI UTILITIES */
+  .display-1 { font-size: 5.5rem !important; }
+  .pulse-dot { width: 8px; height: 8px; background: #3b82f6; border-radius: 50%; animation: pulse 1.5s infinite; }
+  .backdrop-blur-lg { backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+  .opacity-05 { opacity: 0.05; }
+  .btn-pro-black {
+    background: #000; color: #fff; padding: 18px 40px; text-decoration: none;
+    font-weight: 900; letter-spacing: 1px; transition: 0.3s; text-transform: uppercase;
+  }
+  .btn-pro-black:hover { background: #3b82f6; transform: translateY(-5px); }
+  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+  @media (max-width: 992px) {
+    .display-1 { font-size: 3.5rem !important; }
+    .hero-visual-wrapper { margin-top: 50px; }
+  }
+</style>
+
+
+ <section class="py-5 position-relative overflow-hidden" style="background: #020617; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); border-radius: 0 !important;">
+
+  <div class="position-absolute top-0 start-0 w-100 h-100" style="background-image: radial-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.2; pointer-events: none;"></div>
+
+  <div class="container py-5">
+    <div class="row g-0 align-items-center">
+
+      <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="p-4 text-center">
+          <span class="text-primary fw-900 extra-small text-uppercase mb-2 d-block" style="letter-spacing: 3px;">Protocol Efficiency</span>
+          <h2 class="fw-900 text-white mb-0" style="font-size: 4rem; letter-spacing: -5px; line-height: 1;">99.8<span style="font-size: 1.5rem; letter-spacing: 0;">%</span></h2>
+          <p class="text-white opacity-30 small fw-800 text-uppercase mt-2" style="letter-spacing: 2px;">Safety Record</p>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3 border-start border-white border-opacity-10" data-aos="fade-up" data-aos-delay="200">
+        <div class="p-4 text-center">
+          <span class="text-primary fw-900 extra-small text-uppercase mb-2 d-block" style="letter-spacing: 3px;">Operational Scale</span>
+          <h2 class="fw-900 text-white mb-0" style="font-size: 4rem; letter-spacing: -5px; line-height: 1;">2.5<span style="font-size: 1.5rem; letter-spacing: 0;">k+</span></h2>
+          <p class="text-white opacity-30 small fw-800 text-uppercase mt-2" style="letter-spacing: 2px;">Daily Deployments</p>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3 border-start border-white border-opacity-10" data-aos="fade-up" data-aos-delay="300">
+        <div class="p-4 text-center">
+          <span class="text-primary fw-900 extra-small text-uppercase mb-2 d-block" style="letter-spacing: 3px;">Node Latency</span>
+          <h2 class="fw-900 text-white mb-0" style="font-size: 4rem; letter-spacing: -5px; line-height: 1;">18<span style="font-size: 1.5rem; letter-spacing: 0;">m</span></h2>
+          <p class="text-white opacity-30 small fw-800 text-uppercase mt-2" style="letter-spacing: 2px;">Avg Response</p>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3 border-start border-white border-opacity-10" data-aos="fade-up" data-aos-delay="400">
+        <div class="p-4 text-center">
+          <span class="text-primary fw-900 extra-small text-uppercase mb-2 d-block" style="letter-spacing: 3px;">Partner Wealth</span>
+          <h2 class="fw-900 text-white mb-0" style="font-size: 4rem; letter-spacing: -5px; line-height: 1;"><span style="font-size: 2rem; letter-spacing: 0;">₹</span>15<span style="font-size: 1.5rem; letter-spacing: 0;">Cr</span></h2>
+          <p class="text-white opacity-30 small fw-800 text-uppercase mt-2" style="letter-spacing: 2px;">Partner Earnings</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+  <section id="services" class="py-5">
+    <div class="container mb-5 text-center" data-aos="fade-up">
+        <h2 class="fw-800 fs-1" style="letter-spacing: -2px;">Service Verticals.</h2>
+        <p class="text-muted fw-600">Master-grade professionals for every high-end requirement.</p>
+    </div>
+    <div class="swiper serviceSwiper py-5 px-4">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide"><div class="service-card-scroll"><div class="icon-box-pro"><i class="fas fa-bolt"></i></div><h4 class="fw-800" >Electrician</h4><p class="text-muted fw-600">Grid Maintenance</p></div></div>
+        <div class="swiper-slide"><div class="service-card-scroll"><div class="icon-box-pro"><i class="fas fa-snowflake"></i></div><h4 class="fw-800">HVAC Elite</h4><p class="text-muted fw-600">Cooling Systems</p></div></div>
+        <div class="swiper-slide"><div class="service-card-scroll"><div class="icon-box-pro"><i class="fas fa-sink"></i></div><h4 class="fw-800">Plumbing</h4><p class="text-muted fw-600">Leak Diagnostics</p></div></div>
+        <div class="swiper-slide"><div class="service-card-scroll"><div class="icon-box-pro"><i class="fas fa-broom"></i></div><h4 class="fw-800">Sanitization</h4><p class="text-muted fw-600">Deep Cleaning</p></div></div>
+        <div class="swiper-slide"><div class="service-card-scroll"><div class="icon-box-pro"><i class="fas fa-hammer"></i></div><h4 class="fw-800">Carpentry</h4><p class="text-muted fw-600">Wood Engineering</p></div></div>
+      </div>
+    </div>
+  </section>
+
+<section class="py-5 position-relative overflow-hidden" style="background: #020617; border-radius: 0 !important;">
+
+  <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.08) 0%, transparent 50%); pointer-events: none;"></div>
+
+  <div class="container py-5">
+    <div class="row align-items-center g-5">
+
+      <div class="col-lg-6" data-aos="zoom-in-right">
+        <div class="position-relative">
+          <div class="main-hero-card" style="height: 520px; border-radius: 0 !important; border: 1px solid rgba(255,255,255,0.1); transform: perspective(2000px) rotateY(12deg); box-shadow: -30px 50px 100px rgba(0,0,0,0.7);">
+            <img src="images/hero5.jpeg" alt="Elite Customer UX" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(1.1) brightness(0.85); border-radius: 0 !important;">
+          </div>
+
+          <div class="position-absolute p-3 border shadow-2xl" style="left: -25px; top: 40px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); border: 1px solid #3b82f6 !important; border-radius: 0 !important; z-index: 3;">
+             <div class="d-flex align-items-center gap-3">
+               <div class="spinner-grow text-primary" style="width: 10px; height: 10px;"></div>
+               <span class="text-white fw-800 small text-uppercase" style="letter-spacing: 2px;">Customer Node: Online</span>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 ps-lg-5" data-aos="fade-left">
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <div style="width: 40px; height: 2px; background: #3b82f6;"></div>
+            <span class="text-primary fw-800 text-uppercase" style="letter-spacing: 4px; font-size: 0.7rem;">Operational Module</span>
+        </div>
+
+        <h2 class="display-4 text-white mb-4 fw-900" style="letter-spacing: -3px; line-height: 0.85;">Elite Discovery. <br><span class="text-primary">Radical Safety.</span></h2>
+
+        <p class="text-white opacity-50 mb-5 fw-500" style="font-size: 1.1rem; max-width: 90%;">The FixoFix Customer Terminal is meticulously engineered for frictionless service discovery and autonomous resource allocation.</p>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+             <div class="p-3" style="border-left: 2px solid #3b82f6;">
+               <h6 class="fw-800 text-white text-uppercase small mb-2" style="letter-spacing: 1px;">Transparency</h6>
+               <p class="small text-white opacity-40 fw-500 m-0">Standardized labor audits and fixed pricing logs.</p>
+             </div>
+          </div>
+          <div class="col-md-6">
+             <div class="p-3" style="border-left: 2px solid #3b82f6;">
+               <h6 class="fw-800 text-white text-uppercase small mb-2" style="letter-spacing: 1px;">Tracking</h6>
+               <p class="small text-white opacity-40 fw-500 m-0">Geofenced partner sync with real-time arrival logs.</p>
+             </div>
+          </div>
+          <div class="col-md-6">
+             <div class="p-3" style="border-left: 2px solid #3b82f6;">
+               <h6 class="fw-800 text-white text-uppercase small mb-2" style="letter-spacing: 1px;">Security</h6>
+               <p class="small text-white opacity-40 fw-500 m-0">Two-factor OTP handshake to initialize job sessions.</p>
+             </div>
+          </div>
+          <div class="col-md-6">
+             <div class="p-3" style="border-left: 2px solid #3b82f6;">
+               <h6 class="fw-800 text-white text-uppercase small mb-2" style="letter-spacing: 1px;">Verification</h6>
+               <p class="small text-white opacity-40 fw-500 m-0">Every expert is 100% Aadhaar-audited and certified.</p>
+             </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<section class="py-5" style="background: #ffffff; position: relative; overflow: hidden;">
+
+  <div class="position-absolute top-0 start-0 w-100 h-100" style="background-image: radial-gradient(circle at 5% 5%, rgba(37, 99, 235, 0.03) 0%, transparent 40%); pointer-events: none;"></div>
+
+  <div class="container py-5">
+    <div class="mb-5" data-aos="fade-right">
+      <p class="text-primary fw-800 text-uppercase mb-2" style="letter-spacing: 5px; font-size: 0.75rem;">System Flow 01</p>
+      <h2 class="display-3 fw-900 text-dark" style="letter-spacing: -5px; line-height: 1;">Member <span class="text-primary">Journey.</span></h2>
+    </div>
+
+    <div class="row g-5">
+
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="p-2 border-start border-3 border-dark" style="transition: 0.4s;">
+          <h1 class="display-2 fw-900 text-dark opacity-10 mb-0" style="margin-left: -5px;">01</h1>
+          <div class="py-3">
+            <h4 class="fw-800 text-dark text-uppercase mb-3" style="letter-spacing: 1px;">Discovery Node</h4>
+            <p class="text-muted fw-600 mb-4" style="font-size: 0.95rem; line-height: 1.7;">System instantly scans local geofenced nodes to match you with the highest-rated verified professional in your proximity.</p>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-dark text-white px-2 py-1" style="font-size: 0.6rem; border-radius: 0;">LATENCY: < 1s</span>
+                <span class="badge bg-light text-dark px-2 py-1 border" style="font-size: 0.6rem; border-radius: 0;">AI-MATCH</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="p-2 border-start border-3 border-primary" style="background: linear-gradient(90deg, #f8fafc 0%, transparent 100%);">
+          <h1 class="display-2 fw-900 text-primary mb-0" style="margin-left: -5px;">02</h1>
+          <div class="py-3">
+            <h4 class="fw-800 text-dark text-uppercase mb-3" style="letter-spacing: 1px;">Live Sync</h4>
+            <p class="text-muted fw-600 mb-4" style="font-size: 0.95rem; line-height: 1.7;">Activate geofenced synchronization. Track your assigned expert's arrival with millisecond precision on our real-time operational map.</p>
+            <div class="d-flex align-items-center gap-2">
+                <div class="spinner-grow text-primary" style="width: 8px; height: 8px;"></div>
+                <span class="text-primary fw-800" style="font-size: 0.65rem; letter-spacing: 1px;">TRACKING ACTIVE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="p-2 border-start border-3 border-success">
+          <h1 class="display-2 fw-900 text-success opacity-10 mb-0" style="margin-left: -5px;">03</h1>
+          <div class="py-3">
+            <h4 class="fw-800 text-dark text-uppercase mb-3" style="letter-spacing: 1px;">Handshake</h4>
+            <p class="text-muted fw-600 mb-4" style="font-size: 0.95rem; line-height: 1.7;">Secure the session via two-factor OTP authentication. The professional session only initializes after your digital authorization.</p>
+            <div class="d-flex align-items-center gap-2 text-success">
+                <i class="fas fa-shield-check" style="font-size: 0.7rem;"></i>
+                <span class="fw-800" style="font-size: 0.65rem; letter-spacing: 1px;">SECURE PROTOCOL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<section class="py-5 position-relative overflow-hidden" style="background: #020617; border-radius: 0 !important;">
+
+  <div class="position-absolute top-0 end-0 w-100 h-100" style="background: radial-gradient(circle at 90% 20%, rgba(37, 99, 235, 0.08) 0%, transparent 50%); pointer-events: none;"></div>
+
+  <div class="container py-5">
+    <div class="row align-items-center g-5 flex-row-reverse">
+
+      <div class="col-lg-6" data-aos="zoom-in-left">
+        <div class="position-relative">
+          <div class="main-hero-card" style="height: 520px; border-radius: 0 !important; border: 1px solid rgba(255,255,255,0.1); transform: perspective(2000px) rotateY(-12deg); box-shadow: 30px 50px 100px rgba(0,0,0,0.7);">
+            <img src="images/hero4.jpeg" alt="Partner Command Terminal" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(1.1) brightness(0.85); border-radius: 0 !important;">
+          </div>
+
+          <div class="position-absolute p-3 border shadow-2xl" style="right: -25px; bottom: 40px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); border: 1px solid #3b82f6 !important; border-radius: 0 !important; z-index: 3;">
+             <div class="d-flex align-items-center gap-3">
+               <div class="bg-primary p-2 text-white"><i class="fas fa-chart-line"></i></div>
+               <div>
+                 <p class="m-0 fw-800 small text-white text-uppercase" style="letter-spacing: 2px;">Partner Earnings</p>
+                 <p class="m-0 text-primary extra-small fw-700">SETTLEMENT: INSTANT</p>
+               </div>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 pe-lg-5" data-aos="fade-right">
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <span class="text-primary fw-800 text-uppercase" style="letter-spacing: 4px; font-size: 0.7rem;">Partner Infrastructure</span>
+            <div style="width: 40px; height: 2px; background: #3b82f6;"></div>
+        </div>
+
+        <h2 class="display-4 text-white mb-4 fw-900" style="letter-spacing: -3px; line-height: 0.85;">Dignity through <br><span class="text-primary">Engineering.</span></h2>
+
+        <p class="text-white opacity-50 mb-5 fw-500" style="font-size: 1.1rem; max-width: 90%;">FixoFix Pro is not merely an application; it is a professional ecosystem engineered to transform gig-workers into elite, certified technicians.</p>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+             <div class="p-3" style="border-left: 2px solid #3b82f6;">
+               <h6 class="fw-800 text-white text-uppercase small mb-2" style="letter-spacing: 1px;">Identity</h6>
+               <p class="small text-white opacity-40 fw-500 m-0">Secure Aadhaar-linked digital Pro-ID for every partner.</p>
+             </div>
+          </div>
+          <div class="col-md-6">
+             <div class="p-3" style="border-left: 2px solid #3b82f6;">
+               <h6 class="fw-800 text-white text-uppercase small mb-2" style="letter-spacing: 1px;">Analytics</h6>
+               <p class="small text-white opacity-40 fw-500 m-0">Live demand-prediction and cluster mapping for jobs.</p>
+             </div>
+          </div>
+          <div class="col-md-6">
+             <div class="p-3" style="border-left: 2px solid #3b82f6;">
+               <h6 class="fw-800 text-white text-uppercase small mb-2" style="letter-spacing: 1px;">Earnings</h6>
+               <p class="small text-white opacity-40 fw-500 m-0">Direct wallet settlement with zero-day payout cycles.</p>
+             </div>
+          </div>
+          <div class="col-md-6">
+             <div class="p-3" style="border-left: 2px solid #3b82f6;">
+               <h6 class="fw-800 text-white text-uppercase small mb-2" style="letter-spacing: 1px;">Academy</h6>
+               <p class="small text-white opacity-40 fw-500 m-0">Continuous skill certification and safety training node.</p>
+             </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<section class="py-5" style="background: #ffffff; position: relative; overflow: hidden; border-top: 1px solid #f1f5f9;">
+
+  <div class="position-absolute bottom-0 end-0 w-100 h-100" style="background-image: radial-gradient(circle at 95% 95%, rgba(37, 99, 235, 0.03) 0%, transparent 40%); pointer-events: none;"></div>
+
+  <div class="container py-5">
+    <div class="mb-5 text-end" data-aos="fade-left">
+      <p class="text-primary fw-800 text-uppercase mb-2" style="letter-spacing: 5px; font-size: 0.75rem;">System Flow 02</p>
+      <h2 class="display-3 fw-900 text-dark" style="letter-spacing: -5px; line-height: 1;">Partner <span class="text-primary">Lifecycle.</span></h2>
+    </div>
+
+    <div class="row g-5">
+
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="p-2 border-start border-3 border-dark" style="transition: 0.4s;">
+          <h1 class="display-2 fw-900 text-dark opacity-10 mb-0" style="margin-left: -5px;">01</h1>
+          <div class="py-3">
+            <h4 class="fw-800 text-dark text-uppercase mb-3" style="letter-spacing: 1px;">Duty Sync</h4>
+            <p class="text-muted fw-600 mb-4" style="font-size: 0.95rem; line-height: 1.7;">Initialize the partner terminal by toggling 'On-Duty' to sync with local demand clusters. Your professional identity is now active on the discovery node.</p>
+            <div class="d-flex align-items-center gap-2">
+                <div class="spinner-grow text-dark" style="width: 8px; height: 8px;"></div>
+                <span class="text-dark fw-800" style="font-size: 0.65rem; letter-spacing: 1px;">NODE VISIBLE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="p-2 border-start border-3 border-primary" style="background: linear-gradient(90deg, #f8fafc 0%, transparent 100%);">
+          <h1 class="display-2 fw-900 text-primary mb-0" style="margin-left: -5px;">02</h1>
+          <div class="py-3">
+            <h4 class="fw-800 text-dark text-uppercase mb-3" style="letter-spacing: 1px;">Deployment</h4>
+            <p class="text-muted fw-600 mb-4" style="font-size: 0.95rem; line-height: 1.7;">Receive geofenced job requests directly on your terminal. AI-routing provides optimum navigation paths and precise customer proximity data.</p>
+            <div class="d-flex align-items-center gap-2 text-primary">
+                <i class="fas fa-location-arrow" style="font-size: 0.7rem;"></i>
+                <span class="fw-800" style="font-size: 0.65rem; letter-spacing: 1px;">ROUTING ACTIVE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="p-2 border-start border-3 border-success">
+          <h1 class="display-2 fw-900 text-success opacity-10 mb-0" style="margin-left: -5px;">03</h1>
+          <div class="py-3">
+            <h4 class="fw-800 text-dark text-uppercase mb-3" style="letter-spacing: 1px;">Settlement</h4>
+            <p class="text-muted fw-600 mb-4" style="font-size: 0.95rem; line-height: 1.7;">Verify the customer OTP to conclude the session. Earnings are instantly credited to your digital wallet upon successful service authorization.</p>
+            <div class="d-flex align-items-center gap-2 text-success">
+                <i class="fas fa-wallet" style="font-size: 0.7rem;"></i>
+                <span class="fw-800" style="font-size: 0.65rem; letter-spacing: 1px;">INSTANT PAYOUT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+ <section id="testimonials" class="py-5 position-relative overflow-hidden" style="background: #020617; border-radius: 0 !important;">
+
+  <div class="position-absolute top-50 start-50 translate-middle w-100 h-100" style="background: radial-gradient(circle at center, rgba(37, 99, 235, 0.05) 0%, transparent 70%); pointer-events: none;"></div>
+
+  <div class="container py-5">
+    <div class="text-center mb-5" data-aos="fade-up">
+      <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
+          <div style="width: 40px; height: 1px; background: rgba(255,255,255,0.2);"></div>
+          <span class="text-primary fw-800 text-uppercase" style="letter-spacing: 5px; font-size: 0.75rem;">Validation Node</span>
+          <div style="width: 40px; height: 1px; background: rgba(255,255,255,0.2);"></div>
+      </div>
+      <h2 class="display-3 fw-900 text-white" style="letter-spacing: -4px;">Trusted <span class="text-primary">Voices.</span></h2>
+    </div>
+
+    <div class="swiper reviewSwiper py-5 px-3">
+      <div class="swiper-wrapper">
+
+        <div class="swiper-slide">
+          <div class="p-5 h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 0 !important; backdrop-filter: blur(20px); transition: 0.3s;">
+            <div>
+              <div class="text-primary mb-4" style="font-size: 2rem;"><i class="fas fa-quote-left"></i></div>
+              <p class="fs-4 text-white opacity-80 fw-500" style="line-height: 1.6; letter-spacing: -0.5px;">"The OTP-Handshake protocol ensures unprecedented security. This is pure operational excellence."</p>
+            </div>
+            <div class="mt-5 pt-4 border-top border-white/10">
+              <h6 class="text-white fw-900 mb-1" style="letter-spacing: 2px;">ARYAN SHARMA</h6>
+              <span class="text-primary extra-small fw-800 text-uppercase">Verified Homeowner</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="swiper-slide">
+          <div class="p-5 h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(37, 99, 235, 0.3); border-radius: 0 !important; backdrop-filter: blur(20px);">
+            <div>
+              <div class="text-primary mb-4" style="font-size: 2rem;"><i class="fas fa-quote-left"></i></div>
+              <p class="fs-4 text-white opacity-80 fw-500" style="line-height: 1.6; letter-spacing: -0.5px;">"Response speed is 10/10. Emergency AC repair at midnight was handled with absolute precision."</p>
+            </div>
+            <div class="mt-5 pt-4 border-top border-white/10">
+              <h6 class="text-white fw-900 mb-1" style="letter-spacing: 2px;">SNEHA GUPTA</h6>
+              <span class="text-primary extra-small fw-800 text-uppercase">Elite Member</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="swiper-slide">
+          <div class="p-5 h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 0 !important; backdrop-filter: blur(20px);">
+            <div>
+              <div class="text-primary mb-4" style="font-size: 2rem;"><i class="fas fa-quote-left"></i></div>
+              <p class="fs-4 text-white opacity-80 fw-500" style="line-height: 1.6; letter-spacing: -0.5px;">"No bargaining, no hidden costs. The fixed-pricing algorithm is a game changer for India."</p>
+            </div>
+            <div class="mt-5 pt-4 border-top border-white/10">
+              <h6 class="text-white fw-900 mb-1" style="letter-spacing: 2px;">RAHUL VERMA</h6>
+              <span class="text-primary extra-small fw-800 text-uppercase">Beta Tester</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="swiper-pagination mt-5" style="position: relative;"></div>
+    </div>
+  </div>
+</section>
+
+  <section class="py-5 position-relative overflow-hidden" style="background: #ffffff; border-top: 1px solid #f1f5f9;">
+
+  <div class="position-absolute top-0 start-0 w-100 h-100" style="background-image: radial-gradient(#3b82f6 0.5px, transparent 0.5px); background-size: 30px 30px; opacity: 0.03; pointer-events: none;"></div>
+
+  <div class="container py-5">
+    <div class="text-center mb-5" data-aos="fade-up">
+      <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
+          <div style="width: 40px; height: 2px; background: #3b82f6;"></div>
+          <span class="text-primary fw-800 text-uppercase" style="letter-spacing: 5px; font-size: 0.75rem;">Audit Framework</span>
+          <div style="width: 40px; height: 2px; background: #3b82f6;"></div>
+      </div>
+      <h2 class="display-4 fw-900 text-dark" style="letter-spacing: -4px; line-height: 1;">Security is our <br><span class="text-primary">Core Protocol.</span></h2>
+    </div>
+
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6" data-aos="fade-right">
+
+        <div class="p-4 mb-4" style="background: #fcfcfc; border: 1px solid #f1f5f9; border-left: 5px solid #3b82f6; border-radius: 0 !important; transition: 0.3s;">
+          <div class="d-flex gap-4 align-items-center">
+            <div class="bg-dark text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 65px; height: 65px; min-width: 65px; border-radius: 0 !important; font-size: 1.5rem;">
+              <i class="fas fa-fingerprint"></i>
+            </div>
+            <div>
+              <h5 class="fw-900 text-dark text-uppercase" style="letter-spacing: 1px; font-size: 1.1rem;">Biometric Bio-Sync</h5>
+              <p class="small text-muted fw-600 m-0">Identity is secured via government-grade biometric encryption. We ensure the partner at your node is the exact individual verified on our terminal.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4" style="background: #fcfcfc; border: 1px solid #f1f5f9; border-left: 5px solid #000000; border-radius: 0 !important; transition: 0.3s;">
+          <div class="d-flex gap-4 align-items-center">
+            <div class="bg-primary text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 65px; height: 65px; min-width: 65px; border-radius: 0 !important; font-size: 1.5rem;">
+              <i class="fas fa-certificate"></i>
+            </div>
+            <div>
+              <h5 class="fw-900 text-dark text-uppercase" style="letter-spacing: 1px; font-size: 1.1rem;">Elite Skill Audit</h5>
+              <p class="small text-muted fw-600 m-0">Every partner undergoes a multi-stage technical audit and hands-on certification before receiving operational deployment clearance.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6" data-aos="zoom-in">
+        <div class="p-5 text-center position-relative overflow-hidden" style="background: #ffffff; border: 2px solid #3b82f6; border-radius: 0 !important; box-shadow: 20px 20px 0px rgba(59, 130, 246, 0.05);">
+
+          <div class="text-primary mb-4">
+            <i class="fas fa-shield-check fa-5x"></i>
+          </div>
+          <h3 class="fw-900 text-dark mb-3 text-uppercase" style="letter-spacing: 2px;">100% Backend Audited</h3>
+          <p class="text-muted fw-600 mb-0" style="line-height: 1.7;">Technicians must pass mandatory physical address verification and criminal record screening through our proprietary operational flow before system access.</p>
+
+          <div class="mt-4 d-flex justify-content-center gap-2">
+            <span class="badge bg-dark text-white px-3 py-2" style="border-radius: 0 !important; font-size: 0.65rem; letter-spacing: 1px;">ID-LOCK: ACTIVE</span>
+            <span class="badge bg-primary text-white px-3 py-2" style="border-radius: 0 !important; font-size: 0.65rem; letter-spacing: 1px;">BIO-SYNC: VERIFIED</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+   <div class="container mt-5">
+    <div class="worker-cta d-flex flex-wrap justify-content-between align-items-center gap-4" data-aos="fade-up">
+      <div>
+        <h2 class="fw-800 m-0">Join our Elite Fleet.</h2>
+        <p class="m-0 opacity-75 mt-2">Become a verified professional and start earning with India's best.</p>
+      </div>
+      <a href="../worker/worker.html" class="btn btn-light rounded-pill px-5 py-3 fw-bold text-primary">Apply Now</a>
+    </div>
+  </div>
+
+  <footer id="footer" class="premium-footer">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-4">
+          <a href="#" class="brand-logo text-white mb-4 d-inline-block text-decoration-none">
+            <i class="fa-solid fa-screwdriver-wrench text-primary"></i> FixoFix.
+          </a>
+          <p class="footer-text-white" style="max-width: 300px;">
+            India's most trusted elite home service ecosystem. Delivering excellence and reliability to your doorstep.
+          </p>
+          <div class="mt-4">
+            <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-x-twitter"></i></a>
+          </div>
+        </div>
+        <div class="col-md-3 col-lg-2">
+          <h6 class="fw-bold mb-4 text-white">Navigation</h6>
+          <a href="#home" class="footer-link">Home</a>
+          <a href="#services" class="footer-link">Services</a>
+          <a href="#testimonials" class="footer-link">Reviews</a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+          <h6 class="fw-bold mb-4 text-white">Contact Us</h6>
+          <p class="footer-text-white small mb-2"><i class="fa-solid fa-envelope me-2 text-primary"></i> support@fixofix.in</p>
+          <p class="footer-text-white small mb-2"><i class="fa-solid fa-phone me-2 text-primary"></i> +91 1800-QFIX-247</p>
+          <p class="footer-text-white small"><i class="fa-solid fa-location-dot me-2 text-primary"></i> DLF Cyber City, Gurugram</p>
+        </div>
+        <div class="col-lg-3">
+          <h6 class="fw-bold mb-4 text-white">Elite Updates</h6>
+          <div class="d-flex gap-2">
+            <input type="email" class="form-control newsletter-input" placeholder="Your email">
+            <button class="btn btn-primary rounded-3 px-3"><i class="fa-solid fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+      <hr class="my-5" style="border-color: rgba(255,255,255,0.15);">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="d-flex gap-3">
+          <a href="terms-and-conditions.html" class="footer-link small m-0">TERMS&CONDITIONS</a>
+          <a href="admin-login.html" class="footer-link small m-0">ADMIN TERMINAL</a>
+        </div>
+        <p class="footer-text-white small m-0">&copy; 2025 FixoFix India. Standard of Excellence.</p>
+        <a href="#" class="footer-link small">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    AOS.init({ duration: 1000, once: true });
+    window.onscroll = () => { document.getElementById('topNav').classList.toggle('nav-scrolled', window.scrollY > 40); };
+
+    new Swiper(".serviceSwiper", {
+      slidesPerView: 1, spaceBetween: 25, loop: true,
+      autoplay: { delay: 2000, disableOnInteraction: false },
+      breakpoints: { 768: { slidesPerView: 2 }, 1024: { slidesPerView: 4 } }
+    });
+
+    new Swiper(".reviewSwiper", {
+      slidesPerView: 1, spaceBetween: 30, loop: true,
+      autoplay: { delay: 3000, disableOnInteraction: false },
+      breakpoints: { 1024: { slidesPerView: 2 } }
+    });
+  </script>
+</body>
+</html>
