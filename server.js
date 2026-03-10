@@ -58,7 +58,12 @@ app.use(session({
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // For frontend (if served from backend)
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname)));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "customer", "index.html"));
+});
+
 
 
 /* ================= ROUTES ================= */
