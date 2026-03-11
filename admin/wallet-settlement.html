@@ -252,7 +252,7 @@ async function loadInspectionFees() {
 
   try {
 
-    const res = await fetch('http://localhost:3000/admin/inspection-fees');
+    const res = await fetch('https://fixofix-service-booking-platform.onrender.com/admin/inspection-fees');
     const data = await res.json();
 
     const tbody = document.getElementById('inspectionBody');
@@ -323,7 +323,7 @@ window.addEventListener('DOMContentLoaded', loadInspectionFees);
 async function loadTotalFees() {
   try {
 
-    const res = await fetch('http://localhost:3000/admin/total-inspection-fees');
+    const res = await fetch('https://fixofix-service-booking-platform.onrender.com/admin/total-inspection-fees');
 
     if (!res.ok) {
       throw new Error("Server error");
@@ -346,7 +346,7 @@ async function loadCashPayments() {
 
   try {
 
-    const res = await fetch('http://localhost:3000/admin/cash-payments');
+    const res = await fetch('https://fixofix-service-booking-platform.onrender.com/admin/cash-payments');
     const data = await res.json();
 
     const tbody = document.getElementById('cashBody');
@@ -416,7 +416,7 @@ async function loadOnlinePayments() {
 
   try {
 
-    const res = await fetch('http://localhost:3000/admin/online-payments');
+    const res = await fetch('https://fixofix-service-booking-platform.onrender.com/admin/online-payments');
     const data = await res.json();
 
     const tbody = document.getElementById('onlineBody');
@@ -479,7 +479,7 @@ document.addEventListener('DOMContentLoaded', loadOnlinePayments);
 <script>
 async function loadTotals() {
 
-  const res = await fetch('http://localhost:3000/admin/grand-total');
+  const res = await fetch('https://fixofix-service-booking-platform.onrender.com/admin/grand-total');
   const data = await res.json();
 
   // Cash

@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const tableBody = document.getElementById("requestTableBody");
 
   try {
-    const response = await fetch("http://localhost:3000/api/bookings");
+    const response = await fetch("https://fixofix-service-booking-platform.onrender.com/api/bookings");
     if (!response.ok) throw new Error("Failed to fetch booking data");
     const bookings = await response.json();
 

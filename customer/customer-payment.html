@@ -227,7 +227,7 @@
   // 1. Load latest booking from Backend
   window.addEventListener('DOMContentLoaded', async () => {
     try {
-      const res = await fetch('http://localhost:3000/latest-booking', { credentials: 'include' });
+      const res = await fetch('https://fixofix-service-booking-platform.onrender.com/latest-booking', { credentials: 'include' });
       const data = await res.json();
       
       if(!res.ok) {
@@ -282,7 +282,7 @@
     btn.disabled = true;
 
     try {
-      const res = await fetch('http://127.0.0.1:3000/platform-fee', {
+      const res = await fetch('https://fixofix-service-booking-platform.onrender.com/platform-fee', {
          method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({

@@ -361,7 +361,7 @@
       const bookingData = { name, phone, address, service, preferred_date, preferred_time };
 
       try {
-        const response = await fetch('http://127.0.0.1:3000/bookings', {
+        const response = await fetch('https://fixofix-service-booking-platform.onrender.com/bookings', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -387,7 +387,7 @@
         localStorage.removeItem('editBooking');
 
         try {
-          const res = await fetch('http://localhost:3000/latest-booking', {
+          const res = await fetch('https://fixofix-service-booking-platform.onrender.com/latest-booking', {
             credentials: 'include'
           });
 
@@ -422,7 +422,7 @@ document
 
 async function loadProfile() {
   try {
-    const res = await fetch('http://127.0.0.1:3000/api/profile', {
+    const res = await fetch('https://fixofix-service-booking-platform.onrender.com/api/profile', {
       method: 'GET',
       credentials: 'include',
       headers: {
@@ -466,7 +466,7 @@ async function updateProfile(e) {
   };
 
   try {
-    const res = await fetch('http://127.0.0.1:3000/api/profile', {
+    const res = await fetch('https://fixofix-service-booking-platform.onrender.com/api/profile', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'

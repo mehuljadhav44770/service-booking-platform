@@ -265,7 +265,7 @@
       const password = document.getElementById('adminPassword').value.trim();
 
       try {
-        const res = await fetch('http://localhost:3000/login-admin', {
+        const res = await fetch('https://fixofix-service-booking-platform.onrender.com/login-admin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })

@@ -127,7 +127,7 @@
     let usersData = [];
 
     try {
-      const response = await fetch("http://localhost:3000/api/users");
+      const response = await fetch("https://fixofix-service-booking-platform.onrender.com/api/users");
       usersData = await response.json();
       renderTable(usersData);
 

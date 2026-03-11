@@ -418,7 +418,7 @@ otps.forEach((o, i) => {
 
         try{
             const email = sessionStorage.getItem('workerEmail');
-            const res = await fetch('http://localhost:3000/verify-aadhaar',{
+            const res = await fetch('https://fixofix-service-booking-platform.onrender.com/verify-aadhaar',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({
@@ -479,7 +479,7 @@ async function sendEmailOtp() {
 
     try {
 
-        const res = await fetch("http://localhost:3000/send-email-otp", {
+        const res = await fetch("https://fixofix-service-booking-platform.onrender.com/send-email-otp", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -538,7 +538,7 @@ async function verifyEmailOtp(){
 
     try{
 
-        const res = await fetch("http://localhost:3000/verify-email-otp",{
+        const res = await fetch("https://fixofix-service-booking-platform.onrender.com/verify-email-otp",{
             method:"POST",
             headers:{ "Content-Type":"application/json" },
             body: JSON.stringify({

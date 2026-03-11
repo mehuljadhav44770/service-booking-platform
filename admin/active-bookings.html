@@ -162,7 +162,7 @@
   // Fetch bookings from backend
   async function fetchBookings() {
     try {
-      const res = await fetch("http://localhost:3000/api/admin-active-bookings");
+      const res = await fetch("https://fixofix-service-booking-platform.onrender.com/api/admin-active-bookings");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
 

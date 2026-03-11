@@ -117,7 +117,7 @@ if (!workerId) {
 // Fetch bookings assigned to worker
 async function fetchNotifications() {
   try {
-    const res = await fetch(`http://localhost:3000/api/worker-notifications/${workerId}`);
+    const res = await fetch(`https://fixofix-service-booking-platform.onrender.com/api/worker-notifications/${workerId}`);
     const data = await res.json();
 
     const tableBody = document.getElementById('notificationsTableBody');
@@ -168,7 +168,7 @@ async function updateStatus(button, connectionId, status) {
   buttons.forEach(btn => btn.disabled = true);
 
   try {
-    const res = await fetch(`http://localhost:3000/api/update-connection-status/${connectionId}`, {
+    const res = await fetch(`https://fixofix-service-booking-platform.onrender.com/api/update-connection-status/${connectionId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status })

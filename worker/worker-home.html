@@ -563,7 +563,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
 
-      const res = await fetch("http://localhost:3000/api/worker/profile", {
+      const res = await fetch("https://fixofix-service-booking-platform.onrender.com/api/worker/profile", {
         credentials: "include"
       });
 
@@ -630,7 +630,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
 
-      const res = await fetch("http://localhost:3000/api/worker/profile", {
+      const res = await fetch("https://fixofix-service-booking-platform.onrender.com/api/worker/profile", {
         method: "PUT",
         body: formData,
         credentials: "include"
@@ -684,7 +684,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // 🔄 Load availability from DB
   async function loadWorkerStatus() {
     try {
-      const res = await fetch(`http://localhost:3000/worker/status?email=${encodeURIComponent(workerEmail)}`);
+      const res = await fetch(`https://fixofix-service-booking-platform.onrender.com/worker/status?email=${encodeURIComponent(workerEmail)}`);
       const data = await res.json();
       if (data && data.worker && typeof data.worker.available === 'boolean') {
         onlineSwitch.checked = data.worker.available;
@@ -699,7 +699,7 @@ window.addEventListener('DOMContentLoaded', () => {
   onlineSwitch.addEventListener('change', async () => {
     const newStatus = onlineSwitch.checked;
     try {
-      const res = await fetch('http://localhost:3000/worker/availability', {
+      const res = await fetch('https://fixofix-service-booking-platform.onrender.com/worker/availability', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: workerEmail, available: newStatus })
@@ -711,7 +711,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 🔒 Logout
   window.logoutWorker = function () {
-    fetch('http://localhost:3000/logout-worker', {
+    fetch('https://fixofix-service-booking-platform.onrender.com/logout-worker', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: workerEmail })
@@ -727,7 +727,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // ✅ Fetch pending bookings dynamically
   async function fetchPendingBookings() {
     try {
-      const res = await fetch(`http://localhost:3000/api/worker-pending-bookings/${workerId}`);
+      const res = await fetch(`https://fixofix-service-booking-platform.onrender.com/api/worker-pending-bookings/${workerId}`);
       const data = await res.json();
       const tbody = document.getElementById('pendingBookingsBody');
       tbody.innerHTML = '';
@@ -788,7 +788,7 @@ async function generateOTP(bookingId) {
   const otp = Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
 
   try {
-    const res = await fetch('http://localhost:3000/api/save-otp', {
+    const res = await fetch('https://fixofix-service-booking-platform.onrender.com/api/save-otp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -922,7 +922,7 @@ async function submitCharge() {
   }
 
   try {
-    const res = await fetch('http://localhost:3000/api/submit-charge', {
+    const res = await fetch('https://fixofix-service-booking-platform.onrender.com/api/submit-charge', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ connection_id: connectionId, amount, note })
@@ -995,7 +995,7 @@ async function submitNegotiationRange() {
   }
 
   try {
-    const res = await fetch('http://localhost:3000/api/submit-negotiation', {
+    const res = await fetch('https://fixofix-service-booking-platform.onrender.com/api/submit-negotiation', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -1043,7 +1043,7 @@ async function viewCounterOffer(connectionId) {
   try {
 
     const res = await fetch(
-      `http://localhost:3000/api/worker/latest-counter?connection_id=${connectionId}`,
+      `https://fixofix-service-booking-platform.onrender.com/api/worker/latest-counter?connection_id=${connectionId}`,
       { credentials: 'include' }
     );
 

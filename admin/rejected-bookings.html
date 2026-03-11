@@ -186,7 +186,7 @@
 
   async function loadRejectedBookings() {
     try {
-      const res = await fetch('http://localhost:3000/api/rejected-bookings');
+      const res = await fetch('https://fixofix-service-booking-platform.onrender.com/api/rejected-bookings');
       const data = await res.json();
 
       const table = document.getElementById('rejectedBookingsTable');
@@ -231,7 +231,7 @@
     const tbody = document.getElementById('eligibleWorkersTbody');
     tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">Loading eligible workers...</td></tr>`;
 
-    fetch(`http://localhost:3000/api/eligible-workers?service=${encodeURIComponent(service)}&location=${encodeURIComponent(location)}&excludeId=${rejectedWorkerId}`)
+    fetch(`https://fixofix-service-booking-platform.onrender.com/api/eligible-workers?service=${encodeURIComponent(service)}&location=${encodeURIComponent(location)}&excludeId=${rejectedWorkerId}`)
       .then(res => res.json())
       .then(workers => {
         if (!workers || workers.length === 0) {
@@ -264,7 +264,7 @@
             const bookingId = this.dataset.bookingId;
 
             try {
-              const res = await fetch(`http://localhost:3000/api/reassign-booking/${bookingId}`, {
+              const res = await fetch(`https://fixofix-service-booking-platform.onrender.com/api/reassign-booking/${bookingId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ newWorkerId })
