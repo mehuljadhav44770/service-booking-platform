@@ -939,16 +939,8 @@ async function fetchFinalBill(showModal = false) {
 
 
         } else {
-
-            // Hide button if no charge exists
-
-            const billBtn = document.getElementById("viewBillBtn");
-              console.log("View Bill clicked");
-
-
-            if (billBtn) billBtn.style.display = "none";
-
-        }
+    console.log("No bill available yet");
+}
 
 
 
@@ -1064,7 +1056,7 @@ fetchLatestBooking();
 
 setInterval(fetchLatestBooking, 5000); // Booking info every 5s
 
-setInterval(fetchFinalBill, 7000);      // Update bill data every 7s (no modal)
+setInterval(() => fetchFinalBill(false), 5000);
 
 
 
