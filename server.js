@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // ✅ CORS setup for multiple origins
 // include localhost:3000 so requests from pages served by this server are allowed
-const allowedOrigins = ['http://127.0.0.1:5500', 'http://127.0.0.1:3000', 'http://localhost:3000', 'http://localhost:5500']; // your frontend
+const allowedOrigins = ['http://127.0.0.1:5500', 'http://127.0.0.1:3000', 'http://localhost:3000', 'http://localhost:5500','https://fixofix-service-booking-platform.onrender.com' ]; // your frontend
 
 app.use(cors({
   origin: function (origin, callback) {
