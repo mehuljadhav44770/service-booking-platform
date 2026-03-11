@@ -1,33 +1,32 @@
-// email.js
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
-// Create reusable transporter
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  connectionTimeout: 10000
 });
 
-/**
- * Send Email
- * @param {string} to - Recipient email
- * @param {string} subject - Email subject
- * @param {string} text - Plain text body
- * @param {string} html - HTML body (optional)
- */
 async function sendEmail(to, subject, text, html = "") {
   try {
-    await transporter.sendMail({
+
+    console.log("📨 Attempting to send email to:", to);
+
+    const info = await transporter.sendMail({
       from: process.env.EMAIL_FROM,
       to,
       subject,
       text,
-      html,
+      html
     });
-    console.log("✅ Email sent successfully to", to);
+
+    console.log("✅ Email sent:", info.response);
+
   } catch (err) {
     console.error("❌ Error sending email:", err);
   }

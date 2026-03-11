@@ -819,8 +819,8 @@ app.post('/login-admin', async (req, res) => {
 
 // Assign Worker to Booking (Insert into connections)
 app.post('/api/assign-worker-to-customer', async (req, res) => {
-   console.log('Request body:', req.body);
-  res.json({ message: 'Route works!' });
+  console.log('Request body:', req.body);
+
   try {
     const { workerId, bookingId } = req.body;
 
@@ -846,19 +846,21 @@ app.post('/api/assign-worker-to-customer', async (req, res) => {
       VALUES ($1, $2, $3, 'pending', 129.00)
       RETURNING *;
     `;
+
     const values = [customerId, workerId, bookingId];
     const result = await pool.query(query, values);
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Worker assigned to booking successfully.",
       connection: result.rows[0]
     });
 
   } catch (err) {
     console.error("Error assigning worker:", err);
-    res.status(500).json({ error: "Failed to assign worker" });
+    return res.status(500).json({ error: "Failed to assign worker" });
   }
 });
+
 
 
 
