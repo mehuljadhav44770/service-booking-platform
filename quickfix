@@ -1,0 +1,1777 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 17.5
+-- Dumped by pg_dump version 17.5
+
+-- Started on 2026-03-11 18:25:46
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 228 (class 1259 OID 17247)
+-- Name: bookings; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.bookings (
+    id integer NOT NULL,
+    name character varying(100) NOT NULL,
+    phone character varying(15) NOT NULL,
+    address text NOT NULL,
+    service character varying(100) NOT NULL,
+    preferred_date date NOT NULL,
+    preferred_time time without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    customer_id integer
+);
+
+
+ALTER TABLE public.bookings OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 17246)
+-- Name: bookings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.bookings_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.bookings_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5037 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: bookings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.bookings_id_seq OWNED BY public.bookings.id;
+
+
+--
+-- TOC entry 218 (class 1259 OID 17119)
+-- Name: categories; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.categories (
+    id integer NOT NULL,
+    name character varying(50) NOT NULL
+);
+
+
+ALTER TABLE public.categories OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 17118)
+-- Name: categories_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.categories_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.categories_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5038 (class 0 OID 0)
+-- Dependencies: 217
+-- Name: categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.categories_id_seq OWNED BY public.categories.id;
+
+
+--
+-- TOC entry 224 (class 1259 OID 17154)
+-- Name: connections; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.connections (
+    id integer NOT NULL,
+    customer_id integer,
+    provider_id integer,
+    order_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    status character varying DEFAULT 'pending'::character varying,
+    platform_fee numeric(10,2) DEFAULT 129.00,
+    booking_id integer,
+    otp character varying(6),
+    reached_at timestamp without time zone,
+    service_charge numeric(10,2),
+    charge_status character varying(20) DEFAULT 'none'::character varying,
+    charge_note text,
+    CONSTRAINT connections_status_check CHECK (((status)::text = ANY (ARRAY['pending'::text, 'reached'::text, 'cancelled'::text, 'accepted'::text, 'rejected'::text])))
+);
+
+
+ALTER TABLE public.connections OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 17153)
+-- Name: connections_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.connections_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.connections_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5039 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: connections_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.connections_id_seq OWNED BY public.connections.id;
+
+
+--
+-- TOC entry 234 (class 1259 OID 17376)
+-- Name: negotiations; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.negotiations (
+    negotiation_id integer NOT NULL,
+    booking_id integer NOT NULL,
+    worker_id integer NOT NULL,
+    connection_id integer,
+    min_charge numeric(10,2) NOT NULL,
+    max_charge numeric(10,2) NOT NULL,
+    agreed_charge numeric(10,2),
+    status character varying(20) DEFAULT 'pending'::character varying,
+    customer_notes text,
+    worker_notes text,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    customer_counter numeric(10,2),
+    CONSTRAINT negotiations_status_check CHECK (((status)::text = ANY (ARRAY['pending'::text, 'accepted'::text, 'rejected'::text])))
+);
+
+
+ALTER TABLE public.negotiations OWNER TO postgres;
+
+--
+-- TOC entry 233 (class 1259 OID 17375)
+-- Name: negotiations_negotiation_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.negotiations_negotiation_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.negotiations_negotiation_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5040 (class 0 OID 0)
+-- Dependencies: 233
+-- Name: negotiations_negotiation_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.negotiations_negotiation_id_seq OWNED BY public.negotiations.negotiation_id;
+
+
+--
+-- TOC entry 232 (class 1259 OID 17295)
+-- Name: notifications; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.notifications (
+    id integer NOT NULL,
+    worker_id integer NOT NULL,
+    booking_id integer NOT NULL,
+    message text NOT NULL,
+    is_read boolean DEFAULT false,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.notifications OWNER TO postgres;
+
+--
+-- TOC entry 231 (class 1259 OID 17294)
+-- Name: notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.notifications_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.notifications_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5041 (class 0 OID 0)
+-- Dependencies: 231
+-- Name: notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.notifications_id_seq OWNED BY public.notifications.id;
+
+
+--
+-- TOC entry 230 (class 1259 OID 17258)
+-- Name: payments; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.payments (
+    id integer NOT NULL,
+    booking_id integer NOT NULL,
+    gateway character varying,
+    paid_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    final_charge numeric(10,2) DEFAULT 0.00 NOT NULL,
+    payment_mode character varying(20) DEFAULT 'online'::character varying,
+    payment_status character varying(20) DEFAULT 'pending'::character varying,
+    transaction_id character varying(100),
+    provider_amount numeric(10,2) DEFAULT 0.00,
+    settled_at timestamp without time zone,
+    CONSTRAINT payment_mode_check CHECK (((payment_mode)::text = ANY ((ARRAY['online'::character varying, 'cash'::character varying])::text[]))),
+    CONSTRAINT payment_status_check CHECK (((payment_status)::text = ANY ((ARRAY['pending'::character varying, 'paid'::character varying, 'failed'::character varying, 'refunded'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.payments OWNER TO postgres;
+
+--
+-- TOC entry 229 (class 1259 OID 17257)
+-- Name: payments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.payments_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.payments_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5042 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: payments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.payments_id_seq OWNED BY public.payments.id;
+
+
+--
+-- TOC entry 236 (class 1259 OID 17423)
+-- Name: platform_fees; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.platform_fees (
+    id integer NOT NULL,
+    booking_id integer NOT NULL,
+    amount numeric(10,2) NOT NULL,
+    payment_method character varying(20),
+    gateway character varying(50),
+    transaction_id character varying(100),
+    status character varying(20) DEFAULT 'paid'::character varying,
+    paid_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.platform_fees OWNER TO postgres;
+
+--
+-- TOC entry 235 (class 1259 OID 17422)
+-- Name: platform_fees_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.platform_fees_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.platform_fees_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5043 (class 0 OID 0)
+-- Dependencies: 235
+-- Name: platform_fees_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.platform_fees_id_seq OWNED BY public.platform_fees.id;
+
+
+--
+-- TOC entry 226 (class 1259 OID 17191)
+-- Name: reviews; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.reviews (
+    id integer NOT NULL,
+    provider_id integer,
+    user_id integer,
+    comment text
+);
+
+
+ALTER TABLE public.reviews OWNER TO postgres;
+
+--
+-- TOC entry 225 (class 1259 OID 17190)
+-- Name: reviews_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.reviews_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.reviews_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5044 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: reviews_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.reviews_id_seq OWNED BY public.reviews.id;
+
+
+--
+-- TOC entry 222 (class 1259 OID 17139)
+-- Name: service_providers; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.service_providers (
+    id integer NOT NULL,
+    name character varying NOT NULL,
+    email character varying,
+    phone character varying(15) NOT NULL,
+    category_id integer,
+    experience character varying,
+    location character varying,
+    available boolean DEFAULT true,
+    password_hash text,
+    is_verified boolean DEFAULT false,
+    aadhaar_verified boolean DEFAULT false,
+    aadhaar_last4 character varying(4),
+    aadhaar_name character varying(100),
+    aadhaar_verified_at timestamp without time zone,
+    dl_image_path text,
+    aadhaar_image_path text,
+    email_otp character varying(6),
+    otp_expiry timestamp without time zone,
+    email_verified boolean DEFAULT false
+);
+
+
+ALTER TABLE public.service_providers OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 17138)
+-- Name: service_providers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.service_providers_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.service_providers_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5045 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: service_providers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.service_providers_id_seq OWNED BY public.service_providers.id;
+
+
+--
+-- TOC entry 237 (class 1259 OID 17455)
+-- Name: user_sessions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.user_sessions (
+    sid character varying NOT NULL,
+    sess json NOT NULL,
+    expire timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.user_sessions OWNER TO postgres;
+
+--
+-- TOC entry 220 (class 1259 OID 17126)
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    name character varying NOT NULL,
+    email character varying NOT NULL,
+    password_hash text NOT NULL,
+    phone character varying(15),
+    address character varying,
+    role character varying(10) NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT users_role_check CHECK (((role)::text = ANY ((ARRAY['admin'::character varying, 'customer'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 17125)
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.users_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.users_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5046 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
+
+
+--
+-- TOC entry 4805 (class 2604 OID 17250)
+-- Name: bookings id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.bookings ALTER COLUMN id SET DEFAULT nextval('public.bookings_id_seq'::regclass);
+
+
+--
+-- TOC entry 4791 (class 2604 OID 17122)
+-- Name: categories id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.categories ALTER COLUMN id SET DEFAULT nextval('public.categories_id_seq'::regclass);
+
+
+--
+-- TOC entry 4799 (class 2604 OID 17157)
+-- Name: connections id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.connections ALTER COLUMN id SET DEFAULT nextval('public.connections_id_seq'::regclass);
+
+
+--
+-- TOC entry 4816 (class 2604 OID 17379)
+-- Name: negotiations negotiation_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.negotiations ALTER COLUMN negotiation_id SET DEFAULT nextval('public.negotiations_negotiation_id_seq'::regclass);
+
+
+--
+-- TOC entry 4813 (class 2604 OID 17298)
+-- Name: notifications id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notifications ALTER COLUMN id SET DEFAULT nextval('public.notifications_id_seq'::regclass);
+
+
+--
+-- TOC entry 4807 (class 2604 OID 17261)
+-- Name: payments id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.payments ALTER COLUMN id SET DEFAULT nextval('public.payments_id_seq'::regclass);
+
+
+--
+-- TOC entry 4820 (class 2604 OID 17426)
+-- Name: platform_fees id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.platform_fees ALTER COLUMN id SET DEFAULT nextval('public.platform_fees_id_seq'::regclass);
+
+
+--
+-- TOC entry 4804 (class 2604 OID 17194)
+-- Name: reviews id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reviews ALTER COLUMN id SET DEFAULT nextval('public.reviews_id_seq'::regclass);
+
+
+--
+-- TOC entry 4794 (class 2604 OID 17142)
+-- Name: service_providers id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.service_providers ALTER COLUMN id SET DEFAULT nextval('public.service_providers_id_seq'::regclass);
+
+
+--
+-- TOC entry 4792 (class 2604 OID 17129)
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
+-- TOC entry 5022 (class 0 OID 17247)
+-- Dependencies: 228
+-- Data for Name: bookings; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.bookings (id, name, phone, address, service, preferred_date, preferred_time, created_at, customer_id) FROM stdin;
+1	sanket pimple	8010701130	ganesh nagar n8-cidco	Plumber	2002-02-02	12:22:00	2025-07-25 15:41:14.730571	\N
+2	mehul	987654321	dmmd	Electrician	2002-12-22	15:49:00	2025-07-25 15:51:09.515646	\N
+3	anil jadhav	987654321	vishwakarma society	Plumber	2025-03-23	00:00:00	2025-07-25 18:25:59.278061	\N
+4	rajshree	7841826366	viswakarma	Painter	2025-02-07	22:00:00	2025-07-25 18:38:04.025046	\N
+5	sanket pimple	8010701130	ganesh nagar n8-cidco 	Plumber	2025-03-22	10:01:00	2025-07-25 20:10:02.140708	\N
+6	soham gitte	8010701130	kanachanwadi	Plumber	2020-04-03	02:31:00	2025-07-25 20:14:02.545323	\N
+7	anil jadhav	46746678734	mmk	Plumber	2025-07-29	10:00:00	2025-07-25 20:23:23.921622	\N
+8	shourya	7841826366	rccr4cr	Electrician	2023-03-04	15:41:00	2025-07-25 20:30:14.757463	\N
+9	anil jadhav	46746678734	ddme	Electrician	2025-04-05	14:02:00	2025-07-26 11:09:36.838339	\N
+10	om	987654321	tv centre	Painter	2025-03-31	10:01:00	2025-07-27 17:26:06.975916	\N
+11	gaurav	35434687	hhghds	Electrician	2025-03-22	10:00:00	2025-07-28 09:34:47.700358	\N
+12	anil jadhav	987654321	eghjg	Plumber	2025-12-31	02:33:00	2025-07-28 09:39:20.105731	\N
+13	sanket pimple	987654321	fsffsdfs	Plumber	2025-07-28	21:54:00	2025-07-28 09:54:25.650235	\N
+14	sanket pimple	987654321	fsffsdfs	Plumber	2025-07-28	21:54:00	2025-07-28 10:01:13.982755	\N
+15	akash	5435354345	fsfsfdf	Plumber	2025-07-27	10:04:00	2025-07-28 10:04:11.800796	\N
+16	mehul	46746678734	fsdfsd	Plumber	2025-07-28	10:10:00	2025-07-28 10:10:40.555392	\N
+17	sunil	23456789	jfjerf	Carpenter	2025-07-29	02:34:00	2025-07-28 20:38:36.955708	\N
+18	anil jadhav	23456789	jfds	Electrician	2025-07-14	10:01:00	2025-07-29 18:10:16.369085	\N
+19	mehul	9284534827	hbxjhsbxjh	Electrician	2025-07-09	10:00:00	2025-07-29 18:14:29.294485	\N
+20	rajshree	9284534827	fvfvfv	AC Repair	2025-07-30	14:12:00	2025-07-29 18:21:01.702974	\N
+21	mehul	9284534827	hjnkl	Plumber	2025-07-24	10:00:00	2025-07-29 18:25:34.708303	\N
+22	akash	23456789	sdcd	Electrician	2025-07-25	10:01:00	2025-07-29 18:26:18.159603	\N
+23	akash	46746678734	dccdj	Carpenter	2025-07-16	10:00:00	2025-07-29 18:33:33.216516	\N
+24	sunil jadhav	9579962869	vishwakarma society	Painter	2025-07-31	11:00:00	2025-07-29 20:46:04.008833	\N
+25	gaurav	23456789	hgghv	Carpenter	2025-07-25	10:00:00	2025-07-30 10:33:20.829981	\N
+26	gaurav	23456789	hgghv	Carpenter	2025-07-25	10:00:00	2025-07-30 10:34:27.5138	\N
+27	jitendra	54326789	dcdcd	Plumber	2025-07-24	10:00:00	2025-07-30 19:53:22.462418	\N
+28	anil jadhav	6543276543	getvtg	Electrician	2025-07-24	10:00:00	2025-07-30 20:12:32.587092	\N
+29	prathmesh	234567890	cejdcnjenc	Electrician	2025-07-23	10:00:00	2025-07-31 11:50:57.518371	\N
+30	mehul	2345678	fxghsf	Plumber	2025-08-19	13:27:00	2025-08-01 09:26:14.696672	\N
+31	swanand raut	9284534827	dvhdvc	Plumber	2025-08-18	01:43:00	2025-08-01 10:44:01.279361	\N
+32	anil jadhav	23456789	dvdhdv	Plumber	2025-08-21	10:00:00	2025-08-01 10:56:57.848453	\N
+33	anil jadhav	23456789	dvdhdv	Plumber	2025-08-21	10:00:00	2025-08-01 10:57:24.45947	\N
+34	anil jadhav	23456789	dvdhdv	Plumber	2025-08-21	10:00:00	2025-08-01 10:57:46.220818	\N
+35	sanket	234567	fvec	Carpenter	2025-08-21	21:50:00	2025-08-01 17:50:19.301823	\N
+36	balaji	7387487483	bvcdcc	Plumber	2025-09-04	10:00:00	2025-08-02 11:35:44.115817	\N
+37	mehul	7387487483	eb4heb	Plumber	2025-08-20	11:28:00	2025-08-03 11:24:27.895701	\N
+38	mehul	7387487483	jhgfds	Plumber	2025-08-21	10:43:00	2025-08-04 10:38:25.372713	\N
+39	mehul	7387487483	jhgfds	Plumber	2025-08-21	10:43:00	2025-08-04 10:39:44.324499	\N
+40	mehul	7387487483	jhgfds	Plumber	2025-08-21	10:43:00	2025-08-04 10:48:03.097438	\N
+41	mehul	7387487483	jhgfds	Plumber	2025-08-21	10:43:00	2025-08-04 10:49:48.181133	\N
+42	balaji	7387487483	hss	Plumber	2025-08-14	10:00:00	2025-08-04 10:51:22.98773	\N
+43	sanket	2345677777	hjvfj	Plumber	2025-08-14	10:57:00	2025-08-04 10:52:12.828826	\N
+44	sanket	2345678765	jrjr	Painter	2025-08-22	16:50:00	2025-08-04 16:48:20.238652	\N
+45	mehul	2345678765	bjdc	Plumber	2025-08-23	19:54:00	2025-08-04 19:54:58.430772	\N
+46	soham	8989076769	padampura	Plumber	2025-08-20	13:41:00	2025-08-05 10:41:24.134167	\N
+47	amey	8888888888	test	Plumber	2025-08-18	09:42:00	2025-08-06 09:40:59.133948	\N
+48	mehul	2345678765	test	Plumber	2025-08-27	11:08:00	2025-08-06 11:04:16.498622	\N
+49	ankit	2345678765	test	Carpenter	2025-08-29	23:23:00	2025-08-09 23:22:56.934367	\N
+50	kartik	2345678765	test	Electrician	2025-08-28	02:14:00	2025-08-10 11:14:56.112255	\N
+51	sanket	7387487483	hjhjh	Plumber	5666-04-05	05:06:00	2025-08-11 12:35:45.242276	\N
+52	soham Gitte	2345677777	padampura	Plumber	3434-03-04	03:44:00	2025-08-11 13:12:41.954831	\N
+53	amey	2345678765	hyderabad	Carpenter	2025-08-21	14:36:00	2025-08-12 14:31:50.134445	\N
+54	amey	2345678765	hyderabad	Carpenter	2025-08-21	14:36:00	2025-08-12 14:35:45.21427	\N
+55	swanand kamble	7387487483	test	Plumber	2025-08-13	09:34:00	2025-08-13 09:34:46.406352	\N
+56	swanand kamble	7387487483	test	Plumber	2025-08-13	09:34:00	2025-08-13 09:35:14.152392	\N
+57	mehul	2345678765	test	Plumber	2025-08-22	20:33:00	2025-08-19 20:32:01.331987	55
+58	salman	2345678765	test	Plumber	2025-08-22	21:38:00	2025-08-19 21:34:13.864648	63
+59	rohit	2345677777	hyderabad	Plumber	2025-08-29	00:30:00	2025-08-20 00:26:23.035432	74
+60	yash	2345678989	test	Plumber	2025-08-29	09:34:00	2025-08-20 09:32:03.677782	75
+61	mehul	7387487483	test	Electrician	2025-08-21	10:19:00	2025-08-20 10:19:05.210375	75
+62	salman	2345677777	test	Electrician	2025-08-23	17:47:00	2025-08-21 17:47:29.424039	63
+63	balaji	2345678765	test	Carpenter	2025-08-29	18:18:00	2025-08-21 18:13:38.612647	55
+64	akash	2345678765	test	Plumber	2025-08-29	18:35:00	2025-08-21 18:33:20.896905	55
+65	akash	2345678765	test	Plumber	2025-08-22	18:38:00	2025-08-21 18:33:50.854484	55
+66	mehul	2345678765	hyderabad	Plumber	2025-08-23	18:37:00	2025-08-21 18:37:30.564376	63
+67	sanket	2345678765	test	Electrician	2025-08-29	18:43:00	2025-08-21 18:39:18.19186	63
+68	pratik	9875123456	aurangabad	Electrician	2025-08-23	14:00:00	2025-08-22 12:16:35.25222	76
+69	salman	2345678765	aurangabad	Electrician	2025-08-30	09:35:00	2025-08-23 09:35:44.414592	63
+70	krushna magar	7387487483	aurangabad	Electrician	2025-08-23	10:06:00	2025-08-23 10:06:15.287335	77
+71	sameer	2345677777	aurangabad	Electrician	2025-08-30	11:03:00	2025-08-23 11:03:19.93805	80
+72	kartik	9876543234	nanded	Carpenter	2025-08-29	18:04:00	2025-08-24 18:04:20.241078	44
+73	kartik	2345678765	test	Plumber	2025-08-28	06:42:00	2025-08-24 18:42:49.497509	44
+74	kartik	9876567878	aurangabad	Electrician	2025-08-27	19:16:00	2025-08-24 19:16:13.743193	44
+75	aniket	9876543234	aurangabad	Carpenter	2025-08-27	10:30:00	2025-08-25 19:27:01.301824	82
+76	mehul	2345677777	pune	Plumber	2025-08-31	16:56:00	2025-08-30 12:56:31.565133	83
+77	mehul	2345677777	Aurangabad	Plumber	2025-09-01	16:56:00	2025-08-30 13:00:48.969239	83
+78	mehul jadhav	9378984792	aurangabad	Electrician	2025-09-26	13:48:00	2025-09-02 13:48:33.609073	31
+79	mehul jadhav	9378984792	aurangabad	Carpenter	2025-09-26	13:48:00	2025-09-02 14:02:02.712556	31
+80	mehul jadhav	9378984792	aurangabad	Painter	2025-09-02	13:48:00	2025-09-02 14:02:23.532453	31
+81	chinmay	2345678765	aurangabad	Painter	2025-09-03	14:21:00	2025-09-02 14:20:45.453793	31
+82	akash	3456734564	hfhe	Plumber	2025-09-27	11:27:00	2025-09-20 11:28:06.61309	63
+83	hftf	2345677777	fhgf	Carpenter	2025-10-02	11:36:00	2025-09-20 11:32:37.042371	63
+84	balaji	2345677777	vishwakarma	Plumber	2025-09-25	19:26:00	2025-09-24 19:20:23.61063	63
+85	suhas	2345678989	aurangabd	Plumber	2025-10-19	17:55:00	2025-10-18 17:55:17.776616	84
+86	salman khan	3456789876	aurangabad	Plumber	2025-10-23	20:36:00	2025-10-20 20:31:46.816962	63
+87	udayan	8010701130	aurangabad	Plumber	2025-11-25	22:10:00	2025-11-23 22:10:52.007371	85
+88	dhruvansh rajguru	7387487483	aurangabad	Painter	2025-12-24	10:46:00	2025-12-22 10:46:20.860456	86
+89	swapnil	7387487483	aurangabad	Carpenter	2025-12-25	11:51:00	2025-12-23 11:51:33.142983	87
+90	salman	9378984792	aurangabad	Carpenter	2025-12-27	01:29:00	2025-12-26 13:29:39.476808	91
+91	sunil jadhav	9999999999	aurangabad	Electrician	2025-12-31	13:20:00	2025-12-29 13:16:24.593748	92
+92	rohit	9876543217	hyderabad	Plumber	2025-12-31	20:56:00	2025-12-30 20:56:50.704011	74
+93	manish	9876543217	hyderabad	Plumber	2025-12-31	21:24:00	2025-12-30 21:24:31.05608	74
+94	harsh	9284534827	hyderabad	Plumber	2025-12-31	21:40:00	2025-12-30 21:38:55.935291	74
+95	mayank aggarwal	8010701130	aurangabad	Painter	2026-01-24	20:27:00	2026-01-03 20:27:49.177865	93
+96	mehul	9999897487	aurangabad	Painter	2026-01-17	20:54:00	2026-01-03 20:53:42.437067	93
+97	mynk	8010701130	aurangabad	Painter	2026-01-07	21:15:00	2026-01-05 21:15:25.73114	93
+98	swapnil jadhav	7757467378	aurangabad	Carpenter	2026-01-08	10:31:00	2026-01-06 10:29:47.52271	94
+99	swapnil jadhav	8010701130	aurangabad	Carpenter	2026-01-08	11:40:00	2026-01-06 11:40:55.213906	94
+100	shantanu	8989874784	aurangabad	Electrician	2026-01-09	19:14:00	2026-01-06 19:13:07.17138	95
+101	shantanu	8010701130	aurangabad	Plumber	2026-01-15	21:00:00	2026-01-08 21:58:17.834951	95
+102	shantanu	8010701130	hyderabad	Plumber	2026-01-15	21:00:00	2026-01-08 21:59:13.995155	95
+103	shantanu	8010701130	hyderabad	Plumber	2026-01-16	23:15:00	2026-01-08 23:11:25.727687	95
+104	soham	8010701130	aurangabad	Plumber	2026-01-11	10:51:00	2026-01-09 10:39:49.932166	96
+105	yash	7517515723	aurangabad	Electrician	2026-01-14	10:50:00	2026-01-13 10:50:35.085155	98
+106	vir hadule	8010701130	aurangabad	Carpenter	2026-01-15	10:00:00	2026-01-13 10:57:01.129498	99
+107	john doe	8010701130	aurnagabad	Plumber	2026-01-16	18:17:00	2026-01-13 18:13:29.70929	101
+108	soham gitte	8010701130	aurangabad	Plumber	2026-01-23	18:16:00	2026-01-13 18:16:20.151585	101
+109	sanket pimple	9876543218	aurangabad	Electrician	2026-01-14	18:30:00	2026-01-13 18:24:43.411075	101
+110	sanket pimple	9876543218	aurangabad	Electrician	2026-01-15	18:30:00	2026-01-13 18:27:26.214053	101
+111	kilshan	8010701130	aurangabad	Plumber	2026-01-19	14:00:00	2026-01-18 13:41:08.588263	102
+112	sanket pimple	8010701130	aurangabad	Plumber	2026-01-20	14:45:00	2026-01-18 14:45:15.540692	103
+113	krushna	8010701130	aurangabad	Plumber	2026-01-20	14:08:00	2026-01-19 14:08:54.619859	104
+114	Mehul jadhav	8765445788	Aurangabad	AC Repair	2026-01-13	18:41:00	2026-01-19 14:41:07.444425	107
+115	Mehul jadhav	8765445788	Aurangabad	Plumber	2026-01-13	18:41:00	2026-01-19 14:42:39.831122	107
+116	swapneel tikale	9898989893	hyderabad	Electrician	2026-02-12	13:10:00	2026-02-01 13:07:39.43209	109
+117	swapneel tikale	9898989893	hyderabad	Electrician	2026-02-12	13:10:00	2026-02-01 13:08:52.274777	109
+118	mehul jadhav	8010701130	aurangabad	Plumber	2026-02-25	14:00:00	2026-02-01 14:54:31.107497	110
+119	bhushan	9876543219	aurangabad	Carpenter	2026-02-25	19:40:00	2026-02-03 19:34:31.41998	111
+120	mehul jadhav	8010701130	aurangabad	AC Repair	2026-02-27	20:14:00	2026-02-03 20:12:20.379409	112
+121	mehul jadhav	8010701130	aurangabad	Plumber	2026-02-27	20:14:00	2026-02-03 20:16:00.425683	112
+122	bhushan	8010701130	aurangabad	Plumber	2026-02-13	19:00:00	2026-02-04 19:55:48.59637	111
+123	bhushan	8010701130	aurangabad	Plumber	2026-02-13	20:44:00	2026-02-04 20:39:00.611354	111
+124	renuka	8010701130	aurangabad	Plumber	2026-02-14	10:30:00	2026-02-05 10:26:37.381999	113
+125	soham gitte	8010701130	aurangabad	AC Repair	2026-02-13	20:45:00	2026-02-05 20:40:21.700631	115
+126	shourya	9209224510	aurangabad	Plumber	2026-02-10	10:45:00	2026-02-09 10:43:07.788593	117
+127	gayatri tak	8010701130	aurangabad	Plumber	2026-02-12	10:45:00	2026-02-10 10:39:17.214421	118
+128	sunil jadhav	8010701130	aurangabad	Plumber	2026-02-11	19:40:00	2026-02-10 19:35:35.941543	119
+129	sunil	9284534827	aurangabad	Plumber	2026-02-20	19:59:00	2026-02-11 19:53:03.498757	119
+130	anil jadhav	8010701130	aurangabad	Plumber	2026-02-20	21:03:00	2026-02-13 21:01:03.414676	119
+131	shankar	8010701130	aurangabad	Plumber	2026-02-25	18:27:00	2026-02-15 18:24:56.391217	120
+132	Swapnil  Kulkarni	8483007330	Nashik	Plumber	2026-02-18	19:46:00	2026-02-17 15:43:47.757333	121
+133	sneha more	8208908301	aurangabad	Plumber	2026-02-24	17:00:00	2026-02-20 13:44:49.471539	122
+134	sanket kulkarni	8010701130	aurangabad	Plumber	2026-02-26	19:15:00	2026-02-22 19:10:33.900551	123
+135	mehul	7387487483	aurangabad	Plumber	2026-02-27	11:10:00	2026-02-25 11:05:08.413662	122
+136	mehul	8938928982	aurangabad	Electrician	2026-02-28	18:30:00	2026-02-27 18:30:25.493603	124
+137	mehul jadhav	9284534827	aurangabad	Plumber	2026-03-01	07:00:00	2026-02-28 07:56:27.943209	125
+138	mehul	9876543234	aurangabad	Plumber	2026-03-07	12:10:00	2026-02-28 12:10:55.876631	125
+139	mehul	9876543234	aurangabad	Plumber	2026-03-07	12:10:00	2026-02-28 12:12:42.664187	125
+140	mehul	9876543234	aurangabad	Plumber	2026-03-07	12:10:00	2026-02-28 12:14:03.36246	125
+141	mehul	9876543234	aurangabad	Plumber	2026-02-28	12:17:00	2026-02-28 12:18:01.159983	125
+142	mehul	7676767633	aurangabad	Plumber	2026-03-07	12:38:00	2026-02-28 12:35:34.176531	125
+143	mehul	9876543234	aurangabad	Plumber	2026-03-07	13:10:00	2026-02-28 13:10:16.923303	125
+144	mehul	2345678765	aurangabad	Plumber	2026-03-08	13:40:00	2026-03-07 12:34:21.992473	129
+145	mehul	2345677777	aurangabad	Plumber	2026-03-14	13:51:00	2026-03-07 13:46:41.376135	130
+146	mehul	7387487483	aurangabad	Plumber	2026-03-11	13:50:00	2026-03-08 13:44:12.401815	128
+147	sanket	7387487483	aurangabad	Plumber	2026-03-27	14:23:00	2026-03-08 14:20:36.948803	128
+148	mehul	2345678765	aurangabad	Plumber	2026-03-17	15:12:00	2026-03-08 15:08:08.692777	128
+149	mehul	2345677777	aurangabad	Plumber	2026-03-27	18:30:00	2026-03-08 18:24:54.185211	128
+150	soham Gitte	7387487483	csn	Plumber	2026-03-09	11:39:00	2026-03-09 10:40:03.84569	131
+151	mehul jadhav	9378984792	aurangabad	Plumber	2026-03-19	11:00:00	2026-03-11 11:57:11.441756	132
+152	Swapneel	7387487483	CSN	Electrician	2026-03-12	14:52:00	2026-03-11 14:51:37.871584	134
+\.
+
+
+--
+-- TOC entry 5012 (class 0 OID 17119)
+-- Dependencies: 218
+-- Data for Name: categories; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.categories (id, name) FROM stdin;
+1	Plumber
+2	Electrician
+3	Cleaner
+4	Painter
+5	AC Mechanic
+6	Carpenter
+\.
+
+
+--
+-- TOC entry 5018 (class 0 OID 17154)
+-- Dependencies: 224
+-- Data for Name: connections; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.connections (id, customer_id, provider_id, order_at, status, platform_fee, booking_id, otp, reached_at, service_charge, charge_status, charge_note) FROM stdin;
+3	55	44	2025-08-19 23:01:17.737618	pending	129.00	57	\N	\N	\N	none	\N
+8	\N	44	2025-08-19 23:26:04.62819	pending	129.00	47	\N	\N	\N	none	\N
+10	\N	44	2025-08-20 00:14:35.406113	accepted	129.00	48	\N	\N	\N	none	\N
+1	63	44	2025-08-19 21:51:31.572686	pending	129.00	58	673814	\N	\N	none	\N
+2	63	44	2025-08-19 22:58:23.448208	pending	129.00	58	673814	\N	\N	none	\N
+4	63	44	2025-08-19 23:05:43.240825	pending	129.00	58	673814	\N	\N	none	\N
+5	63	44	2025-08-19 23:10:22.189928	pending	129.00	58	673814	\N	\N	none	\N
+6	63	44	2025-08-19 23:21:45.188474	accepted	129.00	58	673814	\N	\N	none	\N
+7	\N	44	2025-08-19 23:23:13.733412	pending	129.00	56	980689	\N	\N	none	\N
+9	\N	44	2025-08-19 23:50:52.56175	accepted	129.00	56	980689	\N	\N	none	\N
+49	31	68	2025-09-02 14:21:00.343556	accepted	129.00	81	629818	\N	\N	none	\N
+11	74	56	2025-08-20 00:28:39.756957	accepted	129.00	59	180319	\N	\N	none	\N
+12	74	56	2025-08-20 00:38:02.402585	accepted	129.00	59	\N	\N	\N	none	\N
+29	63	59	2025-08-23 10:02:43.550592	pending	129.00	69	980959	\N	\N	none	\N
+30	63	59	2025-08-23 10:02:43.550592	pending	129.00	69	980959	\N	\N	none	\N
+13	75	57	2025-08-20 09:34:43.032826	accepted	129.00	60	274804	\N	\N	none	\N
+31	63	59	2025-08-23 10:02:43.550592	pending	129.00	69	\N	\N	\N	none	\N
+14	55	57	2025-08-20 10:19:33.00572	accepted	129.00	57	318490	\N	\N	none	\N
+15	63	37	2025-08-21 17:58:52.566456	accepted	129.00	62	\N	\N	\N	none	\N
+16	63	37	2025-08-21 18:09:56.68831	accepted	129.00	62	\N	\N	\N	none	\N
+18	76	58	2025-08-23 10:03:58.574858	pending	129.00	68	\N	\N	\N	none	\N
+19	76	58	2025-08-23 10:03:58.574858	pending	129.00	68	\N	\N	\N	none	\N
+20	76	58	2025-08-23 10:03:58.574858	pending	129.00	68	\N	\N	\N	none	\N
+21	76	58	2025-08-23 10:03:58.574858	pending	129.00	68	\N	\N	\N	none	\N
+53	83	69	2025-10-18 17:56:21.05992	pending	129.00	77	\N	\N	\N	none	\N
+28	76	58	2025-08-23 10:03:58.574858	pending	129.00	68	\N	\N	\N	none	\N
+27	76	58	2025-08-23 10:03:58.574858	pending	129.00	68	\N	\N	\N	none	\N
+17	76	58	2025-08-23 10:03:58.574858	pending	129.00	68	\N	\N	\N	none	\N
+26	76	58	2025-08-23 10:03:58.574858	pending	129.00	68	\N	\N	\N	none	\N
+25	76	58	2025-08-23 10:03:58.574858	pending	129.00	68	\N	\N	\N	none	\N
+24	76	58	2025-08-23 10:03:58.574858	pending	129.00	68	\N	\N	\N	none	\N
+23	76	58	2025-08-23 10:03:58.574858	pending	129.00	68	\N	\N	\N	none	\N
+85	95	98	2026-01-08 22:00:05.718073	accepted	129.00	102	880935	2026-01-08 23:10:29.196658	560.00	requested	\N
+55	84	71	2025-10-18 17:59:37.591696	accepted	129.00	85	907719	\N	\N	none	\N
+115	120	128	2026-02-15 18:26:03.210244	accepted	129.00	131	\N	2026-02-15 18:32:07.236412	300.00	requested	\N
+58	85	69	2025-11-23 22:19:17.228139	pending	129.00	87	608357	\N	\N	none	\N
+107	111	122	2026-02-04 20:39:18.199442	accepted	129.00	123	\N	2026-02-04 20:40:37.80027	500.00	requested	\N
+61	87	88	2025-12-23 11:56:22.174306	accepted	129.00	89	628768	\N	\N	none	\N
+101	109	121	2026-02-01 14:16:25.999589	accepted	129.00	117	\N	2026-02-01 14:51:46.150439	80000.00	requested	\N
+65	63	98	2025-12-30 20:30:46.086015	accepted	129.00	66	524345	\N	\N	none	\N
+67	74	98	2025-12-30 20:43:31.064428	accepted	129.00	59	996217	\N	\N	none	\N
+69	74	98	2025-12-30 21:25:16.775107	accepted	129.00	93	\N	\N	\N	none	\N
+84	95	113	2026-01-06 19:15:24.36814	accepted	129.00	100	508361	2026-01-08 21:41:41.408526	500.00	requested	\N
+76	92	101	2026-01-05 19:18:33.679282	pending	129.00	91	\N	\N	\N	none	\N
+75	74	98	2026-01-05 19:18:28.819686	rejected	129.00	94	\N	\N	\N	none	\N
+78	93	102	2026-01-05 20:48:31.722462	rejected	129.00	96	\N	\N	\N	none	\N
+73	93	102	2026-01-03 21:10:16.423324	accepted	129.00	96	\N	2026-01-05 21:01:29.213485	600.00	paid_cash	\N
+109	113	125	2026-02-05 10:33:41.641315	rejected	129.00	124	\N	\N	\N	none	\N
+71	93	102	2026-01-03 20:32:33.88784	accepted	129.00	95	781713	\N	\N	none	\N
+80	93	102	2026-01-05 21:13:32.601643	accepted	129.00	95	781713	2026-01-05 21:14:28.738028	600.00	paid_cash	\N
+82	94	112	2026-01-06 11:38:35.995091	rejected	129.00	98	\N	\N	\N	none	\N
+95	102	118	2026-01-18 13:44:06.451159	accepted	129.00	111	323034	2026-01-18 14:46:28.556875	500.00	requested	\N
+129	125	128	2026-02-28 12:11:11.45253	accepted	129.00	138	\N	\N	\N	none	\N
+111	117	127	2026-02-09 10:46:22.407877	accepted	129.00	126	\N	2026-02-09 10:47:21.029607	850.00	requested	\N
+103	111	123	2026-02-03 19:37:22.735986	accepted	129.00	119	972098	2026-02-03 20:10:45.083715	8000.00	requested	\N
+87	95	98	2026-01-08 23:12:35.835328	accepted	129.00	103	\N	2026-01-09 00:45:26.906689	600.00	requested	\N
+89	96	114	2026-01-09 10:45:17.740797	pending	129.00	104	262809	\N	\N	none	\N
+97	104	119	2026-01-19 14:10:57.494538	accepted	129.00	113	891558	2026-01-19 14:12:59.69505	6000.00	requested	\N
+91	99	116	2026-01-13 10:59:05.341756	accepted	129.00	106	\N	2026-01-13 11:00:11.42654	600.00	requested	\N
+93	101	117	2026-01-13 23:33:56.415639	accepted	129.00	110	965638	\N	\N	none	\N
+113	119	128	2026-02-13 20:42:15.243084	accepted	129.00	129	\N	2026-02-13 20:44:36.697281	700.00	requested	\N
+99	107	120	2026-01-19 14:44:25.910736	accepted	129.00	115	238143	2026-01-19 14:47:05.933625	500.00	requested	\N
+105	111	122	2026-02-04 20:01:24.491409	accepted	129.00	122	500217	2026-02-04 20:05:37.361761	750.00	requested	\N
+121	122	128	2026-02-25 11:06:38.082747	accepted	129.00	135	310642	2026-02-25 12:12:50.948184	550.00	requested	\N
+133	125	128	2026-02-28 12:36:27.728683	accepted	129.00	142	\N	\N	\N	none	\N
+119	123	118	2026-02-25 11:34:27.612329	pending	129.00	134	355322	\N	\N	none	\N
+123	122	146	2026-02-25 11:29:05.176591	accepted	129.00	135	\N	2026-02-25 11:35:30.49238	500.00	requested	\N
+127	123	146	2026-02-25 12:14:21.141148	pending	129.00	134	\N	\N	\N	none	\N
+125	122	69	2026-02-25 12:15:41.793129	pending	129.00	133	\N	\N	\N	none	\N
+117	122	69	2026-02-25 12:15:41.793129	pending	129.00	133	556343	2026-02-20 13:59:31.836462	250.00	requested	\N
+131	125	128	2026-02-28 12:14:31.482953	accepted	129.00	140	\N	2026-02-28 12:15:41.277366	250.00	requested	\N
+135	129	128	2026-03-07 13:22:54.642876	accepted	129.00	144	\N	\N	\N	none	\N
+138	130	149	2026-03-07 13:52:59.917668	accepted	129.00	145	661167	2026-03-07 13:54:12.475109	500.00	requested	\N
+140	128	149	2026-03-08 14:21:55.350707	accepted	129.00	147	\N	2026-03-08 14:46:55.134215	600.00	requested	\N
+142	128	149	2026-03-08 18:25:05.278485	accepted	129.00	149	\N	2026-03-08 18:25:44.332821	1000.00	requested	\N
+144	134	152	2026-03-11 14:51:53.760748	accepted	129.00	152	503289	2026-03-11 14:53:19.240252	700.00	requested	\N
+50	83	22	2025-09-20 11:30:41.707514	pending	129.00	77	\N	\N	\N	none	\N
+40	82	66	2025-09-20 11:31:28.214118	pending	129.00	75	715913	\N	\N	none	\N
+41	82	66	2025-09-20 11:31:28.214118	pending	129.00	75	715913	\N	\N	none	\N
+43	82	66	2025-09-20 11:31:28.214118	pending	129.00	75	865793	\N	\N	none	\N
+33	63	59	2025-08-23 10:02:43.550592	pending	129.00	69	\N	\N	\N	none	\N
+44	82	66	2025-09-20 11:31:28.214118	pending	129.00	75	\N	\N	\N	none	\N
+22	76	58	2025-08-23 10:03:58.574858	pending	129.00	68	\N	\N	\N	none	\N
+32	76	58	2025-08-23 10:03:58.574858	pending	129.00	68	\N	\N	\N	none	\N
+34	76	58	2025-08-23 10:03:58.574858	pending	129.00	68	\N	\N	\N	none	\N
+52	31	68	2025-09-24 19:23:55.448797	pending	129.00	80	\N	\N	\N	none	\N
+51	31	68	2025-09-24 19:23:49.004161	pending	129.00	81	629818	\N	\N	none	\N
+54	83	69	2025-10-18 17:57:37.408039	pending	129.00	77	\N	\N	\N	none	\N
+35	77	60	2025-08-23 10:11:22.409509	accepted	129.00	70	\N	\N	\N	none	\N
+56	63	83	2025-10-20 20:33:40.038425	accepted	129.00	86	\N	\N	\N	none	\N
+36	80	59	2025-08-23 11:06:21.138497	pending	129.00	71	720793	\N	\N	none	\N
+37	80	59	2025-08-23 11:06:21.138497	accepted	129.00	71	\N	\N	\N	none	\N
+38	44	57	2025-08-24 18:44:38.694687	accepted	129.00	73	\N	\N	\N	none	\N
+86	95	113	2026-01-08 23:12:16.920512	pending	129.00	100	\N	\N	\N	none	\N
+39	44	61	2025-08-24 19:17:11.541183	accepted	129.00	74	854734	\N	\N	none	\N
+100	109	121	2026-02-01 13:15:52.450438	accepted	129.00	117	171257	2026-02-01 14:52:05.409866	600.00	requested	\N
+57	85	69	2025-11-23 22:19:17.228139	pending	129.00	87	608357	\N	\N	none	\N
+59	85	69	2025-11-23 22:19:17.228139	pending	129.00	87	608357	\N	\N	none	\N
+116	121	129	2026-02-17 15:50:55.360376	accepted	129.00	132	880605	2026-02-17 15:55:28.993538	150.00	requested	\N
+42	83	22	2025-08-30 13:01:47.327281	pending	129.00	77	\N	\N	\N	none	\N
+102	110	122	2026-02-01 14:57:21.816499	accepted	129.00	118	\N	2026-02-01 14:58:29.531208	650.00	requested	\N
+45	83	22	2025-09-02 13:21:00.110098	pending	129.00	77	\N	\N	\N	none	\N
+46	31	61	2025-09-02 14:00:21.309385	accepted	129.00	78	\N	\N	\N	none	\N
+47	31	18	2025-09-02 14:15:30.151126	accepted	129.00	80	\N	\N	\N	none	\N
+48	31	68	2025-09-02 14:18:41.429776	accepted	129.00	80	\N	\N	\N	none	\N
+60	86	87	2025-12-22 10:57:50.400478	accepted	129.00	88	555491	\N	\N	none	\N
+62	87	88	2025-12-23 11:57:50.888091	rejected	129.00	89	\N	\N	\N	none	\N
+88	96	114	2026-01-09 10:44:10.347564	accepted	129.00	104	262809	2026-01-09 11:11:48.001489	400.00	requested	\N
+63	92	101	2025-12-29 13:19:13.003519	accepted	129.00	91	366472	\N	\N	none	\N
+64	92	101	2025-12-30 20:30:08.239797	pending	129.00	91	\N	\N	\N	none	\N
+66	74	98	2025-12-30 20:43:01.591441	pending	129.00	59	996217	\N	\N	none	\N
+108	113	125	2026-02-05 10:30:18.567869	accepted	129.00	124	375076	2026-02-05 10:32:44.688533	140.00	requested	\N
+68	74	98	2025-12-30 20:57:15.719136	accepted	129.00	92	639127	\N	\N	none	\N
+110	115	126	2026-02-05 20:43:09.677141	pending	129.00	125	\N	\N	\N	none	\N
+70	74	98	2025-12-30 21:39:41.47285	accepted	129.00	94	509619	\N	\N	none	\N
+90	98	115	2026-01-13 10:52:56.127849	accepted	129.00	105	\N	2026-01-13 10:54:38.66451	600.00	requested	\N
+72	93	102	2026-01-03 20:54:11.033836	accepted	129.00	96	392286	\N	\N	none	\N
+77	74	98	2026-01-05 19:26:33.999406	rejected	129.00	93	\N	\N	\N	none	\N
+74	93	102	2026-01-03 21:14:48.519614	accepted	129.00	96	\N	2026-01-05 20:55:38.716936	700.00	paid_cash	\N
+79	93	102	2026-01-05 21:12:59.703676	accepted	129.00	96	\N	\N	\N	none	\N
+92	101	115	2026-01-13 18:30:45.766188	accepted	129.00	110	\N	\N	\N	none	\N
+81	93	102	2026-01-05 21:15:37.42007	accepted	129.00	97	906728	2026-01-05 21:18:12.983763	450.00	paid_cash	\N
+94	102	118	2026-01-18 13:43:29.785274	rejected	129.00	111	323034	\N	\N	none	\N
+83	94	112	2026-01-06 11:41:10.823842	accepted	129.00	99	\N	2026-01-06 11:41:35.678016	600.00	paid_cash	\N
+96	103	118	2026-01-18 14:45:53.44121	accepted	129.00	112	\N	2026-01-18 14:47:23.749246	500.00	requested	\N
+104	112	122	2026-02-03 20:17:10.638737	accepted	129.00	121	221608	2026-02-03 20:19:10.514787	750.00	requested	\N
+98	107	4	2026-01-19 14:44:02.138355	pending	129.00	115	\N	\N	\N	none	\N
+128	125	128	2026-02-28 07:58:53.799154	accepted	129.00	137	283837	2026-02-28 08:00:51.22418	450.00	requested	\N
+130	125	128	2026-02-28 12:13:00.499158	accepted	129.00	139	\N	\N	\N	none	\N
+112	119	128	2026-02-10 19:38:33.586016	accepted	129.00	128	243603	2026-02-10 20:23:47.371921	500.00	requested	\N
+132	125	128	2026-02-28 12:18:43.220671	pending	129.00	141	\N	\N	\N	none	\N
+122	122	146	2026-02-25 11:28:09.619998	pending	129.00	135	\N	\N	\N	none	\N
+114	119	128	2026-02-13 21:08:24.816268	accepted	129.00	130	\N	2026-02-13 21:13:50.698703	700.00	requested	\N
+120	123	118	2026-02-25 11:34:27.612329	pending	129.00	134	355322	2026-02-22 19:18:27.472592	130.00	requested	\N
+124	123	118	2026-02-25 11:34:27.612329	pending	129.00	134	\N	\N	\N	none	\N
+106	111	122	2026-02-04 20:19:15.730498	accepted	129.00	122	\N	2026-02-04 20:36:27.791781	525.00	requested	\N
+141	128	149	2026-03-08 15:08:23.480476	accepted	129.00	148	\N	2026-03-08 15:09:03.774109	700.00	requested	\N
+137	129	128	2026-03-07 13:24:34.205339	accepted	129.00	144	\N	2026-03-07 13:43:55.921238	700.00	requested	\N
+118	122	69	2026-02-25 12:15:41.793129	pending	129.00	133	\N	\N	\N	none	\N
+126	122	69	2026-02-25 12:15:41.793129	pending	129.00	133	\N	\N	\N	none	\N
+134	125	128	2026-02-28 13:11:42.816082	accepted	129.00	143	\N	2026-02-28 13:13:33.622322	50.00	requested	\N
+136	129	146	2026-03-07 13:24:11.789119	pending	129.00	144	\N	\N	\N	none	\N
+139	128	149	2026-03-08 13:45:20.849634	accepted	129.00	146	663276	2026-03-08 13:46:51.126966	450.00	requested	\N
+143	131	150	2026-03-09 10:51:23.035917	accepted	129.00	150	824397	2026-03-09 10:53:30.860254	600.00	requested	\N
+\.
+
+
+--
+-- TOC entry 5028 (class 0 OID 17376)
+-- Dependencies: 234
+-- Data for Name: negotiations; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.negotiations (negotiation_id, booking_id, worker_id, connection_id, min_charge, max_charge, agreed_charge, status, customer_notes, worker_notes, created_at, updated_at, customer_counter) FROM stdin;
+5	117	121	100	600.00	700.00	\N	pending	\N	\N	2026-02-01 13:39:01.976918	2026-02-01 13:39:01.976918	\N
+6	117	121	100	600.00	900.00	\N	pending	\N	\N	2026-02-01 14:00:26.760064	2026-02-01 14:00:26.760064	\N
+7	117	121	100	700.00	800.00	\N	pending	\N	\N	2026-02-01 14:02:51.001119	2026-02-01 14:02:51.001119	\N
+8	117	121	100	899.00	899.00	\N	pending	\N	\N	2026-02-01 14:03:29.533817	2026-02-01 14:03:29.533817	\N
+10	117	121	101	5000.00	7000.00	7000.00	accepted	\N	\N	2026-02-01 14:16:44.477647	2026-02-01 14:45:05.167165	5600.00
+11	117	121	101	700.00	800.00	\N	pending	\N	\N	2026-02-01 14:45:56.975842	2026-02-01 14:46:06.883809	600.00
+12	117	121	101	7000.00	7500.00	7500.00	accepted	\N	\N	2026-02-01 14:47:25.640249	2026-02-01 14:47:35.281894	\N
+13	117	121	101	7500.00	8000.00	8000.00	accepted	\N	\N	2026-02-01 14:49:56.905154	2026-02-01 14:50:20.956677	\N
+14	118	122	102	600.00	700.00	\N	pending	\N	\N	2026-02-01 14:57:46.585401	2026-02-01 14:57:58.932891	650.00
+15	119	123	103	500.00	550.00	550.00	accepted	\N	\N	2026-02-03 19:38:06.733312	2026-02-03 19:38:16.312309	\N
+42	144	128	137	700.00	800.00	\N	pending	\N	\N	2026-03-07 13:28:55.020614	2026-03-07 13:38:59.848104	700.00
+16	119	123	103	8000.00	10000.00	\N	pending	\N	\N	2026-02-03 19:38:55.084352	2026-02-03 20:00:13.068243	8000.00
+43	145	149	138	500.00	700.00	\N	pending	\N	\N	2026-03-07 13:53:40.239542	2026-03-07 13:53:54.495232	500.00
+17	121	122	104	700.00	800.00	800.00	accepted	\N	\N	2026-02-03 20:18:10.544547	2026-02-03 20:19:03.248643	725.00
+18	122	122	105	750.00	800.00	800.00	accepted	\N	\N	2026-02-04 20:02:40.765117	2026-02-04 20:05:29.482432	750.00
+19	122	122	106	500.00	900.00	\N	pending	\N	\N	2026-02-04 20:19:42.162247	2026-02-04 20:19:42.162247	\N
+44	146	149	139	500.00	550.00	\N	pending	\N	\N	2026-03-08 13:46:26.928367	2026-03-08 13:46:36.926644	450.00
+20	122	122	106	600.00	700.00	700.00	accepted	\N	\N	2026-02-04 20:21:06.345607	2026-02-04 20:27:19.247088	600.00
+21	122	122	106	5000.00	8000.00	8000.00	accepted	\N	\N	2026-02-04 20:27:45.602827	2026-02-04 20:32:21.304146	\N
+22	122	122	106	300.00	400.00	400.00	accepted	\N	\N	2026-02-04 20:32:46.471716	2026-02-04 20:32:54.843942	\N
+45	147	149	140	500.00	700.00	\N	pending	\N	\N	2026-03-08 14:22:16.171627	2026-03-08 14:22:34.709455	500.00
+23	122	122	106	500.00	550.00	550.00	accepted	\N	\N	2026-02-04 20:36:01.843219	2026-02-04 20:36:34.477501	525.00
+24	122	122	106	600.00	700.00	700.00	accepted	\N	\N	2026-02-04 20:36:56.152184	2026-02-04 20:37:18.596464	\N
+25	123	122	107	500.00	600.00	600.00	accepted	\N	\N	2026-02-04 20:39:37.849988	2026-02-04 20:40:23.860213	500.00
+26	124	125	108	150.00	200.00	\N	pending	\N	\N	2026-02-05 10:31:25.559085	2026-02-05 10:31:42.646441	140.00
+27	126	127	111	800.00	1000.00	\N	pending	\N	\N	2026-02-09 10:46:49.18521	2026-02-09 10:47:03.59359	850.00
+28	128	128	112	500.00	600.00	\N	pending	\N	\N	2026-02-10 19:39:34.620099	2026-02-10 19:39:47.359833	500.00
+29	129	128	113	700.00	800.00	\N	pending	\N	\N	2026-02-13 20:43:43.575175	2026-02-13 20:43:55.858539	700.00
+30	129	128	113	700.00	800.00	\N	pending	\N	\N	2026-02-13 21:08:03.179181	2026-02-13 21:08:03.179181	\N
+31	130	128	114	700.00	800.00	\N	pending	\N	\N	2026-02-13 21:08:45.070603	2026-02-13 21:09:46.432018	700.00
+32	131	128	115	300.00	400.00	\N	pending	\N	\N	2026-02-15 18:26:28.167473	2026-02-15 18:26:42.299938	300.00
+33	132	129	116	200.00	300.00	\N	pending	\N	\N	2026-02-17 15:53:24.81842	2026-02-17 15:53:56.394158	150.00
+34	133	135	117	300.00	400.00	\N	pending	\N	\N	2026-02-20 13:54:28.66111	2026-02-20 13:54:59.113875	250.00
+35	134	144	120	150.00	200.00	\N	pending	\N	\N	2026-02-22 19:17:35.086662	2026-02-22 19:17:47.851655	130.00
+36	135	128	121	500.00	600.00	\N	pending	\N	\N	2026-02-25 11:07:53.240515	2026-02-25 11:08:53.450202	550.00
+37	135	146	123	500.00	700.00	\N	pending	\N	\N	2026-02-25 11:35:07.44801	2026-02-25 11:35:17.092737	500.00
+38	137	128	128	500.00	700.00	\N	pending	\N	\N	2026-02-28 07:59:52.306341	2026-02-28 08:00:03.700302	450.00
+39	140	128	131	275.00	300.00	\N	pending	\N	\N	2026-02-28 12:15:05.263926	2026-02-28 12:15:22.40158	250.00
+40	142	128	133	300.00	400.00	\N	pending	\N	\N	2026-02-28 12:37:16.751427	2026-02-28 12:37:44.947442	200.00
+41	143	128	134	100.00	150.00	\N	pending	\N	\N	2026-02-28 13:12:40.653582	2026-02-28 13:13:00.853118	50.00
+46	147	149	140	600.00	700.00	\N	pending	\N	\N	2026-03-08 14:43:26.493519	2026-03-08 14:43:41.853239	600.00
+47	148	149	141	700.00	800.00	\N	pending	\N	\N	2026-03-08 15:08:41.91993	2026-03-08 15:08:51.502679	700.00
+48	149	149	142	1000.00	2000.00	\N	pending	\N	\N	2026-03-08 18:25:22.674915	2026-03-08 18:25:31.112759	1000.00
+49	150	150	143	500.00	800.00	\N	pending	\N	\N	2026-03-09 10:52:53.084217	2026-03-09 10:53:05.676008	600.00
+50	152	152	144	600.00	800.00	\N	pending	\N	\N	2026-03-11 14:52:45.068794	2026-03-11 14:52:57.350447	700.00
+\.
+
+
+--
+-- TOC entry 5026 (class 0 OID 17295)
+-- Dependencies: 232
+-- Data for Name: notifications; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.notifications (id, worker_id, booking_id, message, is_read, created_at) FROM stdin;
+\.
+
+
+--
+-- TOC entry 5024 (class 0 OID 17258)
+-- Dependencies: 230
+-- Data for Name: payments; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.payments (id, booking_id, gateway, paid_at, final_charge, payment_mode, payment_status, transaction_id, provider_amount, settled_at) FROM stdin;
+1	17	UPI	2025-07-28 20:39:05.20709	0.00	online	pending	\N	0.00	\N
+2	18	UPI	2025-07-29 18:10:45.220623	0.00	online	pending	\N	0.00	\N
+3	19	UPI	2025-07-29 18:14:45.461884	0.00	online	pending	\N	0.00	\N
+5	23	UPI	2025-07-29 18:34:17.783968	0.00	online	pending	\N	0.00	\N
+6	23	UPI	2025-07-29 18:42:14.770729	0.00	online	pending	\N	0.00	\N
+7	24	UPI	2025-07-29 20:46:40.078343	0.00	online	pending	\N	0.00	\N
+8	26	UPI	2025-07-30 10:34:48.429203	0.00	online	pending	\N	0.00	\N
+9	27	UPI	2025-07-30 19:53:35.078112	0.00	online	pending	\N	0.00	\N
+10	28	UPI	2025-07-30 20:12:40.589909	0.00	online	pending	\N	0.00	\N
+11	28	UPI	2025-07-30 20:17:48.61361	0.00	online	pending	\N	0.00	\N
+12	29	UPI	2025-07-31 11:51:05.27919	0.00	online	pending	\N	0.00	\N
+13	30	UPI	2025-08-01 09:26:32.94813	0.00	online	pending	\N	0.00	\N
+14	36	UPI	2025-08-02 11:35:54.23415	0.00	online	pending	\N	0.00	\N
+15	37	UPI	2025-08-03 11:24:36.842697	0.00	online	pending	\N	0.00	\N
+16	44	UPI	2025-08-04 16:48:29.727394	0.00	online	pending	\N	0.00	\N
+17	45	UPI	2025-08-04 19:55:09.149486	0.00	online	pending	\N	0.00	\N
+18	46	UPI	2025-08-05 10:41:49.723436	0.00	online	pending	\N	0.00	\N
+19	47	UPI	2025-08-06 09:42:36.445998	0.00	online	pending	\N	0.00	\N
+20	48	UPI	2025-08-06 11:04:32.298012	0.00	online	pending	\N	0.00	\N
+21	49	UPI	2025-08-09 23:23:07.238435	0.00	online	pending	\N	0.00	\N
+22	50	UPI	2025-08-10 11:15:04.940062	0.00	online	pending	\N	0.00	\N
+23	51	UPI	2025-08-11 12:36:29.127511	0.00	online	pending	\N	0.00	\N
+24	52	UPI	2025-08-11 13:12:57.544576	0.00	online	pending	\N	0.00	\N
+25	52	UPI	2025-08-11 13:21:25.288417	0.00	online	pending	\N	0.00	\N
+26	56	UPI	2025-08-13 09:35:51.514389	0.00	online	pending	\N	0.00	\N
+27	57	UPI	2025-08-19 20:32:44.011848	0.00	online	pending	\N	0.00	\N
+28	58	UPI	2025-08-19 21:34:18.776434	0.00	online	pending	\N	0.00	\N
+29	59	UPI	2025-08-20 00:26:36.135257	0.00	online	pending	\N	0.00	\N
+30	60	UPI	2025-08-20 09:32:10.558717	0.00	online	pending	\N	0.00	\N
+31	61	UPI	2025-08-20 10:19:16.74654	0.00	online	pending	\N	0.00	\N
+32	62	UPI	2025-08-21 17:47:37.0836	0.00	online	pending	\N	0.00	\N
+33	63	UPI	2025-08-21 18:13:43.364209	0.00	online	pending	\N	0.00	\N
+34	63	UPI	2025-08-21 18:32:18.522952	0.00	online	pending	\N	0.00	\N
+35	66	UPI	2025-08-21 18:37:37.066547	0.00	online	pending	\N	0.00	\N
+36	67	UPI	2025-08-21 18:39:22.875287	0.00	online	pending	\N	0.00	\N
+37	68	UPI	2025-08-22 12:19:00.508917	0.00	online	pending	\N	0.00	\N
+38	69	UPI	2025-08-23 09:35:53.785789	0.00	online	pending	\N	0.00	\N
+39	70	UPI	2025-08-23 10:06:20.126336	0.00	online	pending	\N	0.00	\N
+40	71	UPI	2025-08-23 11:03:27.65835	0.00	online	pending	\N	0.00	\N
+41	71	UPI	2025-08-23 21:03:41.864684	0.00	online	pending	\N	0.00	\N
+42	71	UPI	2025-08-24 12:49:59.885984	0.00	online	pending	\N	0.00	\N
+43	72	UPI	2025-08-24 18:04:41.173152	0.00	online	pending	\N	0.00	\N
+44	72	Card	2025-08-24 18:05:44.581106	0.00	online	pending	\N	0.00	\N
+45	73	Card	2025-08-24 18:42:54.640616	0.00	online	pending	\N	0.00	\N
+46	74	Card	2025-08-24 19:16:18.568941	0.00	online	pending	\N	0.00	\N
+47	75	UPI	2025-08-25 19:29:58.70793	0.00	online	pending	\N	0.00	\N
+48	76	UPI	2025-08-30 12:57:02.532052	0.00	online	pending	\N	0.00	\N
+49	77	UPI	2025-08-30 13:01:01.382684	0.00	online	pending	\N	0.00	\N
+50	78	UPI	2025-09-02 13:49:04.74092	0.00	online	pending	\N	0.00	\N
+51	80	Card	2025-09-02 14:02:29.186405	0.00	online	pending	\N	0.00	\N
+52	80	Card	2025-09-02 14:19:40.951844	0.00	online	pending	\N	0.00	\N
+53	81	Card	2025-09-02 14:20:49.022399	0.00	online	pending	\N	0.00	\N
+54	82	Card	2025-09-20 11:29:13.803777	0.00	online	pending	\N	0.00	\N
+55	83	Card	2025-09-20 11:32:40.573072	0.00	online	pending	\N	0.00	\N
+56	84	Card	2025-09-24 19:21:08.582413	0.00	online	pending	\N	0.00	\N
+57	85	UPI	2025-10-18 17:55:37.034151	0.00	online	pending	\N	0.00	\N
+58	86	Card	2025-10-20 20:31:51.843323	0.00	online	pending	\N	0.00	\N
+59	87	UPI	2025-11-23 22:11:12.313209	0.00	online	pending	\N	0.00	\N
+60	88	UPI	2025-12-22 10:47:26.04665	0.00	online	pending	\N	0.00	\N
+61	89	UPI	2025-12-23 11:51:58.131923	0.00	online	pending	\N	0.00	\N
+62	90	UPI	2025-12-26 13:31:26.144284	0.00	online	pending	\N	0.00	\N
+63	90	UPI	2025-12-26 13:38:20.323015	0.00	online	pending	\N	0.00	\N
+64	91	UPI	2025-12-29 13:16:32.29183	0.00	online	pending	\N	0.00	\N
+65	92	Card	2025-12-30 20:56:56.096291	0.00	online	pending	\N	0.00	\N
+66	93	UPI	2025-12-30 21:24:35.856612	0.00	online	pending	\N	0.00	\N
+67	94	Card	2025-12-30 21:39:00.218167	0.00	online	pending	\N	0.00	\N
+68	95	UPI	2026-01-03 20:28:03.451929	0.00	online	pending	\N	0.00	\N
+69	96	Card	2026-01-03 20:53:46.835566	0.00	online	pending	\N	0.00	\N
+70	97	Card	2026-01-05 21:15:29.553346	0.00	online	pending	\N	0.00	\N
+71	98	Card	2026-01-06 10:29:51.400168	0.00	online	pending	\N	0.00	\N
+72	99	Card	2026-01-06 11:40:59.52947	0.00	online	pending	\N	0.00	\N
+73	100	UPI	2026-01-06 19:13:12.500484	0.00	online	pending	\N	0.00	\N
+74	101	UPI	2026-01-08 21:58:23.784942	0.00	online	pending	\N	0.00	\N
+75	102	UPI	2026-01-08 21:59:18.594825	0.00	online	pending	\N	0.00	\N
+76	103	UPI	2026-01-08 23:11:29.714412	0.00	online	pending	\N	0.00	\N
+77	104	UPI	2026-01-09 10:40:03.253511	0.00	online	pending	\N	0.00	\N
+78	104	UPI	2026-01-09 10:40:20.22409	0.00	online	pending	\N	0.00	\N
+79	105	UPI	2026-01-13 10:50:40.133652	0.00	online	pending	\N	0.00	\N
+80	106	UPI	2026-01-13 10:57:05.405003	0.00	online	pending	\N	0.00	\N
+81	109	UPI	2026-01-13 18:25:09.938811	0.00	online	pending	\N	0.00	\N
+82	110	UPI	2026-01-13 18:27:34.291953	0.00	online	pending	\N	0.00	\N
+83	111	UPI	2026-01-18 13:41:16.068456	0.00	online	pending	\N	0.00	\N
+84	112	UPI	2026-01-18 14:45:19.67367	0.00	online	pending	\N	0.00	\N
+85	113	UPI	2026-01-19 14:09:06.452078	0.00	online	pending	\N	0.00	\N
+86	114	UPI	2026-01-19 14:41:19.860037	0.00	online	pending	\N	0.00	\N
+87	115	UPI	2026-01-19 14:42:45.846018	0.00	online	pending	\N	0.00	\N
+88	117	UPI	2026-02-01 13:10:09.883387	0.00	online	pending	\N	0.00	\N
+89	118	UPI	2026-02-01 14:54:34.643186	0.00	online	pending	\N	0.00	\N
+90	119	UPI	2026-02-03 19:34:48.906156	0.00	online	pending	\N	0.00	\N
+91	119	UPI	2026-02-03 19:39:28.568289	0.00	online	pending	\N	0.00	\N
+92	120	UPI	2026-02-03 20:12:24.380256	0.00	online	pending	\N	0.00	\N
+93	121	UPI	2026-02-03 20:16:04.500778	0.00	online	pending	\N	0.00	\N
+94	122	UPI	2026-02-04 19:56:09.684024	0.00	online	pending	\N	0.00	\N
+95	122	UPI	2026-02-04 20:37:43.719679	0.00	online	pending	\N	0.00	\N
+96	123	UPI	2026-02-04 20:39:04.523958	0.00	online	pending	\N	0.00	\N
+97	124	UPI	2026-02-05 10:28:20.108828	0.00	online	pending	\N	0.00	\N
+98	125	UPI	2026-02-05 20:40:27.304838	0.00	online	pending	\N	0.00	\N
+99	126	UPI	2026-02-09 10:43:15.348001	0.00	online	pending	\N	0.00	\N
+100	127	UPI	2026-02-10 10:48:55.145948	0.00	online	pending	\N	0.00	\N
+101	128	razorpay	2026-02-10 20:23:47.410352	500.00	online	paid	\N	0.00	\N
+104	129	cash	2026-02-13 20:44:36.74519	700.00	cash	paid	\N	700.00	\N
+105	130	razorpay	2026-02-13 21:13:50.735629	700.00	online	paid	\N	700.00	\N
+112	140	razorpay	2026-02-28 12:15:41.317007	250.00	online	paid	\N	250.00	\N
+113	143	razorpay	2026-02-28 13:13:33.644329	50.00	online	paid	\N	50.00	\N
+106	131	razorpay	2026-02-15 18:32:07.264043	300.00	online	paid	\N	300.00	\N
+114	145	cash	2026-03-07 13:54:12.50775	500.00	cash	paid	\N	500.00	\N
+107	132	cash	2026-02-17 15:55:29.019166	150.00	cash	paid	\N	150.00	\N
+108	133	razorpay	2026-02-20 13:59:31.85918	250.00	online	paid	\N	250.00	\N
+109	134	razorpay	2026-02-22 19:18:27.508216	130.00	online	paid	\N	130.00	\N
+115	146	razorpay	2026-03-08 13:46:51.157863	450.00	online	paid	\N	450.00	\N
+110	135	cash	2026-02-25 12:12:50.974016	550.00	cash	paid	\N	550.00	\N
+111	137	cash	2026-02-28 08:00:51.261545	450.00	cash	paid	\N	450.00	\N
+117	148	razorpay	2026-03-08 15:09:03.806096	700.00	online	paid	\N	700.00	\N
+116	147	razorpay	2026-03-08 14:46:55.189388	600.00	online	paid	\N	500.00	\N
+118	149	razorpay	2026-03-08 18:25:44.361597	1000.00	online	paid	\N	1000.00	\N
+119	150	razorpay	2026-03-09 10:53:30.900555	600.00	online	paid	\N	600.00	\N
+120	152	razorpay	2026-03-11 14:53:19.274513	700.00	online	paid	\N	700.00	\N
+\.
+
+
+--
+-- TOC entry 5030 (class 0 OID 17423)
+-- Dependencies: 236
+-- Data for Name: platform_fees; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.platform_fees (id, booking_id, amount, payment_method, gateway, transaction_id, status, paid_at) FROM stdin;
+1	129	29.00	UPI	\N	\N	paid	2026-02-13 20:39:59.529303
+2	129	29.00	UPI	\N	\N	paid	2026-02-13 20:58:42.676631
+3	129	29.00	UPI	\N	\N	paid	2026-02-13 20:59:04.286499
+4	130	29.00	UPI	\N	\N	paid	2026-02-13 21:01:07.933889
+5	131	29.00	UPI	\N	\N	paid	2026-02-15 18:25:00.806096
+6	132	29.00	UPI	\N	\N	paid	2026-02-17 15:44:37.324741
+7	133	29.00	UPI	\N	\N	paid	2026-02-20 13:45:45.773339
+8	134	29.00	UPI	\N	\N	paid	2026-02-22 19:10:44.160462
+9	135	29.00	UPI	\N	\N	paid	2026-02-25 11:05:14.828037
+10	136	29.00	UPI	\N	\N	paid	2026-02-27 18:30:30.210477
+11	137	29.00	UPI	\N	\N	paid	2026-02-28 07:56:31.72368
+12	138	29.00	UPI	\N	\N	paid	2026-02-28 12:10:59.917062
+13	139	29.00	UPI	\N	\N	paid	2026-02-28 12:12:46.770637
+14	140	29.00	UPI	\N	\N	paid	2026-02-28 12:14:09.164624
+15	141	29.00	UPI	\N	\N	paid	2026-02-28 12:18:09.780904
+16	142	29.00	UPI	\N	\N	paid	2026-02-28 12:35:44.228389
+17	143	29.00	UPI	\N	\N	paid	2026-02-28 13:10:25.687069
+18	144	29.00	UPI	\N	\N	paid	2026-03-07 12:34:54.389422
+19	145	29.00	UPI	\N	\N	paid	2026-03-07 13:46:45.50763
+20	146	29.00	UPI	\N	\N	paid	2026-03-08 13:44:18.71903
+21	146	29.00	UPI	\N	\N	paid	2026-03-08 14:04:20.522998
+22	146	29.00	UPI	\N	\N	paid	2026-03-08 14:06:39.757946
+23	147	29.00	UPI	\N	\N	paid	2026-03-08 14:20:40.842819
+24	147	29.00	UPI	\N	\N	paid	2026-03-08 14:43:15.740204
+25	148	29.00	UPI	\N	\N	paid	2026-03-08 15:08:14.230323
+26	149	29.00	UPI	\N	\N	paid	2026-03-08 18:24:57.468444
+27	150	29.00	UPI	\N	\N	paid	2026-03-09 10:40:21.412192
+28	151	29.00	UPI	\N	\N	paid	2026-03-11 11:57:15.960067
+29	152	29.00	UPI	\N	\N	paid	2026-03-11 14:51:43.102991
+\.
+
+
+--
+-- TOC entry 5020 (class 0 OID 17191)
+-- Dependencies: 226
+-- Data for Name: reviews; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.reviews (id, provider_id, user_id, comment) FROM stdin;
+\.
+
+
+--
+-- TOC entry 5016 (class 0 OID 17139)
+-- Dependencies: 222
+-- Data for Name: service_providers; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.service_providers (id, name, email, phone, category_id, experience, location, available, password_hash, is_verified, aadhaar_verified, aadhaar_last4, aadhaar_name, aadhaar_verified_at, dl_image_path, aadhaar_image_path, email_otp, otp_expiry, email_verified) FROM stdin;
+124	rahul verma	rahulya@gmail.com	8010701130	5	3	aurangabad	t	$2b$10$8V07YLOhBSxnRbyAaFpYMe2FZhWCqpWp2XwjjELqTZ0Z5CUrXhxyS	t	t	4878	\N	2026-02-03 20:14:13.993769	\N	\N	\N	\N	f
+118	chinmay bhatlawande	chinu@gmail.com	8010701130	1	1	aurangabad	t	$2b$10$KpVEic42sSaFnR4rJn5Azez7WzehZ5SyKJLeev4UWydvFWyfb6rv6	t	t	6736	\N	2026-01-18 13:42:26.809404	\N	\N	\N	\N	f
+68	suhas jadhav	suhas67@gmail.com	9284534827	4	1	aurangabad	t	$2b$10$MhXuxGjQc.IRmpnOUFmFnOW6QwlClmwgTIkYlEPn4oHsmbRP/OSOW	f	f	\N	\N	\N	\N	\N	\N	\N	f
+98	mehul	mj@gmail.com	9284534827	1	1	hyderabad	t	$2b$10$Su0s6L1J24Wjd0wOhCk4B.yXGUMCK2n5PQlT04.7wyOZvBA0r4oM6	t	f	\N	\N	\N	\N	\N	\N	\N	f
+69	shashikumar	shashikumar@gmail.com	9876543212	1	1	aurangabad	t	$2b$10$Pc5Fwo/vQM5R4dCbTiHx7enwh/Sm6pTNXKxI7UnBfA4ZLfTAi8obm	f	f	\N	\N	\N	\N	\N	\N	\N	f
+72	mehul	balaji89@gmail.com	9876543234	1	1	aurangabad	f	$2b$10$U6jx6ZLO3auETRkcfyj.De.Cd9v7zcllm75UiXSTJanK/CGHkE00y	f	f	\N	\N	\N	\N	\N	\N	\N	f
+75	soham	soham986@gmail.com	8474857585	1	1	nanded	f	$2b$10$d/64VLBWXUwGBMkqYoJOXOIDcKjOQjX99sNd3dv71GGGYa9HJ5IoG	f	f	\N	\N	\N	\N	\N	\N	\N	f
+78	ramchandra	ram56@gmail.com	9876543212	2	1	aurangabd	f	$2b$10$0sYjrCKyeGAtKQls3g19uO2R1exFZQGyQmiTDSv2xOEtsKRYiYTTq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+81	gaurav	arnav6@gmail.com	8474857585	2	1	aurangabd	f	$2b$10$Otqp0hAJWxWCQaK2LIj7oud7BGlfY17HqGh5zR5UjO.RTwpnYAorG	f	f	\N	\N	\N	\N	\N	\N	\N	f
+84	mehul	mehul98@gmail.com	9579962869	1	1	Aurangabad	f	$2b$10$smvwwGEeFRfGObwiPKY1YO4S7ZeFZsODG7AD7a9Q2Yjs5cQKEbi8.	t	f	\N	\N	\N	\N	\N	\N	\N	f
+4	sanket pimple	sanketpimple1234@gmail.com	8010701130	1	3	Aurangabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+87	krushna magar	krushnamagar45@gmail.com	9284534827	4	1	aurangabad	t	$2b$10$HRoB6/MhK/68UgpvFFBA1uDmUJfqph9ojDm9Qez9zfFsJFddKSdBK	t	f	\N	\N	\N	\N	\N	\N	\N	f
+130	mehul jadhav	mehulll@gmail.com	9284534827	2	4	Aurangabad	f	$2b$10$V2zV9zdfjjvZhIeKOnXdcOcyBx9RgwwDM6e1Vem9UVAD4jgeIqgyq	f	f	\N	\N	\N	uploads\\1771514905279-Screenshot 2025-06-22 192028.png	uploads\\1771514905286-Screenshot 2025-06-22 192028.png	\N	\N	f
+120	Mehul jadhav	tanukolekar27@gmail.com	8007477164	1	4	Aurangabad	t	$2b$10$Sg5ajjdUc9h5iNnfRlAFWO8rP5ga.XMSOaPXR9g.YHgbSAOdC55MG	t	t	6544	\N	2026-01-19 14:39:01.128167	\N	\N	\N	\N	f
+90	aniket	pawaraniket4952@gmail.com	8767481496	4	4	aurangabad	t	$2b$10$hAjvqiWTD3JcBA5Fjcqfuepw2If.tfJN43rEXbyNrrkQ4/rwWEpMq	t	f	\N	\N	\N	\N	\N	\N	\N	f
+93	mehulkumar	mehulkumar@gmail.com	9284534827	2	1	aurangabad	f	$2b$10$g5NAkBjdizWQhwKn5QIEheaBx7jk.HSMYkVEle2R90U6GsaTsAMpe	f	f	\N	\N	\N	\N	\N	\N	\N	f
+96	swapnil	swap@gmail.com	9284534827	4	1	hyderabad	f	$2b$10$HOV3DixrcdyHqKsjC05p0.TILXnfgc6pUad4yLRZ0ArrWfuLuSHG.	t	f	\N	\N	\N	\N	\N	\N	\N	f
+132	mehul jadhav	mm8@gmail.com	9284534827	4	4	aurangabad	f	$2b$10$hnLPplTDnk8HzKnji6Y52OU5Y9RRd0vMzjwv.yYhx91V7AJE1aT9S	f	f	\N	\N	\N	uploads\\1771515680774-Screenshot 2025-06-22 192028.png	uploads\\1771515680775-Screenshot 2025-06-22 192028.png	\N	\N	f
+114	mehul	sohamgit@gmail.com	9284534827	1	3	aurangabad	t	$2b$10$Cl1.c0y8bn0tETWI.kX6kO8hCm3PY9wYlGmIk33LHmP8pf9W4xhmC	t	t	6736	\N	2026-01-09 10:42:44.652793	\N	\N	\N	\N	f
+122	mehul jadhav	mehuljadhav98@gmail.com	9876543278	1	1	aurangabad	t	$2b$10$oJ4X.o0duVyBklrL.8e.Fuo2oD2Ylkkjmvo0sLKnozp5Q28WDUqT6	t	t	4334	\N	2026-02-01 14:56:34.831036	\N	\N	\N	\N	f
+100	soham	s3@gmail.com	8474857585	1	1	aurangabad	f	$2b$10$FU1BtfFEEGTf8fJIRDbwAOXejquIkSCOwuYh/XXtNTukZ1CgGmjfq	t	f	\N	\N	\N	\N	\N	\N	\N	f
+104	sunil jadhav	sunill5@gmail.com	9579962869	2	2	Aurangabad	f	$2b$10$Jc6huhcU/Mo.mhgSQP2Z/OjjJt.Zp3YN2eqz6wQwLgdKF.Rk27Hfi	f	f	\N	\N	\N	\N	\N	\N	\N	f
+102	virat	virat@gmail.com	8010701130	4	4	aurangabad	t	$2b$10$Sc1W8mE7B6BgeSt7s5Yqzu/90t46mq1aGL6skOQ2muxWK5XExsxGa	t	f	\N	\N	\N	\N	\N	\N	\N	f
+106	gaurav	g@56gmail.com	8010701130	6	3	aurangabad	f	$2b$10$2IjMabii5SxlQllDOVGp.e6Hi0t7cXYF3alJLlJWWLI34ep.XiGAK	f	f	\N	\N	\N	\N	\N	\N	\N	f
+133	mehul jadhav	mm7@gmail.com	9284534827	2	4	aurangabad	f	$2b$10$DVHAtVbrej3viu56lRC6qOf73ZI2xXhF1VwD5VzVSVEOHrYXRAm7G	t	t	4334	\N	2026-02-19 21:14:24.610639	\N	\N	\N	\N	f
+108	soham	soham67@gmail.com	8010701130	6	1	aurangabad	f	$2b$10$vKbVDhTWbFU7yfxfdq/MZumb9Oikxz/wYEvP8Sow7Kx3NdKSwchEG	f	f	\N	\N	\N	\N	\N	\N	\N	f
+110	mehul	mehul9876@gmail.com	8010701130	6	1	aurangabad	f	$2b$10$PeXbyR2MtEoeVWz50gdJA.yAeI2pj2BVIdTdfk//aW96gc5ahljFG	f	f	\N	\N	\N	\N	\N	\N	\N	f
+134	mehul jadhav	mehusunil@gmail.com	8010701130	1	2	aurangabad	t	$2b$10$wrfPR1J6LQXFuyFzHp83V.ImkDjn23BT.uiYLhzW9jeO15s9woF7K	t	t	8765	\N	2026-02-19 21:16:25.899603	\N	\N	\N	\N	f
+125	amey	amey@gmail.com	8010701130	1	6	aurangabad	t	$2b$10$CZPvy5S/FAMZ0s3U3CZKPOMy6PEgWDX5Ez2Z9dFHVj9yQwRTpQYlO	t	t	6875	\N	2026-02-05 10:29:27.835657	\N	\N	\N	\N	f
+112	soham	sohamg@gmail.com	9579962869	6	1	aurangabad	t	$2b$10$3f2xh.m7btx5cm129UwQLeKEmyEc0eRmFHAXEry1epKnuP.ugJVum	t	t	6736	\N	2026-01-06 11:34:32.590056	\N	\N	\N	\N	f
+139	raj wahule	rajwawle01@gmail.com	8010701130	1	3	aurangabad	f	$2b$10$KP8fX7BLadWBKYn6Jm5ymeylb1CVRrAvOj3YgMmvSDj3pzXF8KDOC	f	f	\N	\N	\N	\N	\N	111488	2026-02-20 20:58:00.004	f
+127	ramchandra ramdasi	rramdasi@gmail.com	8010701130	1	2	aurangabad	t	$2b$10$XxDU837uWMByVbzVi9k4w.gqcmLgqnrxtthyypqjK15SJ.xYgceQi	t	t	6875	\N	2026-02-09 10:45:28.436384	\N	\N	\N	\N	f
+136	swanand raut	sredits005@gmail.com	8010701130	1	3	aurangabad	f	$2b$10$kn.Ud8/0/UIsr8Vtm2nDz.UJ6sQvzJZOW5ouDw50IDQp5EwMnJUp2	t	t	6544	\N	2026-02-20 20:16:05.973276	eb331f25-eaa6-471b-b874-c2efbf745411.png	17eb87d5-4aad-49a2-a210-eb7c7c24f533.png	\N	\N	f
+135	rupali ambore	rupaliambhore000@gmail.com	8010701130	1	3	aurangabad	t	$2b$10$/jV1eUKofRrdUDvylNWJZOjHJSOIDEaaDGIVkbyyX4fUWX8qaq1RG	t	t	3933	\N	2026-02-20 13:49:30.869977	\N	\N	\N	\N	f
+138	soham	sohamgitte2@gmail.com	9579962869	1	2	aurangabad	f	$2b$10$zVfxhjMcN85z6L7ezwaD8uE/IyKamvpQENuEYZ9dN77a4DvaDla2m	t	t	6544	\N	2026-02-20 20:50:23.215309	\N	\N	\N	\N	t
+141	maithili kulkarni	maithilikul18@gmail.com	9284534827	1	1	aurangabad	f	$2b$10$1ugp1RI.EXJ9BA.vxRf.L.pnI9V6s6r.QSs0DN.4zD6y5rqx0QY5G	f	f	\N	\N	\N	\N	\N	293373	2026-02-21 19:20:40.074	f
+140	raj	rajwawle0188@gmail.com	8010701130	1	2	aurangabad	t	$2b$10$UZheJZuhx3D9O13pV.N.X.JQ4k1M8TbSurX9Ib4mAP3oz5VSwr7gi	t	t	6544	\N	2026-02-20 20:57:19.222338	\N	\N	\N	\N	t
+142	maithili kulkarni	rupalikulkarni49571@gmail.com	9284534827	1	1	aurangabad	t	$2b$10$M7kZvRz1sUJf7oEDWurUVOysn0.TqEgq7bRGtz9ehzFN0A7KdtINK	t	t	6875	\N	2026-02-21 19:18:26.845193	\N	\N	\N	\N	t
+143	chinmay bhatlawande	chinu9@gmail.com	8010701130	1	3	aurangabad	f	$2b$10$Y0LzS/laudITqG2xBcXFBuRFdJJDd25yp3lEgwu8piAN7J0wgCp92	f	f	\N	\N	\N	\N	\N	\N	\N	f
+116	arnav lasurkar	arnavlasurkar00@gmail.com	8010701130	6	3	aurangabad	f	$2b$10$LI7Y39wDXMwEofHQOYLphOTlThM/K.ZHASjfIWcV4MGevzE7voFm2	t	t	4898	\N	2026-01-13 10:58:21.309272	\N	\N	\N	\N	f
+145	soham	mehulmehul@gmail.com	9284534827	1	3	aurangabad	f	$2b$10$fatSdW9D1fScCL/oaiLa7./5X0KgteRXLva9BmYEy.KHbaQYrdfi.	f	f	\N	\N	\N	\N	\N	787298	2026-02-25 11:25:36.617	f
+2	arnav lasurkar	arnav44770@gmail.com	8010701130	1	1	hyderabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+70	shashikumar	shashikumar5@gmail.com	9876543212	1	1	aurangabd	f	$2b$10$FO1GW9cu9m5iDVGNEseMUuyTp85RBkbJd0ue9EBuZKEe.fyCuDWFu	f	f	\N	\N	\N	\N	\N	\N	\N	f
+62	rahul	rahul@gmail.com	8474857585	3	1	pune	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+63	mukesh	mukesh@gmail.com	9284534827	3	1	pune	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+18	mehul	mehul456@gmail.com	8474857585	4	1	aurangabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+64	mehul kumar	radheychavan1@gmail.com	9284534827	1	1	pune	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+65	sunil	sunilljadhav5@gmail.com	8474857585	1	1	aurangabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+66	mohan singh	mohan@gmail.com	9284534827	6	2	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+67	jitesh	jitesh@gmail.com	9876543212	6	2	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+73	gaurav	mehul6@gmail.com	9284534827	4	2	aurangabd	f	$2b$10$h0vtPGkrz3akD1MibRQ0f.Vk9sDMekOPcoZyvrTpTi3dxh6zwpm9.	f	f	\N	\N	\N	\N	\N	\N	\N	f
+76	suhas	suhasjadhav09@gmail.com	7058574509	1	1	nanded	f	$2b$10$zVTbTjEVPAmzpi6.6PBJFOrs3t8iv4f6Tsg3CshAR0ulYpAthiW0y	f	f	\N	\N	\N	\N	\N	\N	\N	f
+5	naman	naman1234@gmail.com	8377489444	3	1	hyderabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+6	arnav	arnav@gmail.com	8474857585	5	2	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+7	arnav	arnav@gmail.com	8474857585	2	2	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+9	arnav	balaji@gmail.com	8474857585	3	1	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+11	arnav	suhas@gmail.com	9876543212	5	2	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+12	arnav	suhas@gmail.com	9876543212	5	2	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+13	arnav	sujal@gmail.com	8474857585	6	2	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+14	mehul	mehul123@gmail.com	9284534827	5	1	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+15	mehul	mehuljadhav0000@gmail.com	8474857585	4	1	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+16	mehul	mehul876@gmail.com	9284534827	5	1	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+17	mehul	mehul2345@gmail.com	9876543212	4	2	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+19	mehul	mehul6789@gmail.com	9876543212	2	2	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+20	mehul	mehul2345@gmail.com	9284534827	5	1	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+22	soham	soham@gmail.com	7058574509	1	6	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+23	ramchandra	ramchandra@gmail.com	9284534827	5	1	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+24	atmaram	atmaram@gmail.com	9284534827	3	2	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+25	sanket pimple	sanket23pimple@gmail.com	9876543212	4	3	aurangabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+26	om	om@gmail.com	9876543234	4	2	aurangabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+27	suhas	suhas7@gmail.com	9284534827	3	2	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+28	gaurav	gaurav@gmail.com	9284534827	5	2	hyderabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+29	vaishnav	vaishnav@gmail.com	7058574509	4	2	hyderabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+30	pushkar	pushkar@gmail.com	7058574509	5	3	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+31	akash sir	akash345@gmail.com	9284534827	2	2	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+37	sam	sam1@gmail.com	7058574509	2	1	test	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+38	tarak	t@gmail.com	8474857585	4	1	aurangabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+32	shalaka arya	shalaka@gmail.com	9088556688	4	0	nanded	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+39	swapnil	s@gmail.com	9876543234	4	1	nanded	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+50	suhas	priyagaygodane18@gmail.com	8474857585	4	1	test	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+40	gaurav	gaurav45@gmail.com	9284534827	2	1	hyderabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+41	gaurav	gaurav455@gmail.com	9284534827	2	1	hyderabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+79	ramchandra	ram596@gmail.com	9876543212	2	1	aurangabd	f	$2b$10$nCU/CoOFC0pwpSFoZjvsqehj69PyXdOzItZZS8G9tjknS9lKcXMem	f	f	\N	\N	\N	\N	\N	\N	\N	f
+33	prem	prem@gmail.com	7058574509	4	2	hyderabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+8	arnav	mehul@gmail.com	9876543212	5	1	aurangabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+10	arnav	mehul@gmail.com	9876543212	5	2	aurangabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+82	siddesh	sid@gmail.com	9284534827	5	1	aurangabd	f	$2b$10$eugX1s1RrJ0bfBuTRVQcNuL4UTLyQuRRMvkbdXuj22JidKb7mqfPS	t	f	\N	\N	\N	\N	\N	\N	\N	f
+85	sanket pimple	sanketpimpleee1234@gmail.com	8010701130	2	1	Aurangabad	f	$2b$10$VM6ha84Hbh3HAy/rjh.Tl.egBbyKi8FJxlr6ShX/IQ05Yn/jRxKiu	f	f	\N	\N	\N	\N	\N	\N	\N	f
+88	soham	swapnilbhosale0507@gmail.com	9284534827	6	3	aurangabad	t	$2b$10$eQVmIhvqGx3ta/E7y0mn3edMohsSGQSLbpky0R4HR2Rj/zu3bToE.	t	f	\N	\N	\N	\N	\N	\N	\N	f
+91	soham singh	sohamj@gmail.com	7058574509	5	2	pune	f	$2b$10$xoOtSkwUofrCe2E6aM5tj.fgwGG8/6nzgMHZjix3G9XgRartZIhSO	f	f	\N	\N	\N	\N	\N	\N	\N	f
+94	gaurav	gauravj@gmail.com	2223445556	1	1	test	f	$2b$10$.IEFFOPRL0vvj2xf8cy1ZuIVpuowVLczkh5Yuz2r/4bKEX.CmkDAu	t	f	\N	\N	\N	\N	\N	\N	\N	f
+3	sanket pimple	sanketpimple1234@gmail.com	8010701130	2	2	Aurangabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+35	prathmesh	prathmesh@gmail.com	8474857585	5	1	hyderabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+42	gaurav	gaurav4545@gmail.com	9284534827	1	1	hyderabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+36	vedant	vedant@gmail.com	9876543234	2	3	test	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+52	mehul	mehuljadhav44770@gmail.com	8474857585	2	1	aurangabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+43	ramchandra	ram@gmail.com	9284534827	3	1	hyderabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+53	mehul	m1@gmail.com	8474857585	5	1	aurangabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+34	gaurav	g@gmail.com	9284534827	4	0	aurangabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+45	soham gitte	gauravkamble0777@gmail.com	9284534827	5	1	aurangabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+54	arnav	arnav4@gmail.com	9876543212	1	1	test	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+48	soham	swatijadhav44770@gmail.com	9284534827	5	1	hyderabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+49	mehul	maithilikulkarni381@gmail.com	8474857585	3	1	hyderabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+55	mehul jadhav	mehul9@gmail.com	9284534827	5	1	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+56	advait	advait@gmail.com	9876543212	1	1	hyderabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+44	gaurav jadhav	gaurav34@gmail.com	8474857585	1	1	test	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+57	swaral	swaral@gmail.com	9284534827	1	1	test	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+59	arnav	arnav3@gmail.com	9284534827	2	2	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+60	aditya	aditya@gmail.com	8474857585	2	2	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+61	chinmay	chinmay@gmail.com	8474857585	2	2	aurangabad	t	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+92	soham singh	sohamj5@gmail.com	7058574509	5	2	pune	f	$2b$10$hNHMEa56eu7.F4jPg1ORzeIuvrsKsLCJXpewi06ekSv30kSD8AMVi	f	f	\N	\N	\N	\N	\N	\N	\N	f
+71	gaurav	gaurav1909@gmail.com	8474857585	1	1	aurangabd	t	$2b$10$ocekweCqTeM.fErTHe8wAOO0PmNplHfIe8tqxsW2Uo6U8MnYUG2ZO	f	f	\N	\N	\N	\N	\N	\N	\N	f
+74	ramchandra	balaj689i@gmail.com	9876543212	5	1	pune	f	$2b$10$lS5mMZ4A5VptpsiBXQqCQe1CZtg8OdKu2iZZArmb6yqgwMUGypx92	f	f	\N	\N	\N	\N	\N	\N	\N	f
+77	soham	mehul9876543211@gmail.com	9284534827	2	1	aurangabd	f	$2b$10$M0K.5SA12uCuPfkV59R9Wek1FVbaDRkmbWIbCyua.HUOrgDcPTGiq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+58	mehul jadhav	mehuljadhav@gmail.com	9876543212	2	2	aurangabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+80	mehul	mehuljadhav57@gmail.com	9876543234	2	1	hyderabad	f	$2b$10$r21L3HoCjPFAayK266JpGeHVe9S.gvIkjeulpMe1CXGIl3d9Un0G6	f	f	\N	\N	\N	\N	\N	\N	\N	f
+21	mehul	mehul789@gmail.com	9876543212	2	1	aurangabad	f	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	f	f	\N	\N	\N	\N	\N	\N	\N	f
+95	himanshu	himanshuj@gmail.com	9284534827	2	3	aurangabd	f	$2b$10$Rb5pNiA8omsGQrHdBqwiKO3wPc86blK8Hinba.TYkNhiUud9sG4TS	t	f	\N	\N	\N	\N	\N	\N	\N	f
+97	harry	harry@gmail.com	9284534827	2	1	test	f	$2b$10$S1xLtw3Cu3EqNEdcMHKI2eFmK54SBwF5ZuRuxWi09MRD21bkMb8oO	t	f	\N	\N	\N	\N	\N	\N	\N	f
+99	manish	manish@gmail.com	8474857585	2	1	hyderabad	f	$2b$10$khfUHLunYqFngcBPF51beuGztInRKT6TtF3BnrZ6WhLEselohbzIG	t	f	\N	\N	\N	\N	\N	\N	\N	f
+83	mehul sunil jadhav	mehuljadhav45@gmail.com	9284534827	1	1	aurangabad	f	$2b$10$pK.Tw3s7uICxkPYWjQdboOofhVO11OIdl4hpNswdUDeOMlyeX.2fO	t	f	\N	\N	\N	\N	\N	\N	\N	f
+86	mehul jadhav	mehul78956@gmail.com	8010701130	4	1	Aurangabad	f	$2b$10$iHJmGifmgG97lBr3IwwnuuB1eWBAZ6XIGrZDP2nnOxdcE93QkZKDi	t	f	\N	\N	\N	\N	\N	\N	\N	f
+109	soham	soham657@gmail.com	8010701130	6	1	aurangabad	f	$2b$10$wxV4vmG6C9mtsRINM3l0Ue0mnToPy1et5c.f7OWI.fdhTYB0LjAb2	f	f	\N	\N	\N	\N	\N	\N	\N	f
+89	aditya sontakke	aditya23@gmail.com	8474857585	2	2	aurangabad	f	$2b$10$vqkAbfntXoIWiGJVL3TQ3OJftutE1kOqKown9wYlcAAp7X.i6qFG6	t	f	\N	\N	\N	\N	\N	\N	\N	f
+103	mahesh	mahesh@gmail.com	8967859009	2	2	Aurangabad	f	$2b$10$lNJLXG6iWqSO8.XcEOJYMOZpp4fYa4jCmfOePwb/0bPIP5k4XPECC	f	f	\N	\N	\N	\N	\N	\N	\N	f
+111	arnav lasurkar	arnav7@gmail.com	8010701130	6	1	aurangabad	f	$2b$10$A/K4Bkt/rboY48LkhwMnDu3v9AwWujw9hUz1Mm2yijJykK1N5x4Ve	f	f	\N	\N	\N	\N	\N	\N	\N	f
+105	gaurav bhosale	gauravk@gmail.com	6767583876	6	2	aurangabad	f	$2b$10$ZLfeiNoHppoHA5HToEfZkeUpAgJVM6zZ/PZnAukYFeTCUWE1.SeCe	f	f	\N	\N	\N	\N	\N	\N	\N	f
+117	mehul jadhav	mehulja@gmail.com	9284534827	2	2	aurangabad	t	$2b$10$5j3bwJZS79.wg7i0gMkacua35hdQexo4h6/5gtd.p4tcBCQzw5S62	t	t	6544	\N	2026-01-13 23:27:45.002526	\N	\N	\N	\N	f
+107	mehul	mehul4@gmail.com	8010701130	6	1	aurangabad	f	$2b$10$12mh5wdEiSB4Pcn23GDIzO3z2OMdxc/0xesnI9I8TYc5tN7fbwKh6	f	f	\N	\N	\N	\N	\N	\N	\N	f
+113	mehul jadhav	mehulj@gmail.com	9284534827	2	1	aurangabad	t	$2b$10$Q9KZdOrHtDZJo/ZoFb1TT.Hg8LCaUYWFY95yfzmrbED.wWNCTlAF.	t	t	6736	\N	2026-01-06 19:14:52.140105	\N	\N	\N	\N	f
+115	gaurav kamble	ga@gmail.com	8010701130	2	2	aurangabad	t	$2b$10$jn4e3yDZkgArrDLzYt/f2Ofh4T203viWz711O7t2Jurkf1Qbh4p7e	t	t	6544	\N	2026-01-13 10:52:20.337116	\N	\N	\N	\N	f
+123	dhurv	dhruv@gmail.com	9876543290	6	2	aurangabad	t	$2b$10$D0lYyaGVF.zv85AD3x2KsOx8IgbsdkqlikM67KTG/4se01pSeAaha	t	t	8765	\N	2026-02-03 19:36:15.978392	\N	\N	\N	\N	f
+119	mehul jadhav	mehulsss@gmail.com	9284534827	1	2	aurangabad	t	$2b$10$dZWM.WjTQnG0Ho9mdEM41.6MUC6BHQ3UulledM4l3mkE1BJDP4gWO	t	t	6736	\N	2026-01-19 14:10:20.518135	\N	\N	\N	\N	f
+126	chinmay bhatlawande	chinuu@gmail.com	8010701130	\N	2	aurangabad	t	$2b$10$AEdqq.HnMXV3q7TIrT6l3upebyQhwIaqZGBqaYoFkszOrRvoUlUhW	t	t	8765	\N	2026-02-05 20:41:59.222832	\N	\N	\N	\N	f
+121	sandeep tikale	sand@gmail.com	8884937689	2	10	hyderabad	t	$2b$10$sEzDDNrygxjheml8mpnEZObGTIvTwbO8ObWm/omY88g6PDJ3EBrwO	t	t	6544	\N	2026-02-01 13:13:08.513782	\N	\N	\N	\N	f
+129	mehul jadhav	mehuljadhav4488@gmail.com	9284534827	1	4	Nashik	t	$2b$10$h1Y3CTPn0BjIcdNcQj/QwuyZCmsZJA8jp4rSU/9ojC.Dwnt067ibi	t	t	5577	\N	2026-02-17 15:41:14.142476	\N	\N	\N	\N	f
+131	mehul jadhav	mehuljadhav78@gmail.com	9284534827	1	1	Aurangabad	f	$2b$10$G4ctjrBlhBSCTtc1IMUdoO25GjXr7dxomVQHlpAbgtH6ZSEsSYr0y	f	f	\N	\N	\N	uploads\\1771515547976-Screenshot 2025-06-22 192028.png	uploads\\1771515547983-Screenshot 2025-06-22 192028.png	\N	\N	f
+101	mehul jadhav	mm@gmail.com	9284534827	2	4	aurangabad	f	$2b$10$.q9tl4J70NImuhAlz/x8rOTSGhg/j7kZxA6Wmo60W/BNbtSa8fZyC	t	f	\N	\N	\N	\N	\N	\N	\N	f
+137	swanand raut	swanandraut@gmail.com	8010701130	1	2	aurangabad	f	$2b$10$XsSLOkLgHJp.CNzPxOF3euBiBsJxiatSTCdkmvxaZ36IfHhqVKJf6	f	f	\N	\N	\N	\N	\N	\N	\N	f
+144	chinmay bhatlawande	coolkarnisanket5798@gmail.com	8010701130	1	3	aurangabad	t	$2b$10$BXCw52XNLsNgdPMXBdvZw.NmH26lvTN95UQMfNlyAX1E7I4SZODEm	t	t	6875	\N	2026-02-22 19:13:41.988022	\N	\N	\N	\N	t
+146	dnyaneshwari	dnyaneshwaribornare@gmail.com	9284534827	1	2	aurangabad	t	$2b$10$G5ndK4Oa7UlG0Iq/iDVtducqwX4KiVesXVwYZgXCTp8PxAq0a.ccG	t	t	4569	\N	2026-02-25 11:23:56.955006	\N	\N	\N	\N	t
+147	arnav	arnavlasurkr@gmail.com	9284534827	2	21	aurangabad	f	$2b$10$mROT3yPUm4uP7j6t/9Ir8.mTXralGJ3VXb2G7TWGYD80PKSYIgue.	f	f	\N	\N	\N	\N	\N	\N	\N	f
+148	mehul	mmmmm@gmail.com	9284589988	1	2	aurangabad	f	$2b$10$L8NwB3U7UtAluWgHblYSeO/7P6J.DfZUjaZWPGJ4.9vrgpYcEB74S	f	f	\N	\N	\N	\N	\N	\N	\N	f
+128	ramchandra ramdasi	bwbsbsayavab@gmail.com	8010701130	1	2	aurangabad	t	$2b$10$W3eQTDNx1vkz2E54qhtFJOUqscywUshhoHh3V77lserGdhsCnge3m	t	t	6875	\N	2026-02-10 10:36:57.986087	\N	\N	\N	\N	f
+149	mehul	dinesh@gmail.com	9284534827	1	1	aurangabad	t	$2b$10$R4SEXn8X5FQ5DRaCpNF.iuLfE78R.P9GcNrc71Y3f3OWmYByMXdlK	t	t	2727	\N	2026-03-07 13:52:18.98193	\N	\N	\N	\N	t
+150	Gaurav Kamble	Gaurav12@gmail.com	8474857585	1	1	csn	t	$2b$10$lqcgXE9spMRtpAQ3AVNaZe2uhVi1X0MFluTO5dylcbBFeVAfQAn9q	t	t	4569	\N	2026-03-09 10:48:10.210223	\N	\N	\N	\N	t
+151	arnav	anduu@gmail.com	9284534827	1	3	aurangabad	f	$2b$10$AR0eSJYK0TJV30xI81g5yewJANFYc1FUQ85npwej0yRpmKdG5JYsu	f	f	\N	\N	\N	\N	\N	\N	\N	f
+152	Swapneel	swapneel@gmail.com	8474857585	2	1	CSN	t	$2b$10$BK/ySK1dn7a3dRjoWLA56eOzlWtX2qihNWEi9Fkt02El5dxVd4aqO	t	t	1111	\N	2026-03-11 14:48:37.025622	\N	\N	\N	\N	t
+\.
+
+
+--
+-- TOC entry 5031 (class 0 OID 17455)
+-- Dependencies: 237
+-- Data for Name: user_sessions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.user_sessions (sid, sess, expire) FROM stdin;
+l-rRjw7X05vO1IzdtkHkk5kx-wmG7ARC	{"cookie":{"originalMaxAge":3600000,"expires":"2026-03-11T10:13:25.293Z","secure":false,"httpOnly":true,"path":"/","sameSite":"lax"},"providerId":116,"providerEmail":"arnavlasurkar00@gmail.com"}	2026-03-11 15:43:26
+vBwSSRiEwdSYnEKQTYhANo__JujCyupd	{"cookie":{"originalMaxAge":3600000,"expires":"2026-03-11T10:19:21.528Z","secure":false,"httpOnly":true,"path":"/","sameSite":"lax"},"providerId":152,"providerEmail":"swapneel@gmail.com"}	2026-03-11 15:49:22
+TKP-lnmjUbEc6xaYa1vktYMBvKpTgv2B	{"cookie":{"originalMaxAge":3600000,"expires":"2026-03-11T10:08:35.432Z","secure":false,"httpOnly":true,"path":"/","sameSite":"lax"},"customerId":134}	2026-03-11 15:51:54
+\.
+
+
+--
+-- TOC entry 5014 (class 0 OID 17126)
+-- Dependencies: 220
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users (id, name, email, password_hash, phone, address, role, created_at) FROM stdin;
+84	suhas anil jadhav	jadhavsuhas631@gmail.com	$2b$10$KS3BesKuwX78vL9fcCk.gumksvPCBoEM8XEBUBYnqpaJJ4/5EtRza	7058574509	aurangabad	customer	2025-10-18 17:53:17.726148
+85	uday palaskar	udayanpalaskar@gmail.com	$2b$10$y1kd86B8lolTPnRwz89hgOUORVljQ8N/MZzN6o98r2wi3Twqe1XF.	8010701130	aurangabad	customer	2025-11-23 22:09:03.156043
+86	dhruvansh	dhruvansh44@gmail.com	$2b$10$rBRDHr0tkVhkVRA.M2gomeCkergQh5EFRet5R7OpI408RafXqKeS6	9284534827	aurangabad	customer	2025-12-22 10:42:58.938074
+89	rehman dakait	rehman@gmail.com	$2b$10$8/SqNvRsHrh5ocAN6XOUoelLMsyUtZo2spnrVVGq5Iw1zFM5fhaOe	8474857585	aurangabad	customer	2025-12-24 18:03:05.785115
+91	amey kulkarni	kulkarnirenuka021@gmail.com	$2b$10$JkJWe2pW1g298CBNe0XzEOkZTkGfb0.24UKhSgS0DiWOKSU9437/q	9284534827	aurangabad	customer	2025-12-26 13:27:33.206352
+93	mayank aggarwal	mayank@gmail.com	$2b$10$vSulu392F3dVfUNA6kUR2O7gL.VqpZWIjan3zo.84hS2nJYrX1OAa	8010701130	aurangabad	customer	2026-01-03 20:26:53.865726
+96	mehul jadhav	mehulsuniljadhav@gmail.com	$2b$10$pohMrTYIUo7GDyqlVAmTyOScSDiVcMa67765rKgWYKbXrrsU93g3i	8010701130	aurangabad	customer	2026-01-09 10:38:38.348282
+99	virbhadhra	virhadule@gmail.com	$2b$10$/ZJS0Atv18ajo40cfNlwquLrsKoQkNIB5EP0iIKl/hys0WSx.GhAm	7972003729	aurangabad	customer	2026-01-13 10:56:03.819087
+102	kilshan	kilshan@gmail.com	$2b$10$pEnuMQS6WMj4OCakRDCPauXgbi7I8D0JBZ4HbtL1BcySds2mF01X2	8010701130	aurangabad	customer	2026-01-18 13:34:31.598423
+105	sunil jadhav	sss@gmail.com	$2b$10$LPU4Fkp329CVpvYB61jxKOOnbitOXSM4z.fJ94X5kta9NM7YkcYJu	8010701130	aurangabad	customer	2026-01-19 14:16:48.571199
+108	swapneel tikale	swap@gmail.com	$2b$10$L8l8.R5z7MsYE3eCIiDaouhui5JcWTurWPTRgtk7ZLYmn97n1DPsS	8010701130	hyderabad	customer	2026-02-01 13:04:19.659079
+111	bhushan	bhushan@gmail.com	$2b$10$1UBJEkj9DOocYldmwxkBLuYCeDHAOZkXBFQ0TYqsSznppHle2c606	9876543299	aurangabad	customer	2026-02-03 19:33:17.956421
+113	ram	ramm@gmail.com	$2b$10$t9HtJzExtLCjqxESkvuu0.quoDbVIFcalODwcbgcRGLUsl2WdcYuG	8010701130	aurangabad	customer	2026-02-05 10:25:14.383569
+116	shaurya aggarwal	shaouryaa169@gmail.com	$2b$10$YjX7xY9Hn3gp1XJTWZBTeeJvb76o93gg.J2upbAGKRKjUo1XNLtnu	9209224510	aurangabad	customer	2026-02-09 10:39:54.949333
+119	sunil jadhav	sunil98@gmail.com	$2b$10$poEYISS6GSCpC3Wsq344FeHXyroKlqYWXvz/l52kcanxHfnu4irMy	8010701130	aurangabad	customer	2026-02-10 19:34:48.132092
+122	sneha more	snehamore328@gmail.com	$2b$10$zNqQU0EnZAQ1zwfwkRGM6.mlNF3DssJhqTe79DhL.yEN2/pLrb7P6	8208908301	aurangabad	customer	2026-02-20 13:40:46.340551
+124	mehul	mehuljadhavjadhav@gmail.com	$2b$10$CJELf3R.FolBoPfncYJeu.l0aKLB2wmm40lIEwAFBxvX734ILsufu	9284534827	aurangabad	customer	2026-02-27 18:29:20.615181
+126	mehul jadhav	madhur@gmail.com	$2b$10$Hdy1VxCZB7T45zrzMepYEeApS/Fb37WmhBTGYlIAHjYLo47ylifhm	ddsbdnbd	abad	customer	2026-03-07 12:12:32.700921
+129	mehul	balajii@gmail.com	$2b$10$z2AJIVqeFst22p.gNOVGf.7hKJ7KgW8ZqA1Tc.PIXdpDI4tBC7ezG	4489843098	aurangabad	customer	2026-03-07 12:25:10.003601
+131	soham gitte	sohamgitte12@gmail.com	$2b$10$zapTrTFh0IwJZjE3lut24.VTP7bw7zJ1TC.eLakUQcpFM/Ht3tqRe	7058574509	csn	customer	2026-03-09 10:38:48.690885
+133	mehul	mehmeh@gmail.com	$2b$10$HivVJwAmh2ci96suBvV55e65qguQ.rrqLDxFNJ/nhRJxkoTzTntMS	9284534827	aurangabad	customer	2026-03-11 12:19:04.023328
+87	swapnil bhosale	swapnilbhosale0507@gmail.com	$2b$10$XFlrobaNvUXYgxIL4/fJhObrnBc0G7QiCAgXsSqHibnmUHfayp0VK	9284534827	aurangabad	customer	2025-12-23 11:47:34.598252
+90	aditya prashanth sontakke	adityapsontakke@gmail.com	$2b$10$I2.EU8mB46AVw1I4kx4wnO1NCC.l1zPzo3Tws8HNaUG5c3jkKYjgC	9579693373	aurangabad	customer	2025-12-24 18:04:42.792766
+92	sunil jadhav	sj@gmail.com	$2b$10$JtzhueP25uJQLYlSKcdM0uJZyck23cknPJwvzeKmiyu27nwnpnCVe	9284534827	aurangabad	customer	2025-12-29 13:15:28.195021
+94	swapnil jadhav	swapnil@11gmail.com	$2b$10$JwUsBKs7tITnJFT4RVVCwumkHOMFzj7u9JfJ.P7dy.lbn.BLVYgf6	7875655447	aurangabad	customer	2026-01-06 10:28:25.663141
+97	yash dahihande	yashdaahihande23@gmail.com	$2b$10$EiTDjvrUdHKcCqzlu0YB4uik22gKSjyiMH.fkMnOD9kA2ONWDbgye	7517515723	aurangabad	customer	2026-01-13 10:48:25.629118
+100	mehul jadhav	msj@gmail.com	$2b$10$7tKSzDTKp9WvS8yRtobTre/dFahi2/L.wQ6L88Ldl1khvDjP8pJ6W	8010701130	aurangabad	customer	2026-01-13 17:48:52.50978
+103	sanket	sanketpimple0407@gmail.com	$2b$10$y0l7bPBvh76XnLpn6o7W1e4tTl.7Ud228q6pETRADrm4HbUkpHZLy	8010701130	aurangabad	customer	2026-01-18 14:43:03.8746
+106	Maithili Kulkarni	tanukolekar27@gmail.com	$2b$10$Hw4GVJpzSlFL0VHsdUz04.zouIZrzBVq0/Wu84RwjHuI7ZkH25QmG	8007477164	Pune	customer	2026-01-19 14:33:10.499776
+109	swapneel tikale	swap67@gmail.com	$2b$10$uyuWaAQuSV330YBD6lfDC.3xvKYh8djUIRbv37ce062GZFzxFUNDm	8010701130	hyderabad	customer	2026-02-01 13:05:00.591514
+112	mehul jadhav	mau@gmail.com	$2b$10$7vHXO0hGo84x.hvIAYdDeOHN5I28i7wjchHc9/YED/sxOBtvhWcS.	8010701130	aurangabad	customer	2026-02-03 20:11:15.762511
+114	soham gitte	sanketpimple12234@gmail.com	$2b$10$XdMrhlbxL822IkSpPYZgCOgBvn0Yh7Hey5PBTrZoyX.c7oWwZXoiu	8010701130	aurangabad	customer	2026-02-05 20:21:02.030535
+117	shourya aggarwal	shouryaa169@gmail.com	$2b$10$il5T4WWlme6Kf482aUP3XeNus3FEb/ttfEfdcDXkVobkKUIY5KgFi	9209224510	aurangabad	customer	2026-02-09 10:41:43.815941
+120	mehul	shankar@gmail.com	$2b$10$SSLNzXv4k098Lme8A4cFbuNF3x5TeaW1mYPoRmbKarBLl/khadwmu	8010701130	aurangabad	customer	2026-02-15 18:03:14.776595
+123	sankey kulkarni	sanketkulkarni5798@gmail.com	$2b$10$CZUslzzZVDIVa3TvUgFiFewwvhWsio0UuXXwr2.WaL54zMrTDRF7G	8010701130	aurangabad	customer	2026-02-22 19:08:54.157006
+125	mehul jadhav	mmm@gmail.com	$2b$10$VNIZ8eQNizJMI/u.zfnZoOuWorbK4Ms36NSPT3/nMsRGDxty9UiZe	9284534827	aurangabad	customer	2026-02-28 07:55:42.560492
+127	mehul jadhav	madhur1@gmail.com	$2b$10$JieVAnAZGYzFYKmMHCIiwOezGP/M/KmOi2weeunmPz8sPGel1FGay	9309190997	abad	customer	2026-03-07 12:13:16.082023
+130	mehul	swatii@gmail.com	$2b$10$NDEcFdRCWQ2bPQXsC4loNuN4Nnn604n0QAfTayHN19KPOkq8CyndG	9284534827	aurangabad	customer	2026-03-07 13:45:46.351494
+132	mehul	mehuly@gmail.com	$2b$10$IDoySG/hh5oOGPqRV02mjOrtL8kCGEYJsYicUxnI4pubX.dYFbs3e	9284534827	aurangabad	customer	2026-03-11 11:56:29.399751
+134	mehul	arnavlasurkar00@gmail.com	$2b$10$QyePU.rTtLZXW6KyaWbfXeN6vmI0NdyjJcYmMiJh2Eu99Mp7W62Y6	9284534827	CSN	customer	2026-03-11 14:37:55.742033
+2	mehul jadhav	mehuljadhav44770@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	98765432	 dmmd	customer	2025-07-24 12:56:59.043132
+3	sunil jadhav	suniljadhav6758@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9579962869	 vishwakarma society	customer	2025-07-24 12:58:52.278567
+4	suhas jadhav	suhasjadhav8990@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	987654321	gjjgvj	customer	2025-07-24 13:09:03.183859
+5	akash sir	akashsir4567@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	82782889	njksjhd	customer	2025-07-25 12:49:11.172134
+6	sanket pimple	sanketpimple1234@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8010701130	ganesh nagar n8-cidco	customer	2025-07-25 15:01:23.486101
+7	rajshree	rajshree1234@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	7841826366	vishvzkarma ha. so.cidco n8.ch. sambhaginager.	customer	2025-07-25 18:34:48.223827
+8	om pokle	om345@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9857895876	tv centre	customer	2025-07-27 17:24:55.869557
+9	gaurav kamble	gauravkamble1234@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	368747888	jgdghj	customer	2025-07-28 09:34:13.648188
+12	harsh	harsh@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	34567890	 cdjccdjbc	customer	2025-07-29 18:32:02.608304
+13	sunil jadhav	sunil1234@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9579962869	vishwakarma society	customer	2025-07-29 20:44:43.539073
+14	gaurav kamble	gaurav1234@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8377489444	dfghjk	customer	2025-07-30 10:29:15.301307
+18	akash sir	akash@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8377489444	fwvkhfvwrv	customer	2025-07-30 11:12:56.183238
+20	sam	sam@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8857011111test	test	customer	2025-08-01 09:22:41.265148
+21	balaji	balaji@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8474857585	n8-cidco	customer	2025-08-02 11:03:05.430391
+23	balaji	balaji2@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8474857585	n8-cidco	customer	2025-08-02 11:19:26.343875
+25	balaji	balaji3@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8474857585	n8-cidco	customer	2025-08-02 11:20:20.648292
+26	balaji	balaji4@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8474857585	n8-cidco	customer	2025-08-02 11:24:09.863668
+27	balaji	balaji5@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8474857585	n8-cidco	customer	2025-08-02 11:30:01.117922
+28	balaji	balaji6@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8474857585	fnenc	customer	2025-08-02 11:31:08.7399
+29	balaji	balaji49@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8474857585	ndneknd	customer	2025-08-02 11:33:47.743445
+30	mehul	mehul@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8474857585	r4ddd	customer	2025-08-02 20:38:36.024065
+31	mehul	mehul1@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543212	4rdd	customer	2025-08-03 11:23:16.10324
+32	akash  sir	akash5@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8474857585	test	customer	2025-08-04 09:25:04.048991
+33	mehul	mehul44770@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9284534827	test	customer	2025-08-04 16:51:44.902023
+34	mehul	mehul3@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543212	test	customer	2025-08-04 16:54:35.801347
+35	mehul	mehul1234567@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9284534827	nbjhb	customer	2025-08-04 17:20:11.316258
+36	balaji	balaji234@gmail.coom	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8474857585	visjwakkarma	customer	2025-08-04 18:55:40.430302
+62	mehul	mehuljadhav7777@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	\N	\N	admin	2025-08-14 14:17:11.441168
+63	salman	salman@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	7058574509	hyderabad	customer	2025-08-15 20:19:01.830065
+37	ganesh	ganesh123@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543212	bjewbd	customer	2025-08-04 18:58:57.35473
+38	akash  sir	akash9876@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8474857585	trfds	customer	2025-08-04 19:17:43.913137
+39	mehul	mehul7777@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543212	jcd	customer	2025-08-04 19:53:25.84348
+40	soham	soham@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	7879899678	padampura	customer	2025-08-05 10:39:33.121144
+41	amey kulkarni	amey@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9284534827	test	customer	2025-08-06 09:38:10.215677
+42	soham	soham234@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543212	test	customer	2025-08-06 11:03:24.030657
+43	ankit mundada	ankit@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	7879899678	test	customer	2025-08-09 23:19:40.578331
+44	kartik	kartik@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9284534827	test	customer	2025-08-10 11:14:15.097472
+45	soham gitte	soham2@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	7058574509	padampuraa	customer	2025-08-11 13:11:02.346854
+46	swapnil tikale	sw@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543212	hyderabad	customer	2025-08-12 20:31:47.463482
+47	swanand kamble	swanand@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	7058574509	test	customer	2025-08-13 09:33:09.155049
+48	akshay singh	ak@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9284534827	test	customer	2025-08-13 10:32:20.502088
+49	akshay singh	ak2@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9284534827	test	customer	2025-08-13 10:34:11.966951
+50	akash	a@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543212	test	customer	2025-08-13 10:41:36.916063
+51	gaurav	gaurav789@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9284534827	test	customer	2025-08-13 10:53:38.525752
+52	mehul	m@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543234	test	customer	2025-08-13 10:55:54.78094
+53	mehul	m2@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543234	test	customer	2025-08-13 10:57:03.469485
+54	mehul	m12@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543234	test	customer	2025-08-13 10:58:16.750915
+55	ajay mishra	ajay@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543212	test	customer	2025-08-13 17:09:40.665289
+56	harshwardhan	harsh5@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9284534827	test	customer	2025-08-14 11:37:30.113312
+64	vijay	vijay@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543212	hyderabad	customer	2025-08-16 13:15:46.449689
+65	keyur	keyur@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543212	test	customer	2025-08-16 13:25:41.131305
+66	udayan	u@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9284534827	aurangabad	customer	2025-08-17 13:57:47.070277
+68	sunil jadhav	sunilljadhav5@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9579962869	aurangabad	customer	2025-08-17 14:56:10.851509
+69	gaurav kamble	gauravkamble0777@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8474857585	hyderabad	customer	2025-08-17 15:00:26.930323
+70	maithili kulkarni	maithilikulkarni381@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9284534827	aurangabad	customer	2025-08-17 15:06:52.386476
+71	soham gitte	sohamgitte125@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8474857585	test	customer	2025-08-17 20:40:41.618381
+72	swati	swatijadhav44770@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	7058574509	test	customer	2025-08-17 20:46:18.841896
+73	swanand raut	swanandvraut369@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543234	test	customer	2025-08-19 11:50:59.884268
+74	rohit pimple	rohit@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9284534827	hyderabad	customer	2025-08-20 00:25:38.692465
+75	yash garsole	yash@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543212	test	customer	2025-08-20 09:31:11.521283
+76	pratik	pratik@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543212	aurangabad	customer	2025-08-22 12:15:24.41922
+77	krushna magar	krushna5@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8474857585	aurangabad	customer	2025-08-23 10:05:16.844405
+78	pawan magar	krushnamagar275@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9284534827	aurangabad	customer	2025-08-23 10:57:27.416313
+79	radhey chavan	radheychavan1@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9284534827	aurangabad	customer	2025-08-23 10:58:31.06237
+80	sameer	sameer.patel939@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8474857585	aurangabad	customer	2025-08-23 11:02:09.420465
+81	mohanlal	mohanlal@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9876543212	pune	customer	2025-08-23 20:25:12.025247
+82	aniket pawar	aniket@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	9284534827	aurangabad	customer	2025-08-25 19:25:47.919164
+83	Akshu palve	akankshapalve23@gmail.com	$2b$10$OAuFXKMz.rVK/L9A/kfsj.9X5y5rYJvFjqYuUshpFwjRI6XrSAjKq	8007477164	Mukundwadi	customer	2025-08-30 12:54:21.020771
+88	balaji	arnav@gmailcom	$2b$10$pKT.u7a3f9611GmacEAxXejb5MWYV4nXnrEyJ5DklMhPsbWVbxe1G	4564545	122	customer	2025-12-23 12:06:45.432441
+95	shantanu	shantanu@gmail.com	$2b$10$RRcWeO7ksHf4pVdlTfmF5.fErgQqkAPpulr1qGir05623pGFTR7k.	8010701130	aurangabad	customer	2026-01-06 19:12:18.296614
+98	yash dahihande	yashdahihande23@gmail.com	$2b$10$9YXu2VaWqUBGLzkqbY4uU.URTdfNvFMpKBtH47d44hIOi/b2/nCEy	7517515723	aurangabad	customer	2026-01-13 10:49:36.677388
+101	john doe	john@gmail.com	$2b$10$B1O4NHugMgKRG.hyk/umeucNrsf.VhTYnnLjewztKLB.rFVaGDwe6	8010701130	aurangabad	customer	2026-01-13 18:03:24.169045
+104	krushna magar	krushnamagar0811@gmail.com	$2b$10$OWY9nuDhUV6iYwGmE/pjVuhu.IA/tyj/IqUV2AKLz/Np0fGVKhG76	8010701130	aurangabad	customer	2026-01-19 14:07:25.085266
+107	sunil jadhav	ssssss@gmail.com	$2b$10$ouFoOSHpf74VB8cubuEL6.askiT0MvxSfIKN7m7yil90NuyjBjLOK	9284534827	aurangabad	customer	2026-01-19 14:35:55.716335
+110	mehul jadhav	mehuljadh@gmail.com	$2b$10$8XXOC/gHpou3wIr56MdzQO4hzb64PA4jXfkHNYaP4a.KbfJlR1.7K	8010701130	aurangabad	customer	2026-02-01 14:53:46.530291
+115	soham gitte	sohamgitte95@gmail.com	$2b$10$MdgYDLu/K0ZIZbAXSUQqn.HuJOU/w6sj8TumQod.HYGBPTA1KtMmu	8010701130	aurangabad	customer	2026-02-05 20:23:43.997786
+118	gaytri	gayatritak30@gmail.com	$2b$10$2iW6Et40lD/n9H7xn2p04.3ItHyQsPw65yiD35JuIvCzRftGZmrPi	8010701130	aurangabad	customer	2026-02-10 10:38:27.613031
+121	Swapnil Kulkarni	swapnilkulkarni988@gmail.com	$2b$10$U4fbU/NOZumUChtuKLD43O1AjbpPDzMjGkYX7/55YG6teuN6iZXYm	8483007330	Nashik	customer	2026-02-17 15:37:25.725133
+128	mehul	mehuljadhav456@gmail.com	$2b$10$0nsVlwoT1tr6F9WozCw1NewSO491b.YJO5mDZUbphmH5PELh5nClW	9284534827	aurangabad	customer	2026-03-07 12:19:04.714352
+\.
+
+
+--
+-- TOC entry 5047 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: bookings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.bookings_id_seq', 152, true);
+
+
+--
+-- TOC entry 5048 (class 0 OID 0)
+-- Dependencies: 217
+-- Name: categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.categories_id_seq', 1, false);
+
+
+--
+-- TOC entry 5049 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: connections_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.connections_id_seq', 144, true);
+
+
+--
+-- TOC entry 5050 (class 0 OID 0)
+-- Dependencies: 233
+-- Name: negotiations_negotiation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.negotiations_negotiation_id_seq', 50, true);
+
+
+--
+-- TOC entry 5051 (class 0 OID 0)
+-- Dependencies: 231
+-- Name: notifications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.notifications_id_seq', 1, false);
+
+
+--
+-- TOC entry 5052 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: payments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.payments_id_seq', 120, true);
+
+
+--
+-- TOC entry 5053 (class 0 OID 0)
+-- Dependencies: 235
+-- Name: platform_fees_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.platform_fees_id_seq', 29, true);
+
+
+--
+-- TOC entry 5054 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: reviews_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.reviews_id_seq', 1, false);
+
+
+--
+-- TOC entry 5055 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: service_providers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.service_providers_id_seq', 152, true);
+
+
+--
+-- TOC entry 5056 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 134, true);
+
+
+--
+-- TOC entry 4841 (class 2606 OID 17255)
+-- Name: bookings bookings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.bookings
+    ADD CONSTRAINT bookings_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4829 (class 2606 OID 17124)
+-- Name: categories categories_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.categories
+    ADD CONSTRAINT categories_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4837 (class 2606 OID 17164)
+-- Name: connections connections_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.connections
+    ADD CONSTRAINT connections_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4847 (class 2606 OID 17387)
+-- Name: negotiations negotiations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.negotiations
+    ADD CONSTRAINT negotiations_pkey PRIMARY KEY (negotiation_id);
+
+
+--
+-- TOC entry 4845 (class 2606 OID 17304)
+-- Name: notifications notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notifications
+    ADD CONSTRAINT notifications_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4843 (class 2606 OID 17267)
+-- Name: payments payments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.payments
+    ADD CONSTRAINT payments_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4849 (class 2606 OID 17430)
+-- Name: platform_fees platform_fees_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.platform_fees
+    ADD CONSTRAINT platform_fees_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4839 (class 2606 OID 17198)
+-- Name: reviews reviews_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reviews
+    ADD CONSTRAINT reviews_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4835 (class 2606 OID 17147)
+-- Name: service_providers service_providers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.service_providers
+    ADD CONSTRAINT service_providers_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4852 (class 2606 OID 17461)
+-- Name: user_sessions user_sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_sessions
+    ADD CONSTRAINT user_sessions_pkey PRIMARY KEY (sid);
+
+
+--
+-- TOC entry 4831 (class 2606 OID 17137)
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
+
+
+--
+-- TOC entry 4833 (class 2606 OID 17135)
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4850 (class 1259 OID 17462)
+-- Name: IDX_session_expire; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "IDX_session_expire" ON public.user_sessions USING btree (expire);
+
+
+--
+-- TOC entry 4859 (class 2606 OID 17310)
+-- Name: bookings bookings_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.bookings
+    ADD CONSTRAINT bookings_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4854 (class 2606 OID 17273)
+-- Name: connections connections_booking_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.connections
+    ADD CONSTRAINT connections_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES public.bookings(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4855 (class 2606 OID 17165)
+-- Name: connections connections_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.connections
+    ADD CONSTRAINT connections_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4856 (class 2606 OID 17170)
+-- Name: connections connections_provider_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.connections
+    ADD CONSTRAINT connections_provider_id_fkey FOREIGN KEY (provider_id) REFERENCES public.service_providers(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4860 (class 2606 OID 17268)
+-- Name: payments fk_booking; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.payments
+    ADD CONSTRAINT fk_booking FOREIGN KEY (booking_id) REFERENCES public.bookings(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4865 (class 2606 OID 17431)
+-- Name: platform_fees fk_pf_booking; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.platform_fees
+    ADD CONSTRAINT fk_pf_booking FOREIGN KEY (booking_id) REFERENCES public.bookings(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4862 (class 2606 OID 17388)
+-- Name: negotiations negotiations_booking_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.negotiations
+    ADD CONSTRAINT negotiations_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES public.bookings(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4863 (class 2606 OID 17398)
+-- Name: negotiations negotiations_connection_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.negotiations
+    ADD CONSTRAINT negotiations_connection_id_fkey FOREIGN KEY (connection_id) REFERENCES public.connections(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4864 (class 2606 OID 17393)
+-- Name: negotiations negotiations_worker_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.negotiations
+    ADD CONSTRAINT negotiations_worker_id_fkey FOREIGN KEY (worker_id) REFERENCES public.service_providers(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4861 (class 2606 OID 17305)
+-- Name: notifications notifications_worker_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notifications
+    ADD CONSTRAINT notifications_worker_id_fkey FOREIGN KEY (worker_id) REFERENCES public.service_providers(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4857 (class 2606 OID 17199)
+-- Name: reviews reviews_provider_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reviews
+    ADD CONSTRAINT reviews_provider_id_fkey FOREIGN KEY (provider_id) REFERENCES public.service_providers(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4858 (class 2606 OID 17204)
+-- Name: reviews reviews_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reviews
+    ADD CONSTRAINT reviews_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4853 (class 2606 OID 17148)
+-- Name: service_providers service_providers_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.service_providers
+    ADD CONSTRAINT service_providers_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.categories(id) ON DELETE SET NULL;
+
+
+-- Completed on 2026-03-11 18:25:46
+
+--
+-- PostgreSQL database dump complete
+--
+
