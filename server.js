@@ -326,7 +326,7 @@ app.post('/register-worker', async (req, res) => {
         <p>
           Login to your dashboard and set your availability to <b>Online</b> to start receiving jobs.
         </p>
-        <a href="http://localhost:3000/worker-login.html">Go to Worker Login</a>
+        <a href="https://fixofix-service-booking-platform.onrender.com/worker-login.html">Go to Worker Login</a>
         <hr/>
         <p style="font-size:12px; color:#888;">
           This is an automated message. Please do not reply.
