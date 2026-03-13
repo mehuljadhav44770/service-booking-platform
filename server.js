@@ -6,6 +6,7 @@ const pool = require('./db');
 const bcrypt = require('bcryptjs');
 const session = require('express-session');
 const pgSession = require("connect-pg-simple")(session);
+const crypto = require("crypto");
 
 // Import your email helper
 const sendEmail = require("./email");
@@ -2189,6 +2190,85 @@ app.post("/verify-email-otp", async (req, res) => {
 
 });
 
+app.post("/create-order", async (req, res) => {
+  try {
+
+    const { connection_id, amount } = req.body;
+
+    const options = {
+      amount: amount * 100,
+      currency: "INR",
+      receipt: "receipt_" + Date.now()
+    };
+
+    const order = await razorpay.orders.create(options);
+
+    // save order in database
+    await pool.query(
+      `INSERT INTO razorpay_transactions 
+      (connection_id, razorpay_order_id, amount, payment_status)
+      VALUES ($1,$2,$3,'created')`,
+      [connection_id, order.id, amount]
+    );
+
+    res.json(order);
+
+  } catch (err) {
+    console.error("Create order error:", err);
+    res.status(500).json({ error: "Order creation failed" });
+  }
+});
+
+
+
+
+app.post("/verify-payment", async (req, res) => {
+  try {
+
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature
+    } = req.body;
+
+    const body = razorpay_order_id + "|" + razorpay_payment_id;
+
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(body)
+      .digest("hex");
+
+    if (expectedSignature === razorpay_signature) {
+
+      await pool.query(
+        `UPDATE razorpay_transactions
+         SET razorpay_payment_id=$1,
+             razorpay_signature=$2,
+             payment_status='success',
+             paid_at=NOW()
+         WHERE razorpay_order_id=$3`,
+        [razorpay_payment_id, razorpay_signature, razorpay_order_id]
+      );
+
+      res.json({ status: "success" });
+
+    } else {
+
+      await pool.query(
+        `UPDATE razorpay_transactions
+         SET payment_status='failed'
+         WHERE razorpay_order_id=$1`,
+        [razorpay_order_id]
+      );
+
+      res.status(400).json({ status: "failed" });
+    }
+
+  } catch (err) {
+    console.error("Verify payment error:", err);
+    res.status(500).json({ error: "Payment verification failed" });
+  }
+});
 
 
 

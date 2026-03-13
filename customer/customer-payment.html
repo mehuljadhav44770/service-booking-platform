@@ -197,6 +197,7 @@
     </div>
   </div>
 </div>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
   let selectedMethod = "UPI";
@@ -275,38 +276,83 @@
 
   // 3. Confirm Payment
   async function confirmPayment() {
-    const btn = document.getElementById('mainPayBtn');
-    if (!bookingId) return;
 
-    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Authorizing...';
-    btn.disabled = true;
+  const btn = document.getElementById('mainPayBtn');
+  if (!bookingId) return;
 
-    try {
-      const res = await fetch('https://fixofix-service-booking-platform.onrender.com/platform-fee', {
-         method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    booking_id: bookingId,
-    amount: platformFee,
-    method: selectedMethod
-        })
-      });
+  btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+  btn.disabled = true;
 
-      if (res.ok) {
-        btn.innerHTML = 'Success ✅';
-        btn.style.background = '#22c55e';
-        setTimeout(() => {
-          window.location.href = "customer-dashboard.html";
-        }, 1500);
-      } else {
-        btn.disabled = false;
-        btn.innerHTML = 'Try Again';
+  try {
+
+    // 1️⃣ Create Razorpay order
+    const orderRes = await fetch('https://fixofix-service-booking-platform.onrender.com/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: platformFee,
+        booking_id: bookingId
+      })
+    });
+
+    const order = await orderRes.json();
+
+    // 2️⃣ Razorpay Checkout
+    const options = {
+      key: "rzp_live_xxxxxxxxx",   // your Razorpay key
+      amount: order.amount,
+      currency: "INR",
+      name: "Fixofix",
+      description: "Inspection Fee",
+      order_id: order.id,
+
+      handler: async function (response) {
+
+        // 3️⃣ Verify payment
+        const verifyRes = await fetch("https://fixofix-service-booking-platform.onrender.com/verify-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            booking_id: bookingId,
+            amount: platformFee
+          })
+        });
+
+        const result = await verifyRes.json();
+
+        if(result.status === "success"){
+
+          btn.innerHTML = 'Success ✅';
+          btn.style.background = '#22c55e';
+
+          setTimeout(() => {
+            window.location.href = "customer-dashboard.html";
+          }, 1500);
+
+        } else {
+          alert("Payment verification failed");
+        }
+      },
+
+      theme: {
+        color: "#0f172a"
       }
-    } catch(err) {
-      btn.disabled = false;
-      btn.innerHTML = 'Authorize Secure Payment';
-    }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.open();
+
+  } catch(err) {
+
+    console.error(err);
+    btn.disabled = false;
+    btn.innerHTML = 'Authorize Secure Payment';
+
   }
+}
 
   // 4. Back button logic
   document.getElementById('backButton').addEventListener('click', () => {
