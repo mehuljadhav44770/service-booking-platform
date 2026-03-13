@@ -9,6 +9,7 @@ const pgSession = require("connect-pg-simple")(session);
 
 // Import your email helper
 const sendEmail = require("./email");
+
 const path = require("path"); 
 
 const app = express();
@@ -2096,7 +2097,12 @@ app.post("/send-email-otp", async (req, res) => {
       WHERE email=$3
     `, [otp, expiry, email]);
 
-    await sendEmail(email, `Your OTP is: ${otp}`);
+await sendEmail(
+  email,
+  "Email Verification OTP",
+  `Your OTP is ${otp}`,
+  `<h2>Your OTP: ${otp}</h2><p>This OTP will expire in 5 minutes.</p>`
+);
 
     res.json({ success: true });
 
