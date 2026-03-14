@@ -6,7 +6,7 @@ const pool = require('./db');
 const bcrypt = require('bcryptjs');
 const session = require('express-session');
 const pgSession = require("connect-pg-simple")(session);
-const razorpay = require("razorpay");
+const razorpay = require("./razorpay");
 const crypto = require("crypto");
 
 // Import your email helper
