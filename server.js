@@ -2223,7 +2223,9 @@ app.post("/create-order", async (req, res) => {
 
 });
 
-app.post("/verify-payment", async (req, res) => {
+
+
+app.post("/verify-payment", (req, res) => {
 
   const {
     razorpay_order_id,
@@ -2231,30 +2233,24 @@ app.post("/verify-payment", async (req, res) => {
     razorpay_signature
   } = req.body;
 
+  if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+    return res.status(400).json({ error: "Missing payment data" });
+  }
+
   const body = razorpay_order_id + "|" + razorpay_payment_id;
 
   const expectedSignature = crypto
     .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-    .update(body)
+    .update(body.toString())
     .digest("hex");
 
-  if (expectedSignature !== razorpay_signature) {
-    return res.status(400).json({ success: false });
+  if (expectedSignature === razorpay_signature) {
+    res.json({ success: true });
+  } else {
+    res.status(400).json({ success: false, message: "Invalid signature" });
   }
-
-  await pool.query(
-    `UPDATE razorpay_transactions
-     SET razorpay_payment_id=$1,
-         razorpay_signature=$2,
-         payment_status='paid',
-         paid_at=NOW()
-     WHERE razorpay_order_id=$3`,
-    [razorpay_payment_id, razorpay_signature, razorpay_order_id]
-  );
-
-  res.json({ success: true });
-
 });
+
 // Start server
 app.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');
