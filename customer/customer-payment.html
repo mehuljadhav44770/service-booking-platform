@@ -284,12 +284,13 @@
 
   try {
 
-    // STEP 1: create razorpay order
+    // STEP 1: Create Razorpay Order
     const orderRes = await fetch(
-      "https://fixofix-service-booking-platform.onrender.com/create-order",
+      "https://fixofix-service-booking-platform.onrender.com/create-platform-fee-order",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           booking_id: bookingId,
           amount: platformFee
@@ -298,67 +299,72 @@
     );
 
     const orderData = await orderRes.json();
-    const order = orderData.order;
 
-    // STEP 2: open razorpay popup
+    if (!orderRes.ok) {
+      alert("Failed to create order");
+      btn.disabled = false;
+      return;
+    }
+
+    // STEP 2: Razorpay Checkout
     const options = {
-      key: "rzp_live_SQkOE7aw5Xchk9",
-      amount: order.amount,
+      key: orderData.key,
+      amount: orderData.amount,
       currency: "INR",
       name: "FixoFix",
       description: "Inspection Deposit",
-      order_id: order.id,
+      order_id: orderData.order_id,
 
       handler: async function (response) {
 
-        // STEP 3: verify payment
-        const verifyRes = await fetch(
-          "https://fixofix-service-booking-platform.onrender.com/verify-payment",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature
-            })
+        try {
+
+          // STEP 3: Verify Payment
+          const verifyRes = await fetch(
+            "https://fixofix-service-booking-platform.onrender.com/verify-platform-payment",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            }
+          );
+
+          const verifyData = await verifyRes.json();
+
+          if (!verifyRes.ok) {
+            alert("Payment verification failed");
+            btn.disabled = false;
+            btn.innerHTML = "Authorize Secure Payment";
+            return;
           }
-        );
 
-        if (!verifyRes.ok) {
-          alert("Payment verification failed");
-          btn.disabled = false;
-          return;
-        }
-
-        // STEP 4: call your existing platform-fee api
-        const res = await fetch(
-          "https://fixofix-service-booking-platform.onrender.com/platform-fee",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              booking_id: bookingId,
-              amount: platformFee,
-              method: selectedMethod
-            })
-          }
-        );
-
-        if (res.ok) {
-
-          btn.innerHTML = "Success ✅";
+          // SUCCESS
+          btn.innerHTML = "Payment Successful ✅";
           btn.style.background = "#22c55e";
 
           setTimeout(() => {
             window.location.href = "customer-dashboard.html";
           }, 1500);
 
-        } else {
-          alert("Payment record failed");
-          btn.disabled = false;
+        } catch (err) {
+
+          console.error(err);
+          alert("Verification error");
+
         }
 
+      },
+
+      modal: {
+        ondismiss: function () {
+          btn.disabled = false;
+          btn.innerHTML = "Authorize Secure Payment";
+        }
       },
 
       theme: {
@@ -372,11 +378,13 @@
   } catch (err) {
 
     console.error(err);
+    alert("Payment initialization failed");
     btn.disabled = false;
     btn.innerHTML = "Authorize Secure Payment";
 
   }
 }
+
 
 
   // 4. Back button logic

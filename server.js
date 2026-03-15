@@ -2191,65 +2191,115 @@ app.post("/verify-email-otp", async (req, res) => {
 
 });
 
-app.post("/create-order", async (req, res) => {
-
-  const { connection_id, amount } = req.body;
-
+app.post("/create-platform-fee-order", async (req, res) => {
   try {
 
+    const { booking_id, amount } = req.body;
+
     const options = {
-      amount: amount * 100,
+      amount: amount * 100, // paise
       currency: "INR",
-      receipt: "conn_" + connection_id
+      receipt: "booking_" + booking_id
     };
 
     const order = await razorpay.orders.create(options);
 
     await pool.query(
-      `INSERT INTO razorpay_transactions
-      (connection_id, razorpay_order_id, amount)
-      VALUES ($1,$2,$3)`,
-      [connection_id, order.id, amount]
+      `INSERT INTO platform_fees 
+      (booking_id, amount, gateway, razorpay_order_id, status)
+      VALUES ($1,$2,$3,$4,$5)`,
+      [
+        booking_id,
+        amount,
+        "razorpay",
+        order.id,
+        "pending"
+      ]
     );
 
     res.json({
-      order
+      success: true,
+      order_id: order.id,
+      amount: options.amount,
+      key: process.env.RAZORPAY_KEY_ID
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("Create Order Error:", err);
     res.status(500).json({ error: "Order creation failed" });
   }
-
 });
 
 
 
-app.post("/verify-payment", (req, res) => {
 
-  const {
-    razorpay_order_id,
-    razorpay_payment_id,
-    razorpay_signature
-  } = req.body;
+app.post("/verify-platform-payment", async (req, res) => {
+  try {
 
-  if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-    return res.status(400).json({ error: "Missing payment data" });
-  }
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature
+    } = req.body;
 
-  const body = razorpay_order_id + "|" + razorpay_payment_id;
+    const orderCheck = await pool.query(
+      `SELECT * FROM platform_fees WHERE razorpay_order_id=$1`,
+      [razorpay_order_id]
+    );
 
-  const expectedSignature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-    .update(body.toString())
-    .digest("hex");
+    if (orderCheck.rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid order"
+      });
+    }
 
-  if (expectedSignature === razorpay_signature) {
-    res.json({ success: true });
-  } else {
-    res.status(400).json({ success: false, message: "Invalid signature" });
+    const body = razorpay_order_id + "|" + razorpay_payment_id;
+
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(body)
+      .digest("hex");
+
+    if (expectedSignature === razorpay_signature) {
+
+      await pool.query(
+        `UPDATE platform_fees
+         SET 
+         razorpay_payment_id=$1,
+         razorpay_signature=$2,
+         status='paid',
+         paid_at=NOW()
+         WHERE razorpay_order_id=$3
+         AND status='pending'`,
+        [
+          razorpay_payment_id,
+          razorpay_signature,
+          razorpay_order_id
+        ]
+      );
+
+      res.json({
+        success: true,
+        message: "Payment verified"
+      });
+
+    } else {
+
+      res.status(400).json({
+        success: false,
+        message: "Invalid signature"
+      });
+
+    }
+
+  } catch (err) {
+    console.error("Verify Payment Error:", err);
+    res.status(500).json({ error: "Verification failed" });
   }
 });
+
+
 
 // Start server
 app.listen(3000, () => {
