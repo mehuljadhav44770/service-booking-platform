@@ -2233,7 +2233,9 @@ app.post("/create-platform-fee-order", async (req, res) => {
 
 
 
+
 app.post("/verify-platform-payment", async (req, res) => {
+
   try {
 
     const {
@@ -2242,17 +2244,7 @@ app.post("/verify-platform-payment", async (req, res) => {
       razorpay_signature
     } = req.body;
 
-    const orderCheck = await pool.query(
-      `SELECT * FROM platform_fees WHERE razorpay_order_id=$1`,
-      [razorpay_order_id]
-    );
-
-    if (orderCheck.rows.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid order"
-      });
-    }
+    console.log("VERIFY BODY:", req.body);
 
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
@@ -2261,43 +2253,39 @@ app.post("/verify-platform-payment", async (req, res) => {
       .update(body)
       .digest("hex");
 
-    if (expectedSignature === razorpay_signature) {
-
-      await pool.query(
-        `UPDATE platform_fees
-         SET 
-         razorpay_payment_id=$1,
-         razorpay_signature=$2,
-         status='paid',
-         paid_at=NOW()
-         WHERE razorpay_order_id=$3
-         AND status='pending'`,
-        [
-          razorpay_payment_id,
-          razorpay_signature,
-          razorpay_order_id
-        ]
-      );
-
-      res.json({
-        success: true,
-        message: "Payment verified"
-      });
-
-    } else {
-
-      res.status(400).json({
-        success: false,
-        message: "Invalid signature"
-      });
-
+    if (expectedSignature !== razorpay_signature) {
+      return res.status(400).json({ success: false });
     }
 
-  } catch (err) {
-    console.error("Verify Payment Error:", err);
-    res.status(500).json({ error: "Verification failed" });
+    await pool.query(
+      `UPDATE platform_fees
+       SET razorpay_payment_id=$1,
+           razorpay_signature=$2,
+           transaction_id=$3,
+           razorpay_response=$4,
+           status='paid',
+           paid_at=NOW()
+       WHERE razorpay_order_id=$5`,
+      [
+        razorpay_payment_id,
+        razorpay_signature,
+        razorpay_payment_id,
+        JSON.stringify(req.body),
+        razorpay_order_id
+      ]
+    );
+
+    res.json({ success: true });
+
+  } catch (error) {
+
+    console.error("Verify Error:", error);
+    res.status(500).json({ success: false });
+
   }
+
 });
+
 
 
 
