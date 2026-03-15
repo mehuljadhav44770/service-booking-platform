@@ -2234,6 +2234,7 @@ app.post("/create-platform-fee-order", async (req, res) => {
 
 
 
+
 app.post("/verify-platform-payment", async (req, res) => {
 
   try {
@@ -2244,27 +2245,28 @@ app.post("/verify-platform-payment", async (req, res) => {
       razorpay_signature
     } = req.body;
 
-    console.log("VERIFY BODY:", req.body);
-
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
     const expectedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(body)
+      .update(body.toString())
       .digest("hex");
 
+    console.log("Expected:", expectedSignature);
+    console.log("Received:", razorpay_signature);
+
     if (expectedSignature !== razorpay_signature) {
-      return res.status(400).json({ success: false });
+      console.log("Signature verification failed");
+      return res.status(400).json({ success:false });
     }
 
-    await pool.query(
+    const result = await pool.query(
       `UPDATE platform_fees
        SET razorpay_payment_id=$1,
            razorpay_signature=$2,
            transaction_id=$3,
            razorpay_response=$4,
-           status='paid',
-           paid_at=NOW()
+           status='paid'
        WHERE razorpay_order_id=$5`,
       [
         razorpay_payment_id,
@@ -2275,16 +2277,19 @@ app.post("/verify-platform-payment", async (req, res) => {
       ]
     );
 
-    res.json({ success: true });
+    console.log("Rows updated:", result.rowCount);
 
-  } catch (error) {
+    res.json({ success:true });
 
-    console.error("Verify Error:", error);
-    res.status(500).json({ success: false });
+  } catch(err) {
+
+    console.error("Verification error:", err);
+    res.status(500).json({ success:false });
 
   }
 
 });
+
 
 
 
